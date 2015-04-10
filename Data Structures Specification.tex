@@ -1,0 +1,511 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[american]{babel}
+\usepackage{fontenc}
+\usepackage{graphicx}
+\usepackage{verbatimbox}
+\usepackage{hyperref}
+\usepackage{paralist}
+
+\input{Common}
+
+\title{\longProduct{} Data Structures Specification}
+\author{\yannis}
+
+\let\Item\item
+\newcommand\SpecialItem{\renewcommand\item[1][]{\Item[\textbullet~\bfseries##1]}
+}
+\renewcommand\enddescription{\endlist\global\let\item\Item}
+
+\newcommand{\common}{{\em Common}}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section{Purpose}
+This document specifies the core data structures that are used by the \shortProduct{} software implementation. It covers the entities \client{}~\ref{sec:structure:client} and 
+\server{}~\ref{sec:structure:server}. Structures common to more than one entity are under~\ref{sec:structure:common} and they are referred under entity \common{}.
+
+\section{References}
+For the project overview, see~\cite{project_spec}. For the flows and protocols specification, see~\cite{flow_spec}.
+
+\section{Definitions, Nomenclature and Conventions}
+
+\subsection{Portability}
+The data structures and their fields are specified in a way that is independent from the programming language and the execution platform. For integer types, the width is specified 
+to avoid platform-dependent implementations from diverging. String and composite types (maps, hashtables, etc) are SDK-dependent, but implementation should not rely on any uncommon 
+and SDK-specific behavior (eg, string can correctly be interpreted as an STL or Java string, but any requirement of the type beyond that is not intended).
+
+\subsection{Attributes}
+Data structures are marked with a set of attributes. A list of markers in all caps appears after the data structure. These attributes are:
+
+\newcommand{\persistent}{\MakeUppercase{persistent}}
+\newcommand{\ephemeral}{\MakeUppercase{ephemeral}}
+\newcommand{\secure}{\MakeUppercase{secure}}
+\newcommand{\unsecure}{\MakeUppercase{unsecure}}
+\newcommand{\infrastructure}{\MakeUppercase{infrastructure}}
+\newcommand{\unique}{\MakeUppercase{unique}}
+
+\begin{description}
+ \item[\persistent] The data structure persists process restarts. For the client, this translates to the structure stored in the application storage space. For the server, that it 
+is stored in the database or the filesystem.
+ \item[\ephemeral] The opposite of \persistent. The data structure remains only in memory.
+ \item[\secure] The data structure is to be stored in secure storage. Such data structures cannot leak or be tampered with. For the client, it is stored preferably in an encrypted 
+lightweight database, such as SQLCipher~\cite{sql_cipher}. For the server, it means stored in a database that is secured and its installation hardened. \secure{} normally implies 
+\persistent, although it is in theory possible that \ephemeral{} structures are secured in memory.
+ \item[\unsecure] The data structure is not stored in secure storage. Such data structures can leak or be tampered without loss of information or compromising operation. An example 
+is UI settings.
+ \item[\infrastructure] Infrastructure data structures are used to compose higher level structures. They do not appear independently, therefore the infrastructure attribute is 
+expected to appear alone.
+ \item[\unique] This data structure is expected to have only one instantiation in each process. {\em Attention: this does not mean that the structure is to be implemented as a 
+singleton}. Treat this attribute as informative and only as informative. This specification may change at any time due to requirement changes.
+\end{description}
+
+\subsection{Comments}
+After the specification of the data structure, a short explanation of its functionality and its usage may follow. This explanation should be treated as informative and not as part 
+of the specification.
+
+\subsection{Naming}
+A data structure $X$ for entity $Y$ is specified in a section named after $Y$. When referring to $X$ from another section, its name is $Y.X$. Field $Z$ within $X$ is referred to 
+as $X.Z$ ($Y.X.Z$ from another entity section).
+
+All type names are upper CamelCase. All field names are lower camelCase.
+
+\subsubsection{Non-native Primitive Types}
+There are some field types, for example RSA keys, that are non-native, but are used in the specification as native. We assume that such types come from a library and their 
+specification is implied by the library's API. As long as their intended functionality is well understood, we do not specify them further. If some points need to be elaborated on, 
+details are provided in the comments.
+
+\subsubsection{Containers and Enums}
+Containers, such as maps and lists, are denoted with their properties. For example, a FIFO queue is denoted as such, although the platform implementation may be something like 
+$deque$ in STL. We denote the types of their parameters inside parentheses, separated by colons. Therefore, a map from type $A$ to type $B$ is denoted as $map(A:B)$.
+
+Enumerations are denoted as $\{ A, B, \dots \}$ where $A, B, \dots$ are members of the enumeration. Enumeration members are written in upper CamelCase.
+
+\subsubsection{Inheritance, Typedefs and Templates}
+A data structure $B$ extending $A$ is denoted as
+
+\begin{verbbox}
+B extends A
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+When a structure $B$ is a typedef of $A$, it is denoted as
+
+\begin{verbbox}
+B = A
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+A template class $A$ with template parameters $B$ and $C$ is denoted as
+
+\begin{verbbox}
+A<B, C>
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+For programming languages that do not support template constructs, inheritance can be used to achieve the same effect.
+
+\subsection{Database}
+
+\subsection{Primary and Foreign Keys}
+We define where applicable what the primary key is for a structure and which fields are foreign keys. If the structure has a field named $id$, this is implicitly the primary key. 
+If a structure has a primary key that is not named $id$, we explicitly define it.
+
+\subsubsection{State}
+Some of the operations on server structures involve manipulating state (\ref{sec:structure:RegistrationCodeMap}). These operations must be performed in the database, not the 
+server code, which is stateless. If the database does not have the appropriate mechanisms to execute them, in the manner of MySQL triggers (\cite{mysql_trigger}), then some 
+creative solution, like a garbage collection process, must be implemented.
+
+\subsection{Initial Values and Default Values}
+Where applicable we define where the initial value for a field comes from and what the default value is when the source is allowed to not provide one.
+
+\subsection{Time}
+All time-related fields are specified as having type {\em time}. This should be interpreted as a UNIX timestamp or any equivalent structure that carries full timezone information. 
+All timestamps are generated at the server, for consistency across the system. In case the server is distributed, all server-side processes (including the DB) must share a common 
+clock.
+
+\section{Specification}
+
+\subsection{Common}
+\label{sec:structure:common}
+
+\subsubsection{UserAgent}
+
+\begin{verbbox}
+UserAgent
+{
+  platform, string
+  version, string
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This structure is a representation of the type of client. It is built at process startup.
+
+\SpecialItem
+\begin{description}
+ \item[platform] The platform information given by the system. This usually contains OS, OS version, hardware information, etc.
+ \item[version] The version of the user agent. The type may change to something more structured.
+\end{description}
+
+\subsubsection{Client}
+
+\begin{verbbox}
+Client extends UserAgent
+{
+  id, 64-bit unsigned integer
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This structure extends a user agent with a unique id across a user. The $id$ field is not a primary key for the system, it is a primary key inside a User clients map 
+(see~\ref{sec:structure:server:user}).
+
+\subsubsection{User}
+
+\begin{verbbox}
+User = 64-bit unsigned integer
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This is the base for any type of User. It is a simple typedef to an id, which acts as the key of any subtype.
+
+\subsubsection{TimeoutMap}
+
+\begin{verbbox}
+TimeoutMap<T>
+{
+  timeout, 16-bit unsigned integer,
+    initial value from configuration, default = 60 000 (1'')
+  Map = map(T:time)
+  entries, Map
+  entriesList, FIFO queue(Map.iterator)
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This structure is a map for expirable objects and for periodically garbage-collecting items that have expired. The garbage collection can be triggered periodically (the period 
+should not be less than two times the timeout value) or when the map size has exceeded some threshold.
+
+Note that entries are removed from the map only during garbage collection. If a lookup operation retrieves an expired entry, it is not removed from the map, because the 
+corresponding iterator needs to be removed from the list. This can be implemented, but it would complicate the code and it would degrade performance, for minimal gain in memory 
+consumption.
+
+\SpecialItem
+\begin{description}
+ \item[timeout] The time in msecs for which an entry is considered active. If a platform offers a type for time difference, like C++11 does, this more appropriate type must be 
+used for the field.
+ \item[entries] It maps objects of type $T$ to a timestamp produced when an object is inserted into the map. If hash maps are available for the platform, they must be used instead 
+of a map.
+ \item[entriesList] This list is used to garbage-collect items efficiently. The entries point to items in the orders map. The FIFO nature of the queue ensures that garbage 
+collection can start from the oldest entry and proceed until an unexpired entry is found. The cost of garbage collection is constant per entry. Please note that if a platform 
+doesn't support iterators, the entry id can be used as the value type.
+\end{description}
+
+\subsection{Client}
+\label{sec:structure:client}
+
+\subsubsection{User}
+
+\begin{verbbox}
+User extends Common.User
+{
+  client, Client
+  privateKey, RSA private key
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \unique
+ \item \secure
+ \item \persistent
+\end{inparaitem}
+
+\paragraph*{Comments}
+This data structure holds the information related to the customer using the application.
+
+\SpecialItem
+\begin{description}
+ \item[client] The id of the client and the user agent information.
+ \item[privateKey] A pair of public/private RSA keys is generated by the client at first use. The public key is sent to the server, as it is used to verify the client's signature. 
+The private key is kept by the client for signing.
+\end{description}
+
+\subsubsection{ContactType}
+\begin{verbbox}
+ContactType = { MSISDN, Email, Facebook, Skype, Twitter, Address,
+                Other }
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+ContactType is an enum of all the possible types that the system knows. $Other$ is the default type.
+
+\subsubsection{Contact}
+
+\begin{verbbox}
+Contact
+{
+  target, string
+  type, ContactType
+  attributes, list((string,string))
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\SpecialItem
+\begin{description}
+ \item[target] We assume that the target is normalized and validated by the platform and it is given in its normalized form from the platform SDK. If it turns out that this is not 
+the case for a platform and contact type, the client will apply normalization before importing contacts of this type.
+ \item[type] The type reported by the platform is matched to one of the members of ContactType.
+ \item[attributes] A list of key-value pairs. These are transported from client to client and are inserted to the receiver's contact book by a contact adaptor that runs in the 
+context of the receiving client. This way if the contacts representation for one platform changes, backwards compatibility is not a problem and the adaptors of other platforms can 
+be updated to cover the changes. The attributes are containing essentially any optional contact information.
+\end{description}
+
+\paragraph*{Comments}
+This is a central structure that represents a simple contact. The only fields that are mandatory are target and type, which are used to calculate the hash of the contact. 
+
+\SpecialItem
+\begin{description}
+ \item[Primary Key] target, type
+\end{description}
+
+\subsubsection{PersonalName}
+
+\begin{verbbox}
+PersonalName
+{
+  first, string
+  middle, string
+  last, string
+  title, string
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This data structure represents a personal name that is part of a contact card. All fields may be empty, in which case the UI must surface a contact as display name. The rules 
+for what is being displyed are specified in~\cite{flow_spec}.
+
+\subsubsection{ContactCard}
+
+\begin{verbbox}
+ContactCard
+{
+  id, 64-bit unsigned integer
+  name, PersonalName
+  contacts, set(Contact)
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\SpecialItem
+\begin{description}
+ \item[id] This is generated by the client and it is a serial number.
+ \item[name] It comes from the platform contact book.
+ \item[contacts] It comes from the platform contact book.
+\end{description}
+
+\subsubsection{ContactBook}
+
+\begin{verbbox}
+ContactBook = set(ContactCard)
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \persistent
+ \item \unsecure
+ \item \unique
+\end{inparaitem}
+
+\paragraph*{Comments}
+This is the internal representation of the contact book of the device. It is indexed by $ContactCard.id$.
+
+\subsection{Server}
+\label{sec:structure:server}
+
+\subsubsection{Client}
+
+\begin{verbbox}
+Client extends Common.Client
+{
+  registered, boolean, initial value is false
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+
+The structure extends a client description with a field to indicate whether this client has been registered or its registration is pending and can be garbage-collected.
+
+\subsubsection{User}
+\label{sec:structure:server:user}
+
+\begin{verbbox}
+User
+{
+  id, 64-bit unsigned integer
+  handle, Handle
+  clients, map(Client, RSA public key)
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This data structure holds the information related to a user and its registered clients.
+
+\SpecialItem
+\begin{description}
+ \item[id] This number uniquely identifies the user across the system. It is a primary key in the user's table in the server DB. The server generates this id.
+ \item[handle] The Handle structure is an abstraction that can cover any type of user identification that can act as a communication channel. For example, email address, phone 
+number, street address, etc. The exact requirement will come later. For now, assume it is an email address.
+ \item[clients] A map from $Client$ to its RSA public key. Each user client has its own public/private key.
+\end{description}
+
+\subsubsection{UserSet}
+
+\begin{verbbox}
+UserSet = set(User)
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \secure
+ \item \persistent
+ \item \unique
+\end{inparaitem}
+
+\paragraph*{Comments}
+A set of $User$ objects, indexed by $User.id$. This is the global user table and entry point for retrieving user related information.
+
+\subsubsection{RegistrationCode}
+
+\begin{verbbox}
+RegistrationCode
+{
+  userId, 64-bit unsigned integer
+  clientId, 64-bit unsigned integer
+  code, 6-digit decimal number
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+A registration code is a four digit code that is generated by the server to authenticate a client.
+
+\SpecialItem
+\begin{description}
+ \item[Primary Key] All three fields.
+ \item[Foreign Key] The pair of userId and clientId is a foreign key, in the sense that userId needs to be in UserSet and clientId needs to be in the clients set for the user.
+\end{description}
+
+\subsubsection{RegistrationCodeMap}
+\label{sec:structure:RegistrationCodeMap}
+
+\begin{verbbox}
+RegistrationCodeMap = TimeoutMap<RegistrationCode>
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\paragraph*{Comments}
+Registration codes expire. When the server receives a registration code, it looks it up in this map and if it exists and it hasn't timed out, it authorizes the action.
+
+When a registration code expires, we need to perform some cleanup in UserSet to remove clients that were not activated and users that never completed the registration. When entry 
+$E=\langle code_E,userId_E,clientId_E\rangle$ expires, we look up $userId_E$ in UserSet. We retrieve UserSet($userId_E$).clients($clientId_E$) from that and check if the 
+registered field is false. If it is, we remove the entry. If UserSet($userId_E$).clients is empty now, we remove UserSet($userId_E$), because the user never completed the 
+registration flow.
+
+\bibliography{spec,dataStructures}
+\bibliographystyle{plain}
+
+\end{document}

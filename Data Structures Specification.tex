@@ -366,7 +366,7 @@ PersonalName
 
 \paragraph*{Comments}
 This data structure represents a personal name that is part of a contact card. All fields may be empty, in which case the UI must surface a contact as display name. The rules 
-for what is being displyed are specified in~\cite{flow_spec}.
+for what is being displayed are specified in~\cite{flow_spec}.
 
 \subsubsection{ContactCard}
 
@@ -595,7 +595,7 @@ ContactPointer
 \end{inparaitem}
 
 \paragraph*{Comments}
-This structure represents all the occurences of a contact in a user's client's contact books. It is used as a building block for 
+This structure represents all the occurrences of a contact in a user's client's contact books. It is used as a building block for 
 ContactNode~\ref{sec:structure:server:contact_node}.
 
 \SpecialItem
@@ -611,7 +611,7 @@ set of contacts.
 ContactNode
 {
   owner, ContactPointer
-  referers, set(ContactPointer)
+  referrers, set(ContactPointer)
 }
 \end{verbbox}
 \begin{center}
@@ -623,9 +623,9 @@ ContactNode
 \end{inparaitem}
 
 \paragraph*{Comments}
-This is a node in the directed graph of contact relationships. This structure denotes that a set of users (the referers) have the owner's contact in their contact book. Therefore 
-in the graph for each user in referers there is a directed edge to owner (\ref{sec:structure:server:hashes}). The client and contact ids are kept together to facilitate looking up 
-the client that needs to be contacted by the server if something changes.
+This is a node in the directed graph of contact relationships. This structure denotes that a set of users (the referrers) have the owner's contact in their contact book. Therefore 
+in the graph for each user in referrers there is a directed edge to owner (\ref{sec:structure:server:hashes}). The client and contact ids are kept together to facilitate looking 
+up the client that needs to be contacted by the server if something changes.
 
 \subsubsection{Hashes}
 \label{sec:structure:server:hashes}

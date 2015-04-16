@@ -1,0 +1,73 @@
+\documentclass[a4paper, twoside, 10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{verbatimbox}
+\usepackage{hyperref}
+\usepackage{tabularx}
+
+\input{Common}
+
+\title{\longProduct{} System}
+\author{\yannis}
+
+\setcounter{secnumdepth}{5}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document describes a system for contacts discovery. We outline the idea, its business case and system architecture.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+The purpose of the \longProduct{} system (\commercialName{}) is to allow people that have a common friend exchange contact information on their smartphones and keep this contact 
+information up to date.
+
+There are two points of emphasis: automated contact information exchange and maintenance, and privacy. On one hand, users are able to receive contact information without manually 
+entering the information in their contacts books. On the other hand, each user's information is transmitted to someone else only with their explicit consent and the server doesn't 
+have access to the users' contact or other information.
+
+\section{Purpose and Use Cases}
+
+\commercialName{} is meant as a complement to smartphone contact books that allows ease of adding new entries and keeping existing entries up to date. Some use cases are:
+
+\begin{itemize}
+  \item Alice just moved to a new city where she knows only Bob. She meets Cloe, a friend of Bob's. Alice, Bob and Cloe all use \commercialName{}. Alice doesn't have to write 
+down Cloe's phone number, email or Facebook handle. She can search for Cloe in her two-degrees of separation radius and make a request through \commercialName{}. Cloe accepts and 
+they exchange information in a matter of seconds.
+  \item Alice knows Bob and Cloe, who both know Dave, who knows Ellen who turns out to be a colleague of Alice. Alice and Dave have met, but they haven't had the opportunity to 
+exchange phone numbers. \commercialName{} has detected that Alice and Dave have a high probability to know each other and has them as each other suggested connection. Dave asks 
+Alice through the app for her phone number. Alice accepts and they exchange numbers.
+  \item Alice is the CEO of her company. She goes into a meeting with Bob, her CFO. Bob has arranged this meeting with Cloe and Dave, the founders of a startup, which were brought 
+into contact with Bob through Ellen and Fred who work for a bank. All six of them enter the meeting and never take out their business cards for the traditional card swap frenzy, 
+because they use \commercialName{}. \commercialName{} has exchanged information for everybody already, with their picture if available, so they can keep track of who is who. No 
+one has to add a card to a Rolodex holding 1000 cards or lose one in the laundry or Google to connect a face with a name.
+  \item Alice has quit her company and with that her business phone number. She got a new number, but now she needs to notify everyone. Except that \commercialName{} has detected 
+the new number and has updated all her friends and family's contact books with the new number.
+\end{itemize}
+
+\subsection{Privacy}
+
+While all the above use cases involve the exchange of private and sensitive information, the servers of \commercialName{} do not see or store any of it. There is a perfect privacy 
+layer around all exchanges. The servers have two functions:
+
+\begin{itemize}
+ \item Transports of messages. These messages are encrypted and only the participating users can see their content.
+ \item They detect which users have a high probability that they know each other and suggest them as contacts or search them in the two degrees of separation radius. However, no 
+user app ever sends their contact information to the server, not even their name. All the information matching is done on cryptographically secure blinded representations.
+\end{itemize}
+
+As a result the service itself knows nothing about the users. The users can even check what leaves their clients and the client code is open-sourced, so that security experts can 
+verify that no information leaks from the client.
+
+\section{Competitive Analysis}
+
+\section{References}
+For detailed system design, see~\cite{data_structure_spec},~\cite{flow_spec},~\cite{UI_spec},~\cite{crypto_spec}.
+
+\bibliography{spec,project}
+\bibliographystyle{plain}
+
+\end{document}

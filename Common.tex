@@ -1,9 +1,29 @@
+\usepackage[utf8]{inputenc}
+\usepackage[american]{babel}
+\usepackage{fontenc}
+\usepackage{graphicx}
+\usepackage{verbatimbox}
+\usepackage{hyperref}
+\usepackage{paralist}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{enumitem}
+
+
 \newcommand{\yannis}{Yannis Ioannidis}
 \newcommand{\longProduct}{Contacts Discovery}
 \newcommand{\shortProduct}{CD}
 \newcommand{\commercialName}{CD}
 \newcommand{\client}{{\em Client}}
 \newcommand{\server}{{\em Server}}
+\newcommand{\user}{{\em user}}
 \newcommand{\Server}{{\em \MakeUppercase{server}}}
 \newcommand{\Client}{{\em \MakeUppercase{client}}}
 \newcommand{\User}{{\em \MakeUppercase{user}}}
+
+\author{\yannis}
+
+\let\Item\item
+\newcommand\SpecialItem{\renewcommand\item[1][]{\Item[\textbullet~\bfseries##1]}
+}
+\renewcommand\enddescription{\endlist\global\let\item\Item}

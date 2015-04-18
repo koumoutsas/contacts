@@ -8,9 +8,8 @@
 \usepackage{enumerate}
 \usepackage{amsmath}
 \usepackage{enumitem}
+\usepackage{gitinfo}
 
-
-\newcommand{\yannis}{Yannis Ioannidis}
 \newcommand{\longProduct}{Contacts Discovery}
 \newcommand{\shortProduct}{CD}
 \newcommand{\commercialName}{CD}
@@ -21,7 +20,8 @@
 \newcommand{\Client}{{\em \MakeUppercase{client}}}
 \newcommand{\User}{{\em \MakeUppercase{user}}}
 
-\author{\yannis}
+\author{\gitAuthorName{}\\\gitAuthorEmail{}}
+\date{\gitAuthorDate{}\\Version \gitAbbrevHash{} \gitVtag{}}
 
 \let\Item\item
 \newcommand\SpecialItem{\renewcommand\item[1][]{\Item[\textbullet~\bfseries##1]}

@@ -5,5 +5,5 @@
 *.log
 *.out
 *.toc
-*.tex.backup
+*.*.backup
 gitHeadInfo.gin

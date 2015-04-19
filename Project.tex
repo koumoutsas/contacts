@@ -1,9 +1,8 @@
-\documentclass[a4paper, twoside, 10pt]{article}
+\documentclass[a4paper, 10pt]{article}
 
 \input{Common}
 
 \title{\longProduct{} System}
-\author{\yannis}
 
 \setcounter{secnumdepth}{5}
 
@@ -59,6 +58,30 @@ As a result the service itself knows nothing about the users. The users can even
 verify that no information leaks from the client.
 
 \section{Competitive Analysis}
+
+\section{Target Platforms}
+
+\subsection{OS}
+The initial release targets Android and iOS. We do not target Windows Phone or other mobile OSs, because their combined market share is around 3.7\% at Q4 of 
+2014~\cite{mobile_os_share}. We do not target desktop OSs in the first release, because retrieving contact books on a desktop platform requires a lot more effort (there is no 
+single API to retrieve all contact books from Outlook or Google, for example) and such a service for desktop platforms is a better fit for B2B, which is not a goal for the first 
+release. However, it is something that we will keep under consideration for future releases.
+
+\subsubsection{Version}
+\begin{description}
+ \item[Android] 4.2 and above. The reason is that TLS v1.2 is not supported for earlier versions, which creates some security concerns~\cite{crypto_spec}. We could target 
+earlier versions with the appropriate patches and server configuration, but the total market share for Android 4.1 and earlier is 22\% and dropping~\cite{android_version_share}. 
+For a future release it may make sense to extend support to 4.1, which are installed on a little less than 12.7\% of smartphones worldwide, assuming that by the time the first 
+release is ready their share has not dropped significantly and the implementation doesn't introduce security risks and doesn't require a large effort.
+ \item[iOS] 8 and above. According to~\cite{ios_version_share} the worldwide share of devices that have iOS 7 or earlier is 5\% and it is dropping extremely fast. We are not 
+planning to extend support for iOS eralier than 8 in the future.
+\end{description}
+
+\subsection{Device Type}
+We are targeting only phones for the initial release, but not tablets. The reason is that users do not use tablets to store their contacts, but rather their phone. The 
+implementation effort to develop a UI for tablets will be estimated after the first release and a decision will be made according to the effort and benefit for tablets. The 
+capability to have multiple devices for the same account is provided for in the specifications of the first release, so supporting tablets is a matter of designing the UI layer 
+for them.
 
 \section{References}
 For detailed system design, see~\cite{data_structure_spec},~\cite{flow_spec},~\cite{UI_spec},~\cite{crypto_spec}.

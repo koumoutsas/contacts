@@ -1,0 +1,140 @@
+\documentclass[a4paper,10pt,draft]{article}
+
+\input{Common}
+
+\newcommand{\signedUserData}{\emph{signedUserData}}
+\newcommand{\newPublicKey}{\emph{newPublicKey}}
+\newcommand{\newPrivateKey}{\emph{newPrivateKey}}
+\newcommand{\code}{\emph{code}}
+\newcommand{\serverVerified}{\emph{serverVerified}}
+\newcommand{\handle}{\emph{handle}}
+\newcommand{\personalData}{\emph{personalData}}
+\newcommand{\registrationCode}{\emph{registrationCode}}
+\newcommand{\userAgent}{\emph{userAgent}}
+\newcommand{\privateKey}{\emph{privateKey}}
+\newcommand{\publicKey}{\emph{publicKey}}
+\newcommand{\userId}{\emph{userId}}
+\newcommand{\clientId}{\emph{clientId}}
+\newcommand{\loggedIn}{\emph{loggedIn}}
+\newcommand{\fixedString}{\emph{fixedString}}
+\newcommand{\removeUser}{\emph{removeUser}}
+\newcommand{\newHandle}{\emph{newHandle}}
+
+\title{\longProduct{} System Flows and Protocols Specification}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Purpose}
+This document specifies the protocols and flows executed for the \longProduct{} system (\shortProduct{}) between the \server{} and \client{} entities. The protocols cover contact 
+management and administration flows (account creation, account deletion, etc).
+
+\section{References}
+For the project overview, see~\cite{project_spec}. For the supporting data structures, see~\cite{data_structure_spec}. For details about security and cryptography, 
+see~\cite{crypto_spec}. For the client UI elements specification, see~\cite{UI_spec}.
+
+\section{Definitions, Nomenclature and Conventions}
+
+\subsection{Entities}
+We refer to three entities in this document. These represent different participants in a flow. A short explanation on each one follows. For more detail on their role in the 
+system, see~\cite{project_spec}. Entities are denoted in all uppercase.
+
+\begin{description}
+ \item[\Server{}] includes the central business logic, the database and all interfaces to third-party systems for, among others, sending out notifications and mail.
+ \item[\Client{}] is an abstraction of a user agent. It usually refers to the mobile app that a customer uses, but it can extend to desktop applications, test clients, etc.
+ \item[\User{}] This is a special entity that refers to the human using \Client{}. It is used for flow steps that require interaction between the client user agent and the human 
+user. This entity is not used for protocol specifications. It is used in flow specifications to disambiguate the origin and target of some steps.
+\end{description}
+
+\subsection{Notation for Variables}
+\label{sec:variable_notation}
+Because in each flow or protocol multiple participants are involved, variables are denoted with a hierarchical name, with each level denoted as a dot. For example, variable $X$ of 
+entity $Y$ is denoted as $Y.X$. Inputs and outputs are considered variables.
+
+Variables are declared as
+\begin{center}
+$\langle Entity\rangle.\langle Name\rangle:\langle type\rangle\{[qualification_1, qualification_2, \dots]\}$.
+\end{center}
+
+For example, let $bar$ be an unsigned integer variable of entity $foo$, that takes values in the range $[10,100]$ and has default value 5. The declaration would look like:
+
+\begin{center}
+ foo.bar:unsigned integer[range:[10,100],default value:5].
+\end{center}
+
+The qualifications parts is optional and its syntax is that of a $key:value$ pair.
+
+A data structure $D$ may appear without prior definition, when it has been specified in~\cite{data_structure_spec}. For specifications of types related to security and 
+cryptography, such as registration codes and RSA keys, see~\cite{crypto_spec}.
+
+All variable names are small camelCase.
+
+\subsection{Flow Specifications Organization and 
+Format}\label{sec:flow_spec_def}
+Each flow description is organized in the following sections:
+
+\begin{description}
+ \item[Description] What the flow does.
+ \item[Participants] A list of participating entities.
+ \item[Inputs] A list of the inputs to the flow. See~\ref{sec:variable_notation} for the variable syntax.
+ \item[Outputs] A list of the expected outputs to the flow. The syntax is the same as for inputs. Their description may be simplified when their meaning can be inferred from a 
+more informal description.
+ \item[Other variables] Any other variables that are instantiated during the flow.
+ \item[Local definitions] Definitions of functions that are local to the flow. We provide in~\ref{sec:definitions} some common global definitions, but there may be local functions 
+that only make sense in the context of a flow.
+ \item[Steps] An enumeration of the steps. The first word in each step is the initiating entity, meaning the entity that sends a message in this step.
+\end{description}
+
+\subsection{Protocol Specifications Organization and Format}
+
+\subsection{Definitions}\label{sec:definitions}
+
+\begin{description}
+ \item[Public/Private Key] The public and private keys for entity $A$ are denoted as $K_{public}^A$ and $K_{private}^A$. The encryption of message $m$ for entity $A$ with key 
+$K_{public}^A$ is denoted as $E(A,m)$. The decryption of encrypted message $d$ by entity $A$ with key $K_{private}^A$ is denoted as $D(A,d)$. The identity $m=D(A,E(A,m))$ holds.
+ \item[Signature and Verification] The signing and verification keys for entity $A$ are denoted as $K_{sign}^A$ and $K_{verify}^A$. The signature of message $m$ by entity $A$ is 
+denoted as $S(A,m)$. The verification of signature $s$ produced by $A$ is denoted as $V(A,s)$. The identity $m=V(A,S(A,m))$ holds.
+
+Note that signing a message $m$ involves signing a hash of $m$ and accompanying the signature with $m$. This means that when \Client{} signs a message $m$ and sends the signature 
+$s$ to \Server{}, \Server{} knows from $s$ the details of the message, like the client id, without having to decrypt $s$ first. See~\cite{crypto_spec} for more details.
+\end{description}
+
+\subsection{Alternative Steps}
+Some parts of the flow may have alternative specifications. These alternatives originate from usability concerns or uncertainty about hardware components, which may require 
+multiple ways to effect the same action. Alternative steps are defined after the primary specification.
+
+Alternative flow steps should be considered as future extensions. Initial implementation follows the primary flow specification, but it should take into account that alternative 
+steps may replace the primary ones or that extensions of the implementation may incorporate multiple alternatives. Details about implementation priority and plans for these 
+alternatives can be found in accompanying footnotes.
+
+\section{Flows}
+
+\subsection{Implicit Flow Branches}
+Some flow branches are repeated and are followed under common triggers. To avoid cluttering the main flows, we define them here.
+
+\subsubsection{Registration Code Verification}
+When a step states that \Server{} checks the registration code, the following steps are implied:
+
+\begin{enumerate}
+ \item \Server{} checks the registration code in $RegistrationCodeMap$, with the key being \userId{} and \clientId{}.
+ \begin{enumerate}
+  \item If the checks succeeds, \Server{} removes the entry from\\$RegistrationCodeMap$.
+  \item If the checks fails, \Server{} sends error to the entity that requested the check and terminates the flow.
+ \end{enumerate}
+\end{enumerate}
+
+\subsubsection{Flow Termination with Error on Failed Commit}
+Steps which state that entity $X$ commits $Y$ to the DB imply a flow branch that is followed when the commit operation fails. In this case, $X$ terminates the flow with an error. 
+In most cases, error flows are inferable from other error branches. When this is not possible, the branch is declared explicitly. 
+
+\subsubsection{\Server{} Errors}
+All flows involving \Server{} and another entity may fail for various reasons, such as \userId{} or \clientId{} being unknown or the signature verification failing. For security, 
+\Server{} does not reveal the specific reason the operation failed. Therefore, when, for example, a registration code verification fails, the message from \Server{} to \Client{} 
+does not differentiate between all the reasons the verification may fail.
+
+\bibliography{spec}
+\bibliographystyle{plain}
+
+\end{document}

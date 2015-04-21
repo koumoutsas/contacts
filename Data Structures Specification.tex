@@ -103,9 +103,9 @@ For programming languages that do not support template constructs, inheritance c
 
 \subsection{Database}
 
-\subsection{Primary and Foreign Keys}
-We define where applicable what the primary key is for a structure and which fields are foreign keys. If the structure has a field named $id$, this is implicitly the primary key. 
-If a structure has a primary key that is not named $id$, we explicitly define it.
+\subsection{Keys, Indexes, Primary and Foreign Keys}
+We define where applicable what the primary key is for a structure, which fields are foreign keys, which are keys and which have indexes. If the structure has a field named $id$, 
+this is implicitly the primary key. If a structure has a primary key that is not named $id$, we explicitly define it.
 
 \subsubsection{State}
 Some of the operations on server structures involve manipulating state (\ref{sec:structure:RegistrationCodeMap}). These operations must be performed in the database, not the 
@@ -470,7 +470,7 @@ User
 {
   id, Id
   handle, Handle
-  clients, map(Client, RSA public key)
+  clients, map(Client, {RSA public key, ECDSA verification key})
 }
 \end{verbbox}
 \begin{center}
@@ -487,9 +487,15 @@ This data structure holds the information related to a user and its registered c
 \SpecialItem
 \begin{description}
  \item[id] This number uniquely identifies the user across the system. It is a primary key in the user's table in the server DB. The server generates this id.
- \item[handle] The Handle structure is an abstraction that can cover any type of user identification that can act as a communication channel. For example, email address, phone 
-number, street address, etc. The exact requirement will come later. For now, assume it is an email address.
+ \item[handle] The Handle structure is an abstraction that can cover any type of user identification that can act as a communication channel. For now we assume it is an email 
+address. We cannot use a phone number or anything that is tied to the user's identity, because it leaks information to the server. One possibility is to direct the user to 
+one-time mail address services.
  \item[clients] A map from $Client$ to its RSA public key. Each user client has its own public/private key.
+\end{description}
+
+\SpecialItem
+\begin{description}
+ \item[Index] handle. The reason is that the device registration flow requires looking up id with handle as input.
 \end{description}
 
 \subsubsection{UserSet}

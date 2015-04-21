@@ -13,6 +13,8 @@
 \newcommand{\userAgent}{\emph{userAgent}}
 \newcommand{\privateKey}{\emph{privateKey}}
 \newcommand{\publicKey}{\emph{publicKey}}
+\newcommand{\signKey}{\emph{signKey}}
+\newcommand{\verifyKey}{\emph{verifyKey}}
 \newcommand{\userId}{\emph{userId}}
 \newcommand{\clientId}{\emph{clientId}}
 \newcommand{\loggedIn}{\emph{loggedIn}}
@@ -32,14 +34,14 @@ This document specifies the protocols and flows executed for the \longProduct{} 
 management and administration flows (account creation, account deletion, etc).
 
 \section{References}
-For the project overview, see~\cite{project_spec}. For the supporting data structures, see~\cite{data_structure_spec}. For details about security and cryptography, 
-see~\cite{crypto_spec}. For the client UI elements specification, see~\cite{UI_spec}.
+For the project overview, see \cite{project_spec}. For the supporting data structures, see \cite{data_structure_spec}. For details about security and cryptography, 
+see \cite{crypto_spec}. For the client UI elements specification, see \cite{UI_spec}.
 
 \section{Definitions, Nomenclature and Conventions}
 
 \subsection{Entities}
 We refer to three entities in this document. These represent different participants in a flow. A short explanation on each one follows. For more detail on their role in the 
-system, see~\cite{project_spec}. Entities are denoted in all uppercase.
+system, see \cite{project_spec}. Entities are denoted in all uppercase.
 
 \begin{description}
  \item[\Server{}] includes the central business logic, the database and all interfaces to third-party systems for, among others, sending out notifications and mail.
@@ -66,8 +68,8 @@ For example, let $bar$ be an unsigned integer variable of entity $foo$, that tak
 
 The qualifications parts is optional and its syntax is that of a $key:value$ pair.
 
-A data structure $D$ may appear without prior definition, when it has been specified in~\cite{data_structure_spec}. For specifications of types related to security and 
-cryptography, such as registration codes and RSA keys, see~\cite{crypto_spec}.
+A data structure $D$ may appear without prior definition, when it has been specified in \cite{data_structure_spec}. For specifications of types related to security and 
+cryptography, such as registration codes and RSA keys, see \cite{crypto_spec}.
 
 All variable names are small camelCase.
 
@@ -78,11 +80,11 @@ Each flow description is organized in the following sections:
 \begin{description}
  \item[Description] What the flow does.
  \item[Participants] A list of participating entities.
- \item[Inputs] A list of the inputs to the flow. See~\ref{sec:variable_notation} for the variable syntax.
+ \item[Inputs] A list of the inputs to the flow. See \ref{sec:variable_notation} for the variable syntax.
  \item[Outputs] A list of the expected outputs to the flow. The syntax is the same as for inputs. Their description may be simplified when their meaning can be inferred from a 
 more informal description.
  \item[Other variables] Any other variables that are instantiated during the flow.
- \item[Local definitions] Definitions of functions that are local to the flow. We provide in~\ref{sec:definitions} some common global definitions, but there may be local functions 
+ \item[Local definitions] Definitions of functions that are local to the flow. We provide in \ref{sec:definitions} some common global definitions, but there may be local functions 
 that only make sense in the context of a flow.
  \item[Steps] An enumeration of the steps. The first word in each step is the initiating entity, meaning the entity that sends a message in this step.
 \end{description}
@@ -98,7 +100,7 @@ $K_{public}^A$ is denoted as $E(A,m)$. The decryption of encrypted message $d$ b
 denoted as $S(A,m)$. The verification of signature $s$ produced by $A$ is denoted as $V(A,s)$. The identity $m=V(A,S(A,m))$ holds.
 
 Note that signing a message $m$ involves signing a hash of $m$ and accompanying the signature with $m$. This means that when \Client{} signs a message $m$ and sends the signature 
-$s$ to \Server{}, \Server{} knows from $s$ the details of the message, like the client id, without having to decrypt $s$ first. See~\cite{crypto_spec} for more details.
+$s$ to \Server{}, \Server{} knows from $s$ the details of the message, like the client id, without having to decrypt $s$ first. See \cite{crypto_spec} for more details.
 \end{description}
 
 \subsection{Alternative Steps}
@@ -133,6 +135,763 @@ In most cases, error flows are inferable from other error branches. When this is
 All flows involving \Server{} and another entity may fail for various reasons, such as \userId{} or \clientId{} being unknown or the signature verification failing. For security, 
 \Server{} does not reveal the specific reason the operation failed. Therefore, when, for example, a registration code verification fails, the message from \Server{} to \Client{} 
 does not differentiate between all the reasons the verification may fail.
+
+\subsection{User Registration}
+
+\paragraph{Description}
+This protocol covers the flow where a user registers for the first time. The flow registers implicitly the client from which the registration took place.
+
+\paragraph{Participants} \Server{}, \Client{}, \User{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\handle{}:$\langle$ Handle $\rangle$]
+\end{description}
+
+\paragraph{Outputs}
+For \Client{} either success, if the user was registered successfully, or error if the user information is invalid or the user handle already exists.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\registrationCode{}:registration code]
+ \item[\userAgent{}:UserAgent] This is produced by \Client{} and contains software and platform information.
+ \item[\privateKey{}, \publicKey{}:RSA key pair] Generated by \Client{}.
+ \item[\signKey{}, \verifyKey{}:ECDSA key pair] Generated by \Client{}.
+ \item[\userId{}:64-bit unsigned integer] The internal user id. We cannot use \handle{}, because it may change in the lifetime of an account. Generated by \Server{}.
+ \item[\clientId{}:64-bit unsigned integer] The client id, generated by \Server{}.
+ \item[\loggedIn{}:boolean] A flag indicating whether at \Client{} startup \Client{} transitions to the main screen or a log-in screen.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}\label{user_registration_flow}
+ \item\label{user_registration_flow:first} \Client{} requests \User{} to populate \handle{}.
+ \item \User{} populates \handle{}.
+ \item \Client{} stores \handle{} in secure local storage.
+ \item \Client{} populates \userAgent{}, \publicKey{}, \privateKey{}, \signKey{} and \verifyKey{}.
+ \item \Client{} stores \signKey{} and \privateKey{} to secure local storage\footnote{\userAgent{} is constructed at every client start, because the data may change due to OS or 
+client upgrades.}.
+ \item \Client{} sends \handle{}, \userAgent{}, \publicKey{} and \verifyKey{} to \Server{}.
+ \item\label{user_registration_flow:fifth} \Server{} verifies the integrity of the received data and whether \handle{} is new to the system.
+ \begin{enumerate}
+  \item If the above step fails, \Server{} sends an error message to \Client{} and the flow terminates.
+ \end{enumerate}
+ \item\label{user_registration_flow:sixth} \Server{} generates \registrationCode{}, \userId{} and \clientId{}.
+ \item\label{user_registration_flow:seventh} \Server{} commits \registrationCode{}, \userId{}, \clientId{}, \handle{}, \publicKey{}, \verifyKey{} and \userAgent{} to the DB.
+ \item \Server{} sends \userId{} and \clientId{} to \Client{}.
+ \item\label{user_registration_flow:second} \Client{} stores \userId{} and \clientId{} to secure local storage.
+ \item \Client{} removes \handle{} from storage.
+ \item \Server{} sends \registrationCode{} to \handle{}.
+ \item\label{user_registration_flow:eighth} \User{} enters \registrationCode{} to \Client{}.
+ \item\label{user_registration_flow:third} \Client{} sends \userId{}, \clientId{} and \registrationCode{} signed with \signKey{} to \Server{}.
+ \item \Server{} verifies that \registrationCode{} corresponds to \userId{} and \clientId{} to the DB and the signature is verified.
+ \begin{enumerate}
+  \item If the above check fails, \Server{} sends an error message to \Client{} and the flow terminates.
+ \end{enumerate}
+ \item\label{user_registration_flow:fourth} \Server{} marks $\langle$\userId{}, \clientId{}$\rangle$ as registered.
+ \item \Client{} sets \loggedIn{} to true and stores it in secure storage.
+\end{enumerate}
+
+\subparagraph{Atomicity}
+In the above flow there are two sections where if the connection between \Server{} and \Client{} fails, the whole section needs to repeated from the beginning. These sections are 
+steps \ref{user_registration_flow:first}-\ref{user_registration_flow:second}, inclusive, and \ref{user_registration_flow:third}-\ref{user_registration_flow:fourth}, inclusive. In 
+case of failure, \Server{} reverts any changes to the DB and \Client{} repeats the process with data that have been stored locally. For the first section \Client{} needs \handle{} 
+and for the second \userId{} and \clientId{} from local storage and \registrationCode{} to be reentered by \User{}.
+
+\subsection{Device Registration}
+
+\paragraph{Description}
+The device registration flow is similar to the user registration flow. The use case is a user that already exists wants to use their account on another device.
+
+\paragraph{Participants} \Server{}, \Client{}, \User{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\handle{}:Handle]
+\end{description}
+
+\paragraph{Outputs}
+For \Client{} either success, if the client was registered successfully, or error if the user information is invalid or the user handle doesn't already exists.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\registrationCode{}:registration code]
+ \item[\userAgent{}:UserAgent] This is produced by \Client{} and contains software and platform information.
+ \item[\privateKey{}, \publicKey{}:RSA key pair] Generated by \Client{}.
+ \item[\signKey{}, \verifyKey{}:ECDSA key pair] Generated by \Client{}.
+ \item[\userId{}:64-bit unsigned integer] The internal user id. We cannot use \handle{}, because it may change in the lifetime of an account. Generated by \Server{}.
+ \item[\clientId{}:64-bit unsigned integer] The client id, generated by the server.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}\label{device_registration_flow}
+ \item\label{device_registration_flow:first} \Client{} requests \User{} to populate \handle{}.
+ \item \User{} populates \handle{}.
+ \item \Client{} stores \handle{} in secure local storage.
+ \item \Client{} populates \userAgent{}, \publicKey{}, \privateKey{}, \signKey{} and \verifyKey{}.
+ \item \Client{} stores \signKey{} and \privateKey{} to secure local storage\footnote{\userAgent{} is constructed at every client start, because the data may change due to OS or 
+client upgrades.}.
+ \item \Client{} sends \handle{}, \userAgent{}, \publicKey{} and \verifyKey{} to \Server{}.
+ \item\label{device_registration_flow:fifth} \Server{} verifies the integrity of the received data and whether \handle{} exists.
+ \begin{enumerate}
+  \item If the above step fails, \Server{} sends an error message to \Client{} and the flow terminates.
+ \end{enumerate}
+ \item\label{device_registration_flow:retrieve} \Server{} retrieves \userId{} from \handle{}.
+ \item\label{device_registration_flow:sixth} \Server{} generates \registrationCode{} and \clientId{}.
+ \item\label{device_registration_flow:seventh} \Server{} commits \registrationCode{}, \clientId{}, \handle{}, \publicKey{}, \verifyKey{} and \userAgent{} to the DB.
+ \item \Server{} sends \userId{} and \clientId{} to \Client{}.
+ \item\label{device_registration_flow:second} \Client{} stores \userId{} and \clientId{} to secure local storage.
+ \item \Client{} removes \handle{} from storage.
+ \item \Server{} sends \registrationCode{} to \handle{}.
+ \item\label{device_registration_flow:eighth} \User{} enters \registrationCode{} to \Client{}.
+ \item\label{device_registration_flow:third} \Client{} sends \userId{}, \clientId{} and \registrationCode{} signed with \signKey{} to \Server{}.
+ \item \Server{} verifies that \registrationCode{} corresponds to \userId{} and \clientId{} in its DB and the signature is verified.
+ \begin{enumerate}
+  \item If the above check fails, \Server{} sends an error message to \Client{} and the flow terminates.
+ \end{enumerate}
+ \item\label{device_registration_flow:fourth} \Server{} marks $\langle$\userId{}, \clientId{}$\rangle$ as registered.
+ \item \Client{} sets \loggedIn{} to true and stores it in secure storage.
+ \item \Client{} displays to \User{} that registration succeeded.
+\end{enumerate}
+
+\subparagraph{Atomicity}
+In the above flow there are two sections where if the connection between \Server{} and \Client{} fails, the whole section needs to repeated from the beginning. These sections are 
+steps \ref{device_registration_flow:first}-\ref{device_registration_flow:second}, inclusive, and \ref{device_registration_flow:third}-\ref{device_registration_flow:fourth}, 
+inclusive. In case of failure, \Server{} reverts any changes to the DB and \Client{} repeats the process with data that have been stored locally. For the first section \Client{} 
+needs \handle{} and for the second \userId{} and \clientId{} from local storage and \registrationCode{} to be reentered by \User{}.
+
+\paragraph{Implementation Notes}
+User and device registration flows are almost identical. The differences are:
+
+\begin{itemize}
+ \item In step \ref{user_registration_flow}.\ref{user_registration_flow:fifth}, the check for is whether \handle{} does not exist. In step 
+\ref{device_registration_flow}.\ref{device_registration_flow:fifth}, the check is whether \handle{} exists. This check can be implemented as a pure virtual method in the base 
+class and the two flows can share the flow code.
+ \item In step \ref{user_registration_flow}.\ref{user_registration_flow:sixth} \userId{} is generated, which doesn't happen in step 
+\ref{device_registration_flow}.\ref{device_registration_flow:sixth}. Similarly, in step \ref{user_registration_flow}.\ref{user_registration_flow:seventh} \Server{}
+creates a new user and adds a client to its list, while in step \ref{device_registration_flow}.\ref{device_registration_flow:seventh} \Server{} adds a client to the user retrieved 
+in step \ref{device_registration_flow}.\ref{device_registration_flow:retrieve}. The different actions can be plugged in a common flow code.
+ \item From the perspective of \Client{}, the steps after \ref{user_registration_flow}.\ref{user_registration_flow:eighth} and 
+\ref{device_registration_flow}.\ref{device_registration_flow:eighth} are identical and can be implemented as the same UI flow.
+\end{itemize}
+
+\subsection{Log out Client}
+\label{log_out_client_flow}
+The client transitions to the log in screen. The client needs to log in again with a registration code to be used.
+
+\paragraph{Participants} \Client{}, \User{}
+
+\paragraph{Inputs}
+None. This flow is triggered from an option in settings.
+
+\paragraph{Outputs}
+None. \Client{} transitions to the log in screen.
+
+\paragraph{Other Variables}
+None.
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \User{} requests to log out.
+ \item \Client{} sets its login state to false in secure local storage.
+\end{enumerate}
+
+\paragraph{Alternative Flow}
+\label{log_out_client_flow:alternative}
+
+This flow removes the keys as well as setting the login state to false. If this flow is implemented, flow \ref{log_in_client_flow} needs to be modified to generate a key pair. See 
+\ref{log_in_client_flow:alternative} for details. In this case the flow is extended as:
+
+\begin{enumerate}[resume]
+ \item \Client{} removes \privateKey{} and \signKey{} from its local storage.
+\end{enumerate}
+
+The security/usability trade-off is:
+
+\begin{itemize}
+ \item With the original flow, there is the option to strengthen authentication by requiring that during registration a key needs to be imported through a third channel. For 
+example, in case of a B2B deployment, an organization could issue a QR code that is delivered to the user by hand and it needs to be scanned before a new device is registered. All 
+subsequent keys are strongly authenticated transitively. If a user loses the key (due to the client having been uninstalled or a client malfunction), the device registration flow 
+needs to be restarted.
+
+The security impact is that logging out leaves the keys alive and an attacker can flip the logged in state and use the client. Therefore, logout should be interpreted as 
+protection against only casual attacks.
+\item With the alternative flow, logging out is impervious to stronger attackers, since the keys are not there anymore. However, it is not possible to strengthen the 
+authentication flow, because logging in would require a time-consuming device registration.
+\end{itemize}
+
+The alternative flow may be implemented in the future, if customer requirements favor stronger security guarantees for the logged out state.
+
+\subsection{Log in Client}
+\label{log_in_client_flow}
+This flow is triggered when the client starts and it finds \userId{} and \clientId{} in its local storage and \loggedIn{} is either false or missing. In this case, the user is 
+presented with an option to log in with a registration code or register as a new user or a new client, in which case flows \ref{user_registration_flow} and 
+\ref{device_registration_flow} are triggered respectively.
+
+\paragraph{Participants} \Client{}, \Server{}, \User{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\userId{}:64-bit integer] From \Client{} local storage.
+ \item[\clientId{}:64-bit integer] From \Client{} local storage.
+\end{description}
+
+\paragraph{Outputs}
+For \Client{} either success, if the client registered successfully, or error if the server rejects the request or the registration code is wrong. In case of success, \Client{} 
+transitions to the main screen. In case of error, the client restarts the flow.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\loggedIn{}:boolean] Stored in secure storage.
+ \item[\handle{}:Handle]
+ \item[\registrationCode{}:registration code]
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \User{} requests a log in registration code.
+ \item \Client{} retrieves \userId{} and \clientId{}.
+ \item \Client{} sends \userId{} and \clientId{} to \Server{}.
+ \item \Server{} checks if \userId{} and \clientId{} exist in its DB.
+ \begin{enumerate}
+  \item If the client doesn't exist, \Server{} replies with an error and the flow terminates.
+ \end{enumerate}
+ \item \Server{} retrieves \handle{} for \userId{}.
+ \item \Server{} generates \registrationCode{} and commits it to the DB.
+ \item \Server{} sends \registrationCode{} to \handle{}.
+ \item \User{} enters \registrationCode{} to \Client{}.
+ \item\label{log_out_client_flow:one} \Client{} sends \registrationCode{} signed with \signKey{}, \userId{} and \clientId{} to \Server{}.
+ \item \Server{} checks that \registrationCode{} is valid and verifies the signature.
+ \begin{enumerate}
+  \item If the check fails, \Server{} replies with an error and the flow terminates.
+ \end{enumerate}
+ \item \Client{} sets \loggedIn{} to true and stores it in secure local storage.
+\end{enumerate}
+
+\paragraph{Alternative Flow}
+\label{log_in_client_flow:alternative}
+
+This is to be implemented if \ref{log_out_client_flow:alternative} is implemented. The steps replace steps from \ref{log_out_client_flow:one} until the end of the flow.
+
+\begin{enumerate}
+ \item \Client{} populates \signKey{}, \verifyKey{}, \publicKey{} and \privateKey{}.
+ \item \Client{} sends \registrationCode{} signed with \signKey{}, \verifyKey{}, \publicKey{}, \userId{} and \clientId{} to \Server{}.
+ \item \Server{} checks that \registrationCode{} is valid and verifies the signature.
+ \begin{enumerate}
+  \item If the check fails, \Server{} replies with an error and the flow terminates.
+ \end{enumerate}
+ \item \Client{} sets \loggedIn{} to true and stores it in secure local storage.
+ \item \Client{} stores \signKey{} and \privateKey{} its secure local storage.
+\end{enumerate}
+
+\subsection{Modify Public Key}
+\label{modify_public_key_flow}
+This flow is triggered periodically from the client. For details about when it 
+is triggered see \cite{crypto_spec}.
+
+\paragraph{Participants} \Client{}, \Server{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\userId{}:64-bit integer] From \Client{} local storage.
+ \item[\clientId{}:64-bit integer] From \Client{} local storage.
+ \item[\privateKey{}:RSA private key] The private key that is valid at the 
+start of the flow. From \Client{} local storage.
+\end{description}
+
+\paragraph{Outputs}
+For \Client{} either success, if \Server{} applied the changes, error 
+otherwise. In case of error, the new keys are discarded and the flow is 
+repeated according to the specification in \cite{crypto_spec}.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\newPrivateKey{}:RSA private key] The new private key.
+ \item[\newPublicKey{}:RSA public key] The new public key.
+ \item[\signedUserData{}:RSA signature] The RSA signature of \newPublicKey{} 
+with \privateKey{}. See \cite{crypto_spec} for details.
+ \item[\publicKey{}:RSA public key] The public key of \Client{} stored in the 
+DB of \Server{}.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \Client{} constructs \newPrivateKey{}, \newPublicKey{}.
+ \item \Client{} generates \signedUserData{}.
+ \item \Client{} sends \signedUserData{}, \newPublicKey{}, \userId{} and
+\clientId{} to \Server{}.
+ \item \Server{} retrieves \publicKey{} based on \userId{} and \clientId{}.
+ \item \Server{} verifies the signature of \signedUserData{}.
+ \begin{enumerate}
+  \item If the above step fails, \Server{} replies with error.
+ \end{enumerate}
+ \item \Server{} verifies the integrity of \newPublicKey{}.
+ \begin{enumerate}
+  \item If the above step fails, \Server{} replies with error.
+ \end{enumerate}
+ \item \Server{} commits \newPublicKey{} to the DB.
+ \item \Server{} replies with success.
+ \item\label{modify_public_key:local_storage} \Client{} commits 
+\newPrivateKey{} to secure local storage.
+\end{enumerate}
+
+\subsection{Retrieve User Data and Client Settings}
+\label{retrieve_user_data_flow}
+This flow is triggered when the user wants to review their data and settings. 
+User data are kept server-side to avoid conflicts between clients. The settings 
+involved in this flow are the ones kept server-side.
+
+\paragraph{Participants} \Client{}, \Server{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\userId{}:64-bit integer] From \Client{} local storage.
+ \item[\clientId{}:64-bit integer] From \Client{} local storage.
+ \item[\privateKey{}:RSA private key] From \Client{} local storage.
+\end{description}
+
+\paragraph{Outputs}
+\SpecialItem
+For \Client{} either a key/value list with user data and settings or error.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\publicKey{}:RSA public key] The public key of \Client{} stored in the 
+DB of \Server{}.
+ \item[\fixedString{}: string] Static string that is used to generate a 
+signature that authenticates \Client{}.
+ \item[\signedUserData{}:RSA signature] The RSA signature of \fixedString{}
+with \privateKey{}. See \cite{crypto_spec} for details.
+ \item[\serverVerified{}:boolean]
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \Client{} generates \signedUserData{} from \fixedString{} with 
+\privateKey{}.
+ \item \Client{} sends \userId{}, \clientId{}, \fixedString{} and 
+\signedUserData{} to \Server{}.
+ \item \Server{} populates \publicKey{} from \userId{} and \clientId{}.
+ \item \Server{} verifies the signature of \signedUserData{} from 
+\fixedString{} and \publicKey{} and sets \serverVerified{} to the result.
+ \begin{enumerate}
+  \item If the above step failed, \Server{} sends error to \Client{}.
+  \item \Client{} terminates the flow with error.
+ \end{enumerate}
+ \item \Server{} sends user data and client settings to \Client{}.
+ \item \Client{} terminates the flow with success.
+\end{enumerate}
+
+\subsection{Modify User Agent, User Data and Client Settings, except Handle}
+\label{modify_user_data_flow}
+This flow is triggered when the user wants to modify personal data, like the 
+credit card number, and when the user agent has changed, due to client or OS 
+updates. The difference between the two cases is that the first is triggered by 
+\User{} and the second by \Client{} when it detects a change in OS or 
+client version. The flow is identical to \ref{modify_public_key_flow}, with the 
+difference that \signedUserData{} signs the new user data, instead of 
+\newPublicKey{}. The implementation must be common, parameterized for the input 
+data. The user data must be represented as a key-value list when sent to 
+\Server{} for maximum flexibility.
+
+This flow does not require a registration code, as the effects are reversible 
+and the \handle{} information does not change.
+
+\subsection{Modify Handle}
+This flow is triggered when \User{} requests a \handle{} change.
+
+\paragraph{Participants} \Client{}, \Server{}, \User{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\userId{}:64-bit integer] From \Client{} local storage.
+ \item[\clientId{}:64-bit integer] From \Client{} local storage.
+ \item[\newHandle{}: Handle] The replacement value for \handle{}, entered by
+\User{}.
+\end{description}
+
+\paragraph{Outputs}
+For \Client{} either success, if \handle{} changed successfully, or error 
+if the server rejects the request or the registration code is wrong.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\handle{}:Handle]
+ \item[\registrationCode{}:registration code]
+ \item[\privateKey{}:RSA private key] From \Client{} local storage.
+ \item[\publicKey{}:RSA public key] From \Server{} DB.
+ \item[\signedUserData{}:signature] \newHandle{} signed with \privateKey{}.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \User{} enters \newHandle{}.
+ \item \Client{} retrieves \privateKey{}, \userId{} and \clientId{}.
+ \item \Client{} produces \signedUserData{} from \newHandle{} and \privateKey{}.
+ \item \Client{} sends \signedUserData{}, \userId{} and \clientId{} to 
+\Server{}.
+ \item \Server{} checks if \userId{} and \clientId{} exist in its DB.
+ \begin{enumerate}
+  \item If the client doesn't exist, \Server{} replies with an error and the 
+flow terminates.
+ \end{enumerate}
+ \item \Server{} retrieves \publicKey{} for \userId{}.
+ \item \Server{} verifies the signature of \signedUserData{} and retrieves 
+\newHandle{}.
+ \item \Server{} generates \registrationCode{} and commits it to the DB.
+ \item \Server{} sends \registrationCode{} to \newHandle{}.
+ \item \User{} enters \registrationCode{} to \Client{}.
+ \item \Client{} sends \registrationCode{} signed with \privateKey{}, \userId{} 
+and \clientId{} to \Server{}.
+ \item \Server{} checks that \registrationCode{} is valid and the signature is 
+correct.
+ \begin{enumerate}
+  \item If the check fails, \Server{} replies with an error and the flow 
+terminates.
+ \end{enumerate}
+ \item \Server{} replies to \Client{} with success.
+ \item \Client{} sets \handle{} to \newHandle{}.
+\end{enumerate}
+
+\subsection{Test Public Key}
+\label{test_public_key_flow}
+This flow is triggered when there is reason to believe that the public key 
+stored in \Server{} is out-of-sync with the private key stored in \Client{}. 
+Examples of such cases are:\begin{inparaenum}[(a)] \item Multiple payment 
+flows failed, \item 
+step \ref{modify_public_key_flow}.\ref{modify_public_key:local_storage} failed 
+and the client crashed before it could repeat the flow and recover. 
+\end{inparaenum}The flow can be triggered automatically by \Client{} or by 
+\User{} when there is some suspicion that the key is not invalid. For the 
+purposes of this flow we assume \Client{} triggers it. In case the flow 
+terminates with error, the client logs out.
+
+\paragraph{Participants} \Client{}, \Server{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\userId{}:64-bit integer] From \Client{} local storage.
+ \item[\clientId{}:64-bit integer] From \Client{} local storage.
+ \item[\privateKey{}:RSA private key] From \Client{} local storage.
+\end{description}
+
+\paragraph{Outputs}
+For \Client{} either success, if \Server{} reports that the public key it holds 
+is valid, error otherwise. In case of error, the flow 
+in \ref{reset_public_key_flow} is expected to be triggered.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\publicKey{}:RSA public key] The public key of \Client{} stored in the 
+DB of \Server{}.
+ \item[\fixedString{}: string] Static string that is used to generate a 
+signature that authenticates \Client{}.
+ \item[\signedUserData{}:RSA signature] The RSA signature of \fixedString{}
+with \privateKey{}. See \cite{crypto_spec} for details.
+ \item[\serverVerified{}:boolean]
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \Client{} generates \signedUserData{} from \fixedString{} with 
+\privateKey{}.
+ \item \Client{} sends \userId{}, \clientId{}, \fixedString{} and 
+\signedUserData{} to \Server{}.
+ \item \Server{} populates \publicKey{} from \userId{} and \clientId{}.
+ \item \Server{} verifies the signature of \signedUserData{} from 
+\fixedString{} and \publicKey{} and sets \serverVerified{} to the result.
+ \item \Server{} sends \serverVerified{} to \Client{}.
+ \item \Client{} terminates the flow with success or error according to 
+\serverVerified{}.
+ \begin{enumerate}
+  \item If \serverVerified{} is false, \Client{} sets its login state to 
+false in secure local storage.
+ \end{enumerate}
+\end{enumerate}
+
+\paragraph{Implementation Notes}
+The flow is almost identical to \ref{retrieve_user_data_flow} except for the 
+return value type.
+
+\subsection{Reset Public Key}
+\label{reset_public_key_flow}
+This flow is triggered when the flow in \ref{test_public_key_flow} terminated 
+with error.
+
+\paragraph{Participants} \Client{}, \Server{}, \User{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\userId{}:64-bit integer] From \Client{} local storage.
+ \item[\clientId{}:64-bit integer] From \Client{} local storage.
+\end{description}
+
+\paragraph{Outputs}
+For \Client{} either success, if \Server{} reports that the public key has 
+been reset successfully, or error otherwise. In case of error, the flow is 
+expected to be repeated.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\publicKey{}:RSA public key] The newly generated public key of 
+\Client{}. 
+ \item[\privateKey{}:RSA private key] The newly generated private key of 
+\Client{}.
+ \item[\registrationCode{}:registration code]
+ \item[\signedUserData{}:RSA signature] \registrationCode{} signed with
+\privateKey{}. See \cite{crypto_spec} for details.
+ \item[\handle{}:Handle]
+ \item[\serverVerified:boolean]
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \User{} requests resetting the public key.
+ \item \Client{} sends to \Server{} \userId{} and \clientId{}.
+ \item \Server{} retrieves \handle{} based on \userId.
+ \item \Server{} generates \registrationCode{} and commits it to the DB.
+ \begin{enumerate}
+  \item If the above step fails, \Server{} terminates the flow. \Client{} is 
+not notified. \User{} will have to trigger the flow again.
+ \end{enumerate}
+ \item \User{} enters \registrationCode{} to \Client{}.
+ \item \Client{} generates \publicKey{} and \privateKey{}.
+ \item \Client{} commits \privateKey{} to its DB.
+ \item \Client{} generates \signedUserData{} from \registrationCode{}, 
+\privateKey{}.
+ \item \Client{} sends \publicKey{} and \signedUserData{} to \Server{}.
+ \item \Server{} verifies that \signedUserData{} is \registrationCode{} signed 
+with \publicKey{}. The result of the operation is assigned to \serverVerified{}.
+ \item \Server{} sends \serverVerified{} to \Client{}.
+ \item \Client{} terminates the flow according to the result of 
+\serverVerified{}.
+ \begin{enumerate}
+  \item If the result is false, \privateKey{} is removed from its secure local 
+storage.
+ \end{enumerate}
+\end{enumerate}
+
+\subsection{Delete Client}
+This flow deletes client information from the server and logs out the client. 
+When the last client is deleted for a user, the user information is deleted 
+from the server as well.
+
+\paragraph{Participants} \Client{}, \Server{}, \User{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\userId{}:64-bit integer] From \Client{} local storage.
+ \item[\clientId{}:64-bit integer] From \Client{} local storage.
+\end{description}
+
+\paragraph{Outputs}
+For \Client{} either success, if \Server{} deleted \Client{} successfully, 
+error otherwise. If the flow failed, \Client{} stays active.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\publicKey{}:RSA public key] The newly generated public key of 
+\Client{}. 
+ \item[\privateKey{}:RSA private key] The newly generated private key of
+\Client{}.
+ \item[\registrationCode{}:registration code]
+ \item[\signedUserData{}:RSA signature] \registrationCode{} signed with
+\privateKey{}. See \cite{crypto_spec} for details.
+ \item[\handle{}:Handle]
+ \item[\removeUser:boolean] Whether the user account is to be removed.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \User{} requests \Client{} be deleted.
+ \item \Client{} sends \userId{} and \clientId{} to \Server{}.
+ \item \Server{} retrieves \handle{} from its DB based on \userId{} and 
+\clientId{}.
+ \item \Server{} generates \registrationCode{}.
+ \item \Server{} sends \registrationCode{} to \handle{}.
+ \item \User{} enters \handle{} to \Client{}.
+ \item \Client{} generates \signedUserData{} from \registrationCode{}, 
+\privateKey{}.
+ \item \Client{} sends \signedUserData{}, \userId{}, \clientId{} to \Server{}.
+ \item \Server{} retrieves \publicKey{} from its DB based on \userId{} and 
+\clientId{}.
+ \item \Server{} verifies \registrationCode{} based on its DB and \publicKey{}.
+ \begin{enumerate}
+  \item If the above step failed, \Server{} sends error to \Client{}.
+  \item \Client{} terminates the flow.
+ \end{enumerate}
+ \item \Server{} checks if \clientId{} is that last entry in $UserSet.clients$.
+ \begin{enumerate}
+  \item If it is not, \Server{} sets \removeUser{} and goes to 
+step \ref{delete_client:first}.
+  \item If it is, \Server{} sends to \Client{} a request to remove the entire 
+user account.
+  \item \Client{} asks \User{} about whether the account can be removed.
+  \item \User{} answers the query.
+  \item \Client{} sets the value of \removeUser{} according to the answer by 
+\User{}.
+  \item{} \Client{} sends \removeUser{}, \userId{} and \clientId{} to 
+\Server{}, signed with \privateKey{}.
+  \item{} \Server{} verifies the signature of \removeUser{} and sets the value 
+of \removeUser{}.
+  \begin{enumerate}
+   \item If the signature verification fails, \Server{} sends \Client{} an 
+error.
+   \item \Client{} terminates the flow with error.
+  \end{enumerate}
+ \end{enumerate}
+ \item\label{delete_client:first} \Server{} removes from $UserSet.clients$ the 
+entry for \clientId{}.
+ \item If \removeUser{} is true, \Server{} removes \userId{} from $UserSet$.
+ \item \Server{} sends success to \Client{}.
+ \item \Client{} removes \clientId{} and \privateKey{} from its DB.
+ \item \Client{} sets \loggedIn{} to false and commits it to local storage.
+\end{enumerate}
+
+\subsection{Signature Verification Failure}
+\label{signature_failed_flow}
+The purpose of this flow is to notify the user that a purchase order cannot be 
+executed because the signature cannot be verified. The flow is informative for 
+\User{}; \Client{} shows the appropriate error message in case 
+ fails.
+
+The assumption for this flow is that \Server{} is able to extract enough 
+information from the message from the \Client{} to construct a purchase order 
+and create $receipt$. If the message is corrupted to the point that the client 
+cannot be identified, the flow is not executed.
+
+\paragraph{Participants} \Server{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[receipt: Receipt] The receipt structure generated by \Server{} for the 
+failed purchase order.
+\end{description}
+
+\paragraph{Outputs}
+A message sent to $receipt.handle$. The message format is specified 
+in \cite{UI_spec}.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[message: string] The message to be sent out.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \Server{} generates $message$ from $receipt$.
+ \item \Server{} sends $message$ to $receipt.handle$.
+\end{enumerate}
+
+\subsection{Replay Attack Detected}
+\label{replay_attack_flow}
+This is a sub-flow triggered when \Server{} detects that a purchase order by 
+\Client{} has a sequence number that is smaller than or equal to the one stored 
+in the DB for \Client{}. There are two scenarios the can trigger a replay 
+attack flow:
+
+\begin{enumerate}
+ \item The keys of \Client{} have been leaked and a malicious attacker 
+generates purchase orders with the keys. At the same time \Client{} generates 
+orders using the same sequence numbers. In this case, \Server{} deletes 
+\Client{} from its DB and sends out a warning using channels other than 
+\Client{}.
+
+There is a chance that this case is triggered by a \Client{} malfunction 
+(sequence number gets corrupted). In this case the \Client{} cannot function 
+anyway and \User{} needs to re-register.
+\end{enumerate}
+
+\paragraph{Participants} \Server{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[userId:64-bit unsigned integer] The user id.
+ \item[clientId:64-bit unsigned integer] The client id.
+ \item[purchaseOrder:PurchaseOrder] The purchase order that triggered the 
+replay attack flow.
+ \item[retailer:Retailer] The retailer that forwarded the order.
+\end{description}
+
+\paragraph{Outputs}
+If the receipt generated by the replayed purchase order is equal to the stored 
+receipt, no action is taken. If the receipts do not match, a message is sent to 
+\User{} and \Client{} that the account has been deleted because \Client{} 
+keys have been compromised. This message is delivered via a push notification, 
+because \Client{} cannot be trusted anymore to pull messages.
+
+Further counter-measures for retailers that are flagged for repeated replay 
+attacks will be defined.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[handle:Handle] The handle mapped to \userId{} and \clientId{}.
+ \item[receiptOld:Server.Receipt] The stored receipt corresponding to the 
+already seen payment.
+ \item[receiptNew:Server.Receipt] The new receipt generated by the incoming 
+purchase order.
+ \item[message1:string] The message that is sent to \handle{}.
+ \item[message2:string] The message sent to \Client{}.
+ \item[codeOld:bytearray] The barcode for $receiptOld$.
+ \item[codeNew:bytearray] The barcode for $receiptNew$.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \Server{} populates $receiptOld$ by retrieving it from the $ReceiptSet$ 
+table based on \userId{}, \clientId{} and $purchaseOrder.sequenceNumber$.
+ \item \Server{} populates $receiptNew$ based on \userId{}, \clientId{}, 
+$retailer$ and $purchaseOrder$.
+ \item \Server{} populates $codeOld$ based on $receiptOld.clientId$ and
+$receiptOld.purchaseId$.
+ \item \Server{} populates $codeNew$ from $purchaseOrder$.
+ \item \Server{} compares $codeOld$ to $codeNew$.
+ \begin{enumerate}
+  \item If they are equal, the flow finishes.
+ \end{enumerate}
+ \item \Server{} populates \handle{}, based on \userId{} and \clientId{}.
+ \item \Server{} populates $message1$ based on $receiptNew$. The format of the 
+message is defined in \cite{UI_spec}.
+ \item \Server{} sends $message1$ to \handle{}.
+ \item \Server{} populates $message2$ based on \handle{}. The format of the 
+message is defined in \cite{UI_spec}.
+ \item \Server{} sends $message2$ via a push notification.
+ \item \Server{} deletes the client entry in $UserSet$ corresponding to 
+\userId{} and \clientId{}.
+\end{enumerate}
 
 \bibliography{spec}
 \bibliographystyle{plain}

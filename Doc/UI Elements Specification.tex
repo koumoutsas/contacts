@@ -1,0 +1,1291 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[american]{babel}
+\usepackage{fontenc}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{paralist}
+
+\newcounter{windowTitleCounter}
+\newcommand{\windowTitleLabelText}{Window Title}
+\newcommand{\windowTitleLabel}{window_title:}
+\DeclareRobustCommand{\windowTitle}[1]{%
+   \refstepcounter{windowTitleCounter}%
+\emph{\windowTitleLabelText~\thewindowTitleCounter}\label{\windowTitleLabel#1}}
+\DeclareRobustCommand{\windowTitleRef}[1]{%
+   \emph{\windowTitleLabelText~\ref{\windowTitleLabel#1}}}
+
+\newcounter{messageCounter}
+\newcommand{\messageLabelText}{Message}
+\newcommand{\messageLabel}{message:}
+\DeclareRobustCommand{\messageText}[1]{%
+   \refstepcounter{messageCounter}%
+   \emph{\messageLabelText~\themessageCounter}\label{\messageLabel#1}}
+\DeclareRobustCommand{\messageTextRef}[1]{%
+   \emph{\messageLabelText~\ref{\messageLabel#1}}}
+
+\newcounter{errorMessageCounter}
+\newcommand{\errorMessageLabelText}{Error Message}
+\newcommand{\errorMessageLabel}{error_message:}
+\DeclareRobustCommand{\errorMessageText}[1]{%
+   \refstepcounter{errorMessageCounter}%
+\emph{\errorMessageLabelText~\theerrorMessageCounter}
+\label{\errorMessageLabel#1}}
+\DeclareRobustCommand{\errorMessageTextRef}[1]{%
+   \emph{\errorMessageLabelText~\ref{\errorMessageLabel#1}}}
+
+\newcounter{labelCounter}
+\newcommand{\labelLabelText}{Label}
+\newcommand{\labelLabel}{label:}
+\DeclareRobustCommand{\labelText}[1]{%
+   \refstepcounter{labelCounter}%
+\emph{\labelLabelText~\thelabelCounter}
+\label{\labelLabel#1}}
+\DeclareRobustCommand{\labelRef}[1]{%
+   \emph{\labelLabelText~\ref{\labelLabel#1}}}
+
+\newcommand{\elementLabel}{element:}
+\DeclareRobustCommand{\element}[2]{\subsection{#1}\label{\elementLabel#2}}
+\DeclareRobustCommand{\elementRef}[1]{\ref{\elementLabel#1}}
+
+\let\Item\item
+\newcommand\SpecialItem{\renewcommand\item[1][]{\Item[\textbullet~\bfseries##1]}
+}
+\renewcommand\enddescription{\endlist\global\let\item\Item}
+
+\title{Barcode Payment System Client UI Elements Specification}
+\author{Yannis Ioannidis}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Purpose}
+This document describes the abstract client UI elements needed for the barcode 
+payment system and how they combine with the flows. It is not a full UI design, 
+but it functions as a link between the flows specification and the UI design.
+
+It also provides a list with window titles, message texts, error message texts 
+and element labels.
+
+\section{References}
+For the project overview, see~\cite{project_spec}. For flow specifications, 
+see~\cite{flow_spec}. For the UI design specification, 
+see~\cite{UI_design_spec}. For errors between the server and the client and 
+their surfaced messages, see~\cite{error_code_spec}.
+
+\section{Conventions and Specification Layout}
+
+\subsection{UI Element Specification Format}
+Each element is described in a separate subsection of~\ref{sec:element_spec}. 
+These elements are to be implemented as windows, full-screen or pop-up. Textual 
+elements, such as title, messages and labels, are provided as a reference 
+in~\ref{sec:text_spec}. It it left up to the UI design whether titles and labels 
+appear in general or in certain platforms.
+
+After that, a short explanation of the role of the element is provided. This is 
+intended as a comment only.
+
+Next, the specification for "Back" and "Settings" controls is provided for 
+each element. The specification is a cross-reference to the element these 
+control transition when activated, "None" if the control is inactive or 
+"System" 
+when the action of the "Back" control is to transition out of the client.
+
+Note that the "Back" control function and appearance are platform-specific. 
+Especially for the cases of "None" and "System", platforms that do not have a 
+"Back" button, such as iOS, can omit it. The exact implementation is specified 
+in~\cite{UI_design_spec}.
+
+"Settings" are specified as a key/value list, where the key is the transition 
+that this entry executes and value is the label that appears for this option in 
+the settings menu.
+
+Finally, the list of UI sub-elements is provided. These sub-elements are to be 
+implemented as buttons, text fields, etc. The description is structured as a 
+name, short explanation of the role of the sub-element and a list of flow 
+triggers and references to the UI elements that the UI transitions to after the 
+triggers are activated. The flows can be found in~\cite{flow_spec}.
+
+\subsection{Base UI Elements Specification}
+Some elements or sub-elements appear multiple times. To avoid repetition, we 
+specify these elements in a parameterized form in~\ref{sec:base_element_spec}. 
+A concrete specification of an element of such a type refers to the base 
+element and specifies the parameters.
+
+\subsection{Textual Elements Specification}
+In~\ref{sec:text_spec}, all textual elements are specified. Each such element 
+is referred to with a label of the format $\langle\emph{Element type 
+\#}\rangle$. Its value is given in English. If more languages are specified, 
+translations of these elements will be provided.
+
+For error messages, a parameter indicating the reason for the error is denoted 
+by $\langle\emph{\%reason}\rangle$. The list of errors and their surfaced 
+messages is specified in~\cite{error_code_spec}.
+
+Messages outside the client UI, such as email and push notification payloads, 
+are defined in~\ref{sec:text_spec:notification_messages}.
+
+\section{Base UI Elements Specification}
+\label{sec:base_element_spec}
+
+\element{Message Box}{message_box}
+
+\paragraph{Parameters}
+\SpecialItem
+\begin{description}
+ \item[Title] The title to appear on the message box
+ \item[Description] The description of the element
+ \item[Message] The message to appear
+ \item[Dismiss transition] The UI element to transition to when the element is 
+dismissed. This is the transition that is followed when the dismiss button is 
+clicked and when the "Back" control is triggered.
+\end{description}
+
+\begin{description}
+ \item[Title] Parameter "Title"
+ \item[Description] Parameter "Description"
+ \item[Back] Parameter "Dismiss transition"
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Message Box}
+\begin{description}
+ \item[Text] Parameter "Message"
+ \item[Description] Text box
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{Dismiss Button}
+\begin{description}
+ \item[Label] \labelRef{ok}
+ \item[Description] OK button to dismiss the element
+ \item[Triggers] None
+ \item[Transitions]\mbox{}
+ \begin{description}
+  \item[On click] Parameter "Dismiss transition"
+ \end{description}
+\end{description}
+
+\element{Error Message Box}{error_message_box}
+Extends~\elementRef{message_box} by defining some parameters.
+
+\paragraph{Parameters}
+\SpecialItem
+\begin{description}
+ \item[Message] The error message to appear
+ \item[Dismiss transition] The UI element to transition to when the element is 
+dismissed. This is the transition that is followed when the dismiss button is 
+clicked and when the "Back" control is activated.
+\end{description}
+
+\paragraph{Message Box Parameters}
+\SpecialItem
+\begin{description}
+ \item[Title] \windowTitleRef{error}
+ \item[Description] Error message window
+ \item[Message] Parameter "Message"
+ \item[Dismiss transition] Parameter "Dismiss transition"
+\end{description}
+
+\element{Execute Button}{execute_button}
+
+\paragraph{Parameters}
+\SpecialItem
+\begin{description}
+ \item[On click] The flow to be triggered on click
+ \item[On success] The transition to be followed on flow success
+ \item[On error] The transition to be followed on flow error
+\end{description}
+
+\begin{description}
+ \item[Label] \labelRef{execute}
+ \item[Description] OK button to execute an action
+ \item[Triggers]\mbox{}
+ \begin{description}
+  \item[On click] Parameter "On click"
+ \end{description}
+ \item[Transitions]\mbox{}
+ \begin{description}
+  \item[On success] Parameter "On success"
+  \item[On error] Parameter "On error"
+ \end{description}
+\end{description}
+
+\element{Registration Code Field}{registration_code_field}
+
+\paragraph{Parameters}
+\SpecialItem
+\begin{description}
+ \item[On value entered] The flow to be triggered when a code that is correct 
+according to type information is entered. See~\cite{crypto_spec} for details on 
+the type
+ \item[On success] The transition to be followed on flow success
+ \item[On error] The transition to be followed on flow error
+\end{description}
+
+\begin{description}
+ \item[Label] \labelRef{registration_code}
+ \item[Description] Text field
+ \item[Triggers]\mbox{}
+ \begin{description}
+  \item[On value entered] Parameter "On value entered"
+ \end{description}
+ \item[Transitions]\mbox{}
+  \begin{description}
+   \item[On success] Parameter "On success"
+   \item[On error] Parameter "On error"
+  \end{description}
+\end{description}
+
+\element{Enter PIN Screen}{enter_pin_screen}
+
+\paragraph{Parameters}
+\SpecialItem
+\begin{description}
+ \item[Title] The title for the screen
+ \item[Description] The description of the element
+ \item[Back] The back transition
+ \item[On click] The on-click action for the execute button
+ \item[On success] The on-success action for the execute button
+ \item[On error] The on-error action for the execute button
+\end{description}
+
+\begin{description}
+ \item[Title] Parameter "Title"
+ \item[Description] Parameter "Description"
+ \item[Back] Parameter "Back"
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{PIN Code Box}
+\begin{description}
+ \item[Label] \labelRef{pin_code}
+ \item[Description] A text box adapted for PIN codes. When this element appears 
+on the screen, the digits are cleared, even if the user has entered a partial 
+code before transitioning away from the screen
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{Execute Button}
+Execute button~\elementRef{execute_button} with parameters
+\begin{description}
+ \item[On click] Parameter "On click"
+ \item[On success] Parameter "On success"
+ \item[On error] Parameter "On error"
+\end{description}
+
+\section{UI Elements Specification}
+\label{sec:element_spec}
+
+\element{Log in and Registration}{login}
+\begin{description}
+ \item[Title] \windowTitleRef{login}
+ \item[Description] This element provides text fields and registration buttons
+ \item[Back] System
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Request Registration Code}
+\begin{description}
+ \item[Label] \labelRef{request_registration_code}
+ \item[Description] Button
+ \item[Triggers]\mbox{}
+ \begin{description}
+  \item[On click] The first part of the "Log in Client" flow is executed
+ \end{description}
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{Registration Code Field}
+Registration code field~\elementRef{registration_code_field} with parameters
+\begin{description}
+ \item[On value entered] The second part of the "Log in Client" and "Device 
+Registration" flows
+ \item[On success] Main screen~\elementRef{main_screen}
+ \item[On error] Log in failed~\elementRef{login_failed}
+\end{description}
+
+\subsubsection{Register New Account}
+\begin{description}
+ \item[Label] \labelRef{registration_new_account}
+ \item[Description] Clicking on this button takes the user to a screen to fill 
+out details for registering a new account.
+ \item[Triggers] None
+ \item[Transitions]\mbox{}
+  \begin{description}
+   \item[On click] Register new account~\elementRef{register_new_account} 
+  \end{description}
+\end{description}
+
+\subsubsection{Register New Device}
+\begin{description}
+ \item[Label] \labelRef{registration_new_device}
+ \item[Description] Clicking on this button takes the user to a screen to fill 
+out details for registering a new client.
+ \item[Triggers] None
+ \item[Transitions]\mbox{}
+  \begin{description}
+   \item[On click] Register new device~\elementRef{register_new_device}
+  \end{description}
+\end{description}
+
+\element{Log in Failed}{login_failed}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{login}
+ \item[Dismiss transition] Log in and Registration~\elementRef{login}
+\end{description}
+
+\element{Register New Device}{register_new_device}
+
+\begin{description}
+ \item[Title] \windowTitleRef{register_new_device}
+ \item[Description] Screen to fill in the account id
+ \item[Back] Log in and Registration~\elementRef{login}
+ \item[Settings]\mbox{}
+ \begin{description}
+  \item[New Account~\elementRef{register_new_account}] 
+\labelRef{settings_register_new_account}
+ \end{description}
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Handle Text Box}
+\begin{description}
+ \item[Label] \labelRef{enter_handle}
+ \item[Description] Text box. The value of the field is of type e-mail
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{Execute Button}
+Execute button~\elementRef{execute_button} with parameters
+\begin{description}
+ \item[On click] The first part of the "Device Registration" flow is executed
+ \item[On success] Log in and Registration~\elementRef{login}, where the rest 
+of the the "Device Registration" flow can be executed
+ \item[On error] Device registration 
+error~\elementRef{device_registration_error}
+\end{description}
+
+\element{Device Registration Error}{device_registration_error}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{device_registration}
+ \item[Dismiss transition] Log in and Registration~\elementRef{login}
+\end{description}
+
+\element{Register New Account}{register_new_account}
+Identical to~\elementRef{register_new_device}, with the only difference 
+being that it has some extra sub-elements for user data.
+
+\begin{description}
+ \item[Title] \windowTitleRef{register_new_account}
+ \item[Description] Screen to fill in the account id and other user data
+ \item[Back] Log in and Registration~\elementRef{login}
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Handle Text Box}
+\begin{description}
+ \item[Label] \labelRef{enter_handle}
+ \item[Description] Text box
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{Credit Card Text Box}
+\begin{description}
+ \item[Label] \labelRef{enter_credit_card}
+ \item[Description] Text box
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+More sub-elements will be added as the user data requirements are finalized.
+
+\subsubsection{Execute Button}
+Execute button~\elementRef{execute_button} with parameters
+\begin{description}
+ \item[On click] The first part of the "User Registration" flow is executed.
+ \item[On success] Log in and Registration~\elementRef{login}, where the rest 
+of the the "User Registration" flow can be executed.
+ \item[On error] User registration 
+error~\elementRef{user_registration_error}
+\end{description}
+
+\element{User Registration Error}{user_registration_error}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{user_registration}
+ \item[Dismiss transition] Log in and Registration~\elementRef{login}
+\end{description}
+
+\element{Main Screen}{main_screen}
+
+\begin{description}
+ \item[Title] \windowTitleRef{create_purchase_order}
+ \item[Description] User enters an amount to produce a barcode
+ \item[Back] System
+ \item[Settings]\mbox{}
+ \begin{description}
+  \item[Log in and Registration~\elementRef{login}] 
+\labelRef{log_out} The "Log out" flow is triggered
+  \item[Modify User Data~\elementRef{modify_user_data}] 
+\labelRef{modify_user_data} The "Retrieve User Data and Client Settings" flow 
+is triggered
+  \item[Modify User Handle~\elementRef{modify_user_handle}] 
+\labelRef{modify_user_handle}
+  \item[Test Private Key~\elementRef{test_private_key}] 
+\labelRef{test_private_key}
+  \item[Delete device~\elementRef{delete_client}] \labelRef{delete_client}
+  \item[View receipts~\elementRef{view_receipts}] \labelRef{view_receipts} The 
+"Receipt Retrieval" flow is triggered
+ \item[Change PIN~\elementRef{enter_pin}] \labelRef{change_pin} "Enter PIN for 
+Change"~\elementRef{enter_pin_change}
+ \item[Enable PIN] \labelRef{enable_pin} \elementRef{enter_pin}
+ \item[Disable PIN] \labelRef{disable_pin} \elementRef{enter_pin}
+ \item[Client settings] \labelRef{client_settings} \elementRef{client_settings}
+ \end{description}
+\end{description}
+
+\paragraph*{Note}
+If "Enable PIN" is present, "Change PIN" and "Disable PIN" do not appear as 
+options. Conversely, if "Change PIN" is present, "Disable PIN" is present as 
+well, and "Enable PIN" is not present.
+
+\paragraph{Sub-elements}
+
+\subsubsection{Amount Text Box}
+\label{main_screen:amount_text_box}
+\begin{description}
+ \item[Label] \labelRef{enter_amount}
+ \item[Description] Text box with a combo box with type \emph{Currency}. The 
+initial value of the combo box is taken from \emph{Settings.currency}
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{Execute Button}
+Execute button~\elementRef{execute_button} with parameters
+\begin{description}
+ \item[On click] The barcode generation part of the "Payment" flow is executed.
+ \item[On success] Barcode~\elementRef{barcode}, where the rest of the the 
+"Payment" flow can be executed
+ \item[On error] Barcode error~\elementRef{barcode_error}
+\end{description}
+
+\element{Barcode}{barcode}
+
+\begin{description}
+ \item[Title] \windowTitleRef{purchase_order}
+ \item[Description] QR code / barcode display
+ \item[Back] Main Screen \elementRef{main_screen} with the values entered in 
+\ref{main_screen:amount_text_box} for this code preserved
+ \item[Transitions]\mbox{}
+ \begin{description}
+  \item[On tap/On shake] The part of the Payment flow where a QR code is mapped 
+to barcode is executed. If further tap/shake events are detected, the QR code 
+and barcode images toggle on the display.
+  \begin{description}
+   \item[On success] If the above transition succeeds, the image of a QR code 
+is replaced with the image of a barcode.
+   \item[On error] If the tap/shake transition fails, 
+\elementRef{code_toggle_error}.
+  \end{description}
+  \item[On NFC terminal detected] The Payment flow branch where the QR code is 
+transmitted over NFC is executed. If the transmission fails, the QR code stays 
+on screen. If it succeeds, \elementRef{barcode_transmitted}.
+ \end{description}
+ \item[Settings]\mbox{}
+ \begin{description}
+  \item[Payment details] \labelRef{payment_details} 
+\elementRef{payment_details}.
+  \item[New payment] \labelRef{new_payment} \elementRef{main_screen} with the 
+values of \ref{main_screen:amount_text_box} reset
+ \end{description}
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Code Toggle}
+\begin{description}
+ \item[Label] None
+ \item[Description] Button, with an image of a barcode
+ \item[Triggers] The same as 'On tap' for the parent element.
+ \item[Transitions] The same as 'On tap' for the parent element.
+\end{description}
+
+\subsubsection{Barcode Display}
+\begin{description}
+ \item[Label] None
+ \item[Description] Image
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\element{Barcode Error}{barcode_error}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{barcode_generation}
+ \item[Dismiss transition] Main Screen~\elementRef{main_screen}
+\end{description}
+
+\element{Modify User Data}{modify_user_data}
+
+\begin{description}
+ \item[Title] \windowTitleRef{modify_user_data}
+ \item[Description] Screen to change the credit card and other user 
+data
+ \item[Back] Main Screen~\elementRef{main_screen}
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Credit Card Text Box}
+\begin{description}
+ \item[Label] \labelRef{enter_credit_card}
+ \item[Description] Text box
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+More sub-elements will be added as the user data requirements are finalized.
+
+\subsubsection{Execute Button}
+Execute button~\elementRef{execute_button} with parameters
+\begin{description}
+ \item[On click] The "Modify User Agent and User Data, except Handle" flow is 
+executed.
+ \item[On success] Main Screen~\elementRef{main_screen}
+ \item[On error] Modify User Data Error~\elementRef{modify_user_data_error}
+\end{description}
+
+\element{Modify User Data Error}{modify_user_data_error}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{modify_user_data}
+ \item[Dismiss transition] Modify User Data~\elementRef{modify_user_data}
+\end{description}
+
+\element{Modify User Handle}{modify_user_handle}
+
+\begin{description}
+ \item[Title] \windowTitleRef{modify_user_handle}
+ \item[Description] Screen to change the account handle. This is separate from 
+the rest of the user data, because it requires a registration code step.
+ \item[Back] Main Screen~\elementRef{main_screen}
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Handle Text Box}
+\begin{description}
+ \item[Label] \labelRef{enter_handle}
+ \item[Description] Text box
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{Execute Button}
+Execute button~\elementRef{execute_button} with parameters
+\begin{description}
+ \item[On click] The first part of the "Modify Handle" flow is executed.
+ \item[On success] Log in and Registration~\elementRef{login}, where the second 
+part of the "Modify Handle" flow can be executed
+ \item[On error] Modify User Handle Error~\elementRef{modify_user_handle_error}
+\end{description}
+
+\element{Modify User Handle Error}{modify_user_handle_error}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{modify_user_handle}
+ \item[Dismiss transition] Modify User 
+Handle~\elementRef{modify_user_handle}
+\end{description}
+
+\element{Test Private Key}{test_private_key}
+
+\begin{description}
+ \item[Title] \windowTitleRef{test_private_key}
+ \item[Description] A screen with a button to test if the keys are still valid
+ \item[Back] Main Screen~\elementRef{main_screen}
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Execute Button}
+Execute button~\elementRef{execute_button} with parameters
+\begin{description}
+ \item[On click] The "Test Private Key" flow is executed.
+ \item[On success] Test Private Key 
+Success~\elementRef{test_private_key_success}
+ \item[On error] Test Private Key Error~\elementRef{test_private_key_error}
+\end{description}
+
+\element{Test Private Key Success}{test_private_key_success}
+Message box~\elementRef{message_box} with parameters
+\begin{description}
+ \item[Title] \windowTitleRef{test_private_key_success}
+ \item[Description] This is an informative screen. It notifies the user that 
+the action was completed successfully, because there is no other immediate 
+indication on the outcome of the operation
+ \item[Message] \messageTextRef{test_private_key_success}
+ \item[Dismiss transition] Main screen~\elementRef{main_screen}
+\end{description}
+
+\element{Test Private Key Error}{test_private_key_error}
+
+\begin{description}
+ \item[Title] \windowTitleRef{test_private_key_error}
+ \item[Description] This screen contains an error message and buttons to either 
+fix the problem or log out. This is an error from which the application cannot 
+recover without user action or which can be ignored
+ \item[Back] None
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Reset Keys Button}
+\begin{description}
+ \item[Label] \labelRef{reset_keys}
+ \item[Description] Button
+ \item[Triggers] The first part of the "Reset Public Key" flow
+ \item[Transitions]\mbox{}
+ \begin{description}
+  \item[On success] Reset Private Key~\elementRef{reset_private_key}
+  \item[On error] Reset Private Key Error~\elementRef{reset_private_key_error}
+ \end{description}
+\end{description}
+
+\subsubsection{Dismiss Button}
+\begin{description}
+ \item[Label] \labelRef{dismiss_key_error}
+ \item[Description] Button
+ \item[Triggers] None
+ \item[Transitions]\mbox{}
+ \begin{description}
+  \item[On click] Private Key Error 
+Dismiss~\elementRef{private_key_error_dismiss}
+ \end{description}
+\end{description}
+
+\element{Reset Private Key}{reset_private_key}
+
+\begin{description}
+ \item[Title] \windowTitleRef{reset_private_key}
+ \item[Description] This screen accepts a registration code to complete the 
+reset keys flow
+ \item[Back] None
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Registration Code Field}
+Registration code field~\elementRef{registration_code_field} with parameters
+\begin{description}
+ \item[On value entered] The second part of the "Reset Public Key" flow
+ \item[On success] Reset Private Key 
+Success~\elementRef{reset_private_key_success}
+ \item[On error] Reset Private Key Error~\elementRef{reset_private_key_error}
+\end{description}
+
+\subsubsection{Message Box}
+\begin{description}
+ \item[Text] \messageTextRef{reset_private_key}
+ \item[Description] Text box
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\element{Reset Private Key Success}{reset_private_key_success}
+Message box~\elementRef{message_box} with parameters
+\begin{description}
+ \item[Title] \windowTitleRef{reset_private_key_success}
+ \item[Description] This is an informative screen. It notifies the user that 
+the action was completed successfully, because there is no other immediate 
+indication on the outcome of the operation
+ \item[Message] \messageTextRef{reset_private_key_success}
+ \item[Dismiss transition] Main screen~\elementRef{main_screen}
+\end{description}
+
+\element{Reset Private Key Error}{reset_private_key_error}
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{reset_private_key}
+ \item[Dismiss transition] Main Screen~\elementRef{main_screen}
+\end{description}
+
+\element{Private Key Error Dismiss}{private_key_error_dismiss}
+Message box~\elementRef{message_box} with parameters
+\begin{description}
+ \item[Title] \windowTitleRef{test_private_key_error}
+ \item[Description] This is an informative screen. It notifies the user that 
+the application is about to log out
+ \item[Message] \messageTextRef{private_key_error_dismiss}
+ \item[Dismiss transition] Log in and Registration~\elementRef{login}
+\end{description}
+
+\element{Delete Client}{delete_client}
+
+\begin{description}
+ \item[Title] \windowTitleRef{delete_client}
+ \item[Description] This screen has a button to trigger the flow and accepts a 
+registration code to complete it
+ \item[Back] Main screen~\elementRef{main_screen}
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Message}
+\begin{description}
+ \item[Text] \messageTextRef{delete_client}
+ \item[Description] Text box
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{Registration Code Field}
+\label{delete_client:registration_code_field}
+This element is inactive until~\ref{delete_client:go_button} is clicked. 
+Registration code field~\elementRef{registration_code_field} with parameters
+\begin{description}
+ \item[On value entered] The second part of the "Delete Client" flow
+ \item[On success] Log in and Registration~\elementRef{login}
+ \item[On error] Delete Client Error~\elementRef{delete_client_error}
+\end{description}
+
+\subsubsection{Go Button}
+\label{delete_client:go_button}
+\begin{description}
+ \item[Label] \labelRef{ok}
+ \item[Description] OK button to start the flow
+ \item[Triggers] The first part of the "Delete Client" flow
+ \item[Transitions]\mbox{}
+ \begin{description}
+  \item[On click] \ref{delete_client:registration_code_field} is activated. If 
+this is the last device for the account, 
+\elementRef{delete_account_confirmation} is triggered when the corresponding 
+server message is received.
+ \end{description}
+\end{description}
+
+\element{Delete Client Error}{delete_client_error}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{delete_client}
+ \item[Dismiss transition] Delete client~\elementRef{delete_client}
+\end{description}
+
+\element{Delete Account Confirmation}{delete_account_confirmation}
+
+\begin{description}
+ \item[Title] \windowTitleRef{delete_account_confirmation}
+ \item[Description] Confirm the deletion of account information
+ \item[Back] None
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{Message}
+\begin{description}
+ \item[Text] \messageTextRef{delete_account_confirmation}
+ \item[Description] Text box
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\subsubsection{OK Button}
+\label{delete_account_confirmation:ok}
+\begin{description}
+ \item[Label] \labelRef{ok}
+ \item[Description] Button
+ \item[Triggers]\mbox{}
+ \begin{description}
+  \item[On click] The part of the "Delete Client" flow where the client 
+responds that the server should remove the account
+ \end{description}
+ \item[Transitions]\mbox{}
+ \begin{description}
+  \item[On success] Delete client~\elementRef{delete_client}
+  \item[On error] Delete client error~\elementRef{delete_client_error}
+ \end{description}
+\end{description}
+
+\subsubsection{Cancel Button}
+Identical to~\ref{delete_account_confirmation:ok}, except the trigger for 
+on-click is to respond to the server that it should not remove the account
+
+\element{View Receipts}{view_receipts}
+
+\begin{description}
+ \item[Title] \windowTitleRef{view_receipts}
+ \item[Description] A scrollable view of the stored receipts
+ \item[Back] Main screen~\elementRef{main_screen}
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{View}
+\begin{description}
+ \item[Content] The receipt list
+ \item[Description] Scrollable view
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\element{Duplicate Receipt}{duplicate_receipt}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{duplicate_receipt}
+ \item[Dismiss transition] View Duplicate 
+Receipts~\elementRef{view_duplicate_receipts}
+\end{description}
+
+\paragraph{Comments}
+This element is triggered by the flow "Receipt Retrieval" detecting a problem. 
+This flow is executed either by an internal flow or from 
+\elementRef{main_screen}. If it is triggered by \elementRef{main_screen}, it 
+replaces \elementRef{view_receipts} as transition target.
+
+\element{View Duplicate Receipts}{view_duplicate_receipts}
+
+\begin{description}
+ \item[Title] \windowTitleRef{view_duplicate_receipts}
+ \item[Description] A scrollable view of the duplicate receipts. The content is 
+those receipts from the server that have the same sequence number with receipts 
+stored locally
+ \item[Back] Main screen~\elementRef{main_screen}
+ \item[Settings] None
+\end{description}
+
+\paragraph{Sub-elements}
+
+\subsubsection{View}
+\begin{description}
+ \item[Content] The receipt list
+ \item[Description] Scrollable view
+ \item[Triggers] None
+ \item[Transitions] None
+\end{description}
+
+\element{Enter PIN}{enter_pin}
+This screen appears when the "PIN Entry" flow executes. It extends Enter PIN 
+Screen~\elementRef{enter_pin_screen} with parameters
+
+\begin{description}
+ \item[Title] \windowTitleRef{enter_pin}
+ \item[Description] A screen where the user can enter a 4-digit PIN code
+ \item[Back] System
+ \item[On click] The rest of the "PIN Entry" flow
+ \item[On success] There are three option:
+ \begin{enumerate}
+  \item If the screen is invoked by the application coming to the foreground, 
+it transitions to the screen that would be invoked if PIN code was disabled
+  \item If the screen is invoked by "Disable PIN", the Disable PIN flow is 
+invoked and it transitions to Main Screen~\elementRef{main_screen}
+  \item If the screen is invoked by "Enable PIN", the Enable PIN flow is 
+invoked and it transitions to Main Screen~\elementRef{main_screen}
+ \end{enumerate}
+ \item[On error] The error part of the flow is executed and either the same 
+screen is shown or the UI transitions to \elementRef{login} when retries are 
+exhausted
+\end{description}
+
+\element{Enter PIN for Change}{enter_pin_change}
+Enter PIN screen~\elementRef{enter_pin_screen} with parameters
+
+\begin{description}
+ \item[Title] \windowTitleRef{enter_pin}
+ \item[Description] A screen where the user can enter the old 4-digit PIN code 
+to authorize changing it
+ \item[Back] Main screen~\elementRef{main_screen}
+ \item[On click] The first part of the "Change PIN" flow
+ \item[On success] Enter new PIN~\elementRef{enter_new_pin}
+ \item[On error] The error part of the flow is executed and either the same 
+screen is shown or the UI transitions to \elementRef{login} when retries are 
+exhausted
+\end{description}
+
+\element{Enter New PIN}{enter_new_pin}
+Enter PIN screen~\elementRef{enter_pin_screen} with parameters
+
+\begin{description}
+ \item[Title] \windowTitleRef{enter_new_pin}
+ \item[Description] A screen where the user can enter a 4-digit PIN code
+ \item[Back] Main screen~\elementRef{main_screen}
+ \item[On click] The last part of the "Change PIN" flow
+ \item[On success] Main screen~\elementRef{main_screen}
+ \item[On error] Enter new PIN~\elementRef{enter_new_pin}
+\end{description}
+
+\element{Client Settings}{client_settings}
+The layout of this element is platform-specific. It contains all the client 
+settings that are not covered by other elements. These are:
+
+\begin{itemize}
+ \item Default currency. It triggers the "Change Default Currency" flow.
+\end{itemize}
+
+\element{Payment Details}{payment_details}
+Message box~\elementRef{message_box} with parameters
+\begin{description}
+ \item[Title] \windowTitleRef{payment_details}
+ \item[Description] Displays information about the payment available locally to 
+the client
+ \item[Message] \messageTextRef{payment_details}
+ \item[Dismiss transition] Payment code screen~\elementRef{barcode}
+\end{description}
+
+\element{Code Toggle Error}{code_toggle_error}
+
+Error message box~\elementRef{error_message_box} with parameters
+\begin{description}
+ \item[Message] \errorMessageTextRef{code_toggle_error}
+ \item[Dismiss transition] Barcode~\elementRef{barcode}
+\end{description}
+
+\element{Code Transmitted}{barcode_transmitted}
+Message box~\elementRef{message_box} with parameters
+\begin{description}
+ \item[Title] \windowTitleRef{barcode_transmitted}
+ \item[Description] Notification that the code has been transmitted successfully
+ \item[Message] \messageTextRef{barcode_transmitted}
+ \item[Dismiss transition] Main screen~\elementRef{main_screen}
+\end{description}
+
+\element{EULA}{eula}
+Its appearance is platform-specific and will be defined later. The text will be 
+provided later.
+
+\element{Local Error Message Boxes}{local_error_message_boxes}
+In some cases a flow can fail locally, either because there is no network or a 
+field has a value that is not of the correct type or an internal error prevents 
+the client from accessing its local storage. Such errors are surfaced as error 
+message boxes~\elementRef{error_message_box}. Their text is
+
+\begin{description}
+ \item[Network error] \errorMessageTextRef{network}
+ \item[Internal error] \errorMessageTextRef{internal}. More details are to be 
+avoided, as they do not provide useful information to the user
+ \item[Type error] In general, elements that need input from the user to 
+execute an action should disable the execute buttons until all the values are 
+of the correct type. If this is not possible, due to limitations in the UI 
+framework, a short message indicating which field has an incorrect value should 
+be displayed
+\end{description}
+
+All dismiss actions must take the user to the screen that generated the error 
+to retry the action.
+
+\section{Textual Elements Specification}
+\label{sec:text_spec}
+
+\subsection{Window Titles}
+\begin{description}
+ \item[\windowTitle{login}] Log in/Register
+ \item[\windowTitle{login_failed}] Authorization failed
+ \item[\windowTitle{register_new_device}] Add New Device
+ \item[\windowTitle{error}] Error
+ \item[\windowTitle{register_new_account}] Register New Account
+ \item[\windowTitle{create_purchase_order}] Create Payment Code
+ \item[\windowTitle{purchase_order}] Payment Code
+ \item[\windowTitle{modify_user_data}] Change Account Settings
+ \item[\windowTitle{modify_user_handle}] Change Account E-mail
+ \item[\windowTitle{test_private_key}] Test Account Key
+ \item[\windowTitle{test_private_key_success}] Account Key Correct
+ \item[\windowTitle{test_private_key_error}] Account Key Error
+ \item[\windowTitle{reset_private_key}] Reset Account Key
+ \item[\windowTitle{reset_private_key_success}] Account Key Changed
+ \item[\windowTitle{delete_client}] Forget This Device
+ \item[\windowTitle{delete_account_confirmation}] Confirm Account Removal
+ \item[\windowTitle{view_receipts}] View Receipts
+ \item[\windowTitle{view_duplicate_receipts}] Suspicious Receipts
+ \item[\windowTitle{enter_pin}] Enter PIN
+ \item[\windowTitle{enter_new_pin}] New PIN
+ \item[\windowTitle{payment_details}] Details
+ \item[\windowTitle{barcode_transmitted}] Payment Code Transferred
+\end{description}
+
+\subsection{Messages}
+\begin{description}
+ \item[\messageText{test_private_key_success}] The account key is valid. If you 
+experience problems, please check your account settings and device connectivity 
+settings. If the problems continue, please contact customer support
+ \item[\messageText{reset_private_key_success}] The account key has been 
+changed successfully
+ \item[\messageText{private_key_error_dismiss}] The account key is invalid. The 
+application will log out. Please follow the registration flow to create a new 
+key
+ \item[\messageText{delete_client}] Delete information about this device from 
+the system
+ \item[\messageText{delete_account_confirmation}] You are about to remove the 
+last device for this account. Do you want to delete all information about your 
+account from the system? Answering yes will remove all device and account 
+information. Answering no will remove only device information and you will be 
+able to use your account in the future
+ \item[\messageText{payment_details}] Amount: X
+ \item[\messageText{reset_private_key}] Please enter the code you received
+ \item[\messageText{barcode_transmitted}] Payment code transferred successfully
+\end{description}
+
+\subsection{Error Messages}
+\begin{description}
+ \item[\errorMessageText{login}] Authorization failed
+ \item[\errorMessageText{device_registration}] Device registration failed: 
+\%reason
+ \item[\errorMessageText{user_registration}] Account registration failed: 
+\%reason
+ \item[\errorMessageText{barcode_generation}] Payment code generation failed
+ \item[\errorMessageText{modify_user_data}] Unable to apply the changes
+ \item[\errorMessageText{modify_user_handle}] Unable to change the account 
+ \item[\errorMessageText{delete_client}] Unable to delete device
+ \item[\errorMessageText{reset_private_key}] Unable to change the account key
+ \item[\errorMessageText{network}] Network error. Please check your 
+network settings
+ \item[\errorMessageText{internal}] An internal error has occurred. Please try 
+again
+ \item[\errorMessageText{duplicate_receipt}] Suspicious purchases have been 
+detected. Click below to view them. Please contact customer support to fix the 
+problem
+ \item[\errorMessageText{code_toggle_error}] A barcode cannot be created at 
+this time. Check your network settings and try again
+\end{description}
+
+\subsection{Labels}
+\begin{description}
+ \item[\labelText{request_registration_code}] Request Authorization Code
+ \item[\labelText{registration_code}] Authorization Code
+ \item[\labelText{registration_new_device}] Add Device
+ \item[\labelText{registration_new_account}] Create Account
+ \item[\labelText{ok}] OK
+ \item[\labelText{enter_handle}] Enter account e-mail address
+ \item[\labelText{execute}] OK
+ \item[\labelText{settings_register_new_account}] Create new account
+ \item[\labelText{enter_credit_card}] Credit card
+ \item[\labelText{enter_amount}] Enter amount
+ \item[\labelText{log_out}] Log out
+ \item[\labelText{modify_user_data}] Account settings
+ \item[\labelText{modify_user_handle}] Account e-mail
+ \item[\labelText{test_private_key}] Test account key
+ \item[\labelText{reset_keys}] Reset
+ \item[\labelText{dismiss_key_error}] Ignore
+ \item[\labelText{delete_client}] Delete device
+ \item[\labelText{view_receipts}] View receipts
+ \item[\labelText{change_pin}] Change PIN
+ \item[\labelText{pin_code}] PIN code
+ \item[\labelText{enable_pin}] Enable PIN
+ \item[\labelText{disable_pin}] Disable PIN
+ \item[\labelText{client_settings}] Client settings
+ \item[\labelText{payment_details}] Payment details
+ \item[\labelText{new_payment}] New payment
+\end{description}
+
+\subsection{Notification Messages}
+\label{sec:text_spec:notification_messages}
+
+\subsubsection{Signature Verification Failure}
+
+\SpecialItem
+\begin{description}
+ \item[Input] Receipt.
+ \item[Reason] A payment failed because it was signed with the wrong key. May 
+be due to an attack or due to the user changing their keys while a payment was 
+being executed. It's not a fatal error.
+\end{description}
+
+\paragraph{Email}
+\SpecialItem
+\begin{description}
+ \item[Subject] Payment failure, \emph{Receipt ID}
+ \item[Body] Dear \emph{User's title, first name, last name}
+\\\\
+Your purchase dating from \emph{Purchase order time}, at \emph{Retailer name}
+failed because of a verification problem. Please try again. If the problem 
+still occurs, please contact your customer support.
+\\\\
+If you see this message without having used your card, please contact customer 
+support immediately.
+\\\\
+Yours sincerely,\\
+QCharge team
+
+\end{description}
+
+\subsubsection{Replay Attack Detected}
+
+\SpecialItem
+\begin{description}
+ \item[Input] Receipt.
+ \item[Reason] Purchase orders with duplicate sequence numbers have been 
+detected. It is a serious attack, unless there is a client bug. The user needs 
+to be notified as soon as possible.
+\end{description}
+
+\paragraph{Email}
+\SpecialItem
+\begin{description}
+ \item[Subject] Security alert: payment failure, \emph{Receipt ID}
+ \item[Body] Dear \emph{User's title, first name, last name}
+\\\\
+Your purchase dating from \emph{Purchase order time}, at \emph{Retailer name}
+failed because of a severe security problem. Your account might be in danger. 
+Please contact customer support immediately. 
+\\\\
+Yours sincerely,\\
+QCharge team
+
+\end{description}
+
+\paragraph{Push Notification}
+\SpecialItem
+\begin{description}
+ \item[Body] QCharge security alert. Payment failed due to security reasons. 
+Contact support immediately: +41 44 444 44 44.
+\end{description}
+
+\subsubsection{Receipt Notification}
+
+\SpecialItem
+\begin{description}
+ \item[Input] Receipt.
+ \item[Reason] A payment was successful. The user may disable these 
+notifications. There is a third notification that goes to the cardholder. This 
+notification cannot be turned off. If the user is the same as the cardholder 
+and they have not turned off notifications, the cardholder doesn't receive a 
+separate notification.
+\end{description}
+
+\paragraph{Email}
+\SpecialItem
+\begin{description}
+ \item[Subject] Payment confirmation, \emph{Receipt ID}
+ \item[Body] Dear \emph{User's title, first name, last name}
+\\\\
+We confirm your purchase dating from \emph{Purchase Order Date, Time}, at 
+\emph{Retailer Name} for \emph{Amount}. Please let us know immediately if the 
+purchase has been made without your consent.
+\\\\
+Yours sincerely,\\
+QCharge team
+\end{description}
+
+\paragraph{Push Notification}
+\SpecialItem
+\begin{description}
+ \item[Body] QCharge payment confirmation. \emph{Purchase Order Date, Time}, at 
+\emph{Retailer Name}
+\end{description}
+
+\paragraph{Email to Cardholder}
+\SpecialItem
+\begin{description}
+ \item[Subject] Payment confirmation, \emph{Receipt ID}
+ \item[Body] Dear \emph{User's title, first name, last name}
+\\\\
+We confirm your purchase dating from \emph{Purchase Order Date, Time}, at 
+\emph{Retailer Name} for \emph{Amount}. Please let us know immediately if the 
+purchase has been made without your consent.
+\\\\
+Yours sincerely,\\
+QCharge team
+\end{description}
+
+\subsubsection{Location Congruity Check}
+
+\SpecialItem
+\begin{description}
+ \item[Input] Previous location/time, last location/time.
+ \item[Reason] Two consecutive locations reported by a client are incongruous.
+\end{description}
+
+\paragraph{Email}
+\SpecialItem
+\begin{description}
+ \item[Subject] Security alert: location mismatch
+ \item[Body]Dear \emph{User's title, first name, last name}
+\\\\
+Our security system located your account in two different geographical 
+locations: \emph{Previous Location and Time} and \emph{Last Location and 
+Time}. There might be a security problem. Please contact our customer support 
+to report your location. Thank you for your support.
+\\\\
+Yours sincerely,\\
+QCharge team
+
+\end{description}
+
+\paragraph{Push Notification}
+\SpecialItem
+\begin{description}
+ \item[Body] QCharge security alert. Location mismatch. Contact support: +41 44 
+444 44 44.
+\end{description}
+
+\subsubsection{Location Congruity Check with Retailer Information}
+
+\SpecialItem
+\begin{description}
+ \item[Input] Previous location/time, last location/time, retailer.
+ \item[Reason] Two consecutive locations reported by a client are incongruous. 
+The last location is that of a retailer.
+\end{description}
+
+\paragraph{Email}
+\SpecialItem
+\begin{description}
+ \item[Subject] Security alert: location mismatch
+ \item[Body]Dear \emph{User's title, first name, last name}
+\\\\
+Our security system located your account in two different geographical 
+locations: \emph{Previous Location and Time} and \emph{Last Location and 
+Time} at \emph{Retailer Name}. There might be a security problem. Please 
+contact our customer support to report your location. Thank you for your 
+support.
+\\\\
+Yours sincerely,\\
+QCharge team
+
+\end{description}
+
+\paragraph{Push Notification}
+\SpecialItem
+\begin{description}
+ \item[Body] QCharge security alert. Please confirm your location at 
+\emph{Retailer Location}. Contact support immediately: +41 44 444 44 44.
+\end{description}
+
+\bibliography{spec}
+\bibliographystyle{plain}
+
+\end{document}

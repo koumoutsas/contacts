@@ -242,6 +242,32 @@ collection can start from the oldest entry and proceed until an unexpired entry 
 doesn't support iterators, the entry id can be used as the value type.
 \end{description}
 
+\subsubsection{PublicKeys}
+
+\begin{verbbox}
+PublicKeys
+{
+  encryption, ECDH public key
+  verification, ECDSA verification key
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This is the counterpart structure of PrivateKeys \ref{sec:structure:client:private_keys}.
+
+\SpecialItem
+\begin{description}
+ \item[encryption] The encryption elliptic curve key.
+ \item[verification] The verification elliptic curve key.
+\end{description}
+
 \subsection{Client}
 \label{sec:structure:client}
 
@@ -453,32 +479,6 @@ client.
 \SpecialItem
 \begin{description}
  \item[Foreign Key] hash in Hashes~\ref{sec:structure:server:hashes}.
-\end{description}
-
-\subsubsection{PublicKeys}
-
-\begin{verbbox}
-PublicKeys
-{
-  encryption, ECDH public key
-  verification, ECDSA verification key
-}
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\paragraph*{Comments}
-This is the counterpart structure of PrivateKeys \ref{sec:structure:client:private_keys}.
-
-\SpecialItem
-\begin{description}
- \item[encryption] The encryption elliptic curve key.
- \item[verification] The verification elliptic curve key.
 \end{description}
 
 \subsubsection{Client}

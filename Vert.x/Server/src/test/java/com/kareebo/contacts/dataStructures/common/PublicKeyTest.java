@@ -12,16 +12,13 @@ import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.Security;
 
-import static org.junit.Assert.assertEquals;
-
 /**
- * Unit tests for {@link com.kareebo.contacts.dataStructures.common.PublicKeys}
+ * Unit test for {@link com.kareebo.contacts.dataStructures.common.PublicKey}
  */
-public class PublicKeysTest
+public class PublicKeyTest
 {
-	private PublicKey encryptionKey;
-	private PublicKey verificationKey;
-	private PublicKeys publicKeys;
+	private java.security.PublicKey key;
+	private PublicKey publicKey;
 
 	@Before
 	public void setUp() throws Exception
@@ -38,22 +35,16 @@ public class PublicKeysTest
 		final String algorithm="ECDSA";
 		final KeyPairGenerator keyPairGenerator=KeyPairGenerator.getInstance(algorithm,"BC");
 		keyPairGenerator.initialize(ecSpec,new SecureRandom());
-		final java.security.PublicKey ek=keyPairGenerator.generateKeyPair().getPublic();
-		encryptionKey=new PublicKey(ek.getEncoded(),algorithm);
-		final java.security.PublicKey vk=keyPairGenerator.generateKeyPair().getPublic();
-		verificationKey=new PublicKey(vk.getEncoded(),algorithm);
-		publicKeys=new PublicKeys(ek.getEncoded(),algorithm,vk.getEncoded(),algorithm);
+		key=keyPairGenerator.generateKeyPair().getPublic();
+		publicKey=new PublicKey(key.getEncoded(),algorithm);
 	}
 
 	@Test
-	public void testGetEncryption() throws Exception
+	public void testGetKey() throws Exception
 	{
-		assertEquals(encryptionKey,publicKeys.getEncryption());
-	}
-
-	@Test
-	public void testGetVerification() throws Exception
-	{
-		assertEquals(verificationKey,publicKeys.getVerification());
+		final java.security.PublicKey k1=publicKey.getKey();
+		final java.security.PublicKey k2=publicKey.getKey();
+		org.junit.Assert.assertSame(k1,k2);
+		org.junit.Assert.assertEquals(key,k1);
 	}
 }

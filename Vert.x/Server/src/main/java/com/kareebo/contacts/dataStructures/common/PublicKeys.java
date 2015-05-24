@@ -1,25 +1,10 @@
 package com.kareebo.contacts.dataStructures.common;
 
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-
 /**
- * Encryption and signature verification elliptic curve keys. It uses Bouncy Castle as the provider
+ * Encryption and signature verification key pair
  */
 public class PublicKeys
 {
-	/**
-	 * Key algorithm - Elliptic curve
-	 */
-	final static private String algorithm="ECDSA";
-	/**
-	 * Security provider - Bouncy Castle
-	 */
-	final static private String provider="BC";
 	/**
 	 * Public key for encryption
 	 */
@@ -30,34 +15,25 @@ public class PublicKeys
 	final private PublicKey verification;
 
 	/**
-	 * @param encryptionKey   X509-encoded byte array to initialize the encryption key
-	 * @param verificationKey X509-encoded byte array to initialize the signature verification key
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 * @throws NoSuchProviderException
+	 * @param encryptionKey            X509-encoded byte array of the serialized encryption key
+	 * @param encryptionKeyAlgorithm   The encryption key algorithm
+	 * @param verificationKey          X509-encoded byte array of the serialized signature verification key
+	 * @param verificationKeyAlgorithm The signature verification key algorithm
 	 */
-	public PublicKeys(final byte[] encryptionKey,final byte[] verificationKey) throws NoSuchAlgorithmException,
-		                                                                                  InvalidKeySpecException, NoSuchProviderException
+	public PublicKeys(final byte[] encryptionKey,final String encryptionKeyAlgorithm,final byte[]
+		                                                                                 verificationKey,
+	                  final String verificationKeyAlgorithm)
 	{
-		final KeyFactory keyFactory=KeyFactory.getInstance(algorithm,provider);
-		encryption=keyFactory.generatePublic(new X509EncodedKeySpec(encryptionKey));
-		verification=keyFactory.generatePublic(new X509EncodedKeySpec(verificationKey));
+		encryption=new PublicKey(encryptionKey,encryptionKeyAlgorithm);
+		verification=new PublicKey(verificationKey,verificationKeyAlgorithm);
 	}
 
 	/**
-	 * @return The security provider
+	 * @return The verification key
 	 */
-	public static String getProvider()
+	public PublicKey getVerification()
 	{
-		return provider;
-	}
-
-	/**
-	 * @return The key algorithm
-	 */
-	public static String getAlgorithm()
-	{
-		return algorithm;
+		return verification;
 	}
 
 	/**
@@ -66,13 +42,5 @@ public class PublicKeys
 	public PublicKey getEncryption()
 	{
 		return encryption;
-	}
-
-	/**
-	 * @return The signature verification key
-	 */
-	public PublicKey getVerification()
-	{
-		return verification;
 	}
 }

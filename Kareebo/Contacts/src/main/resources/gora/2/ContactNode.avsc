@@ -1,0 +1,36 @@
+{
+    "name": "ContactNode",
+    "namespace": "com.kareebo.contacts.server.gora",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "hash",
+            "type": "CryptoBuffer"
+        },
+        {
+            "name": "contact",
+            "type":
+            {
+                "name": "ContactNodeInternal",
+                "namespace": "com.kareebo.contacts.server.gora",
+                "type": "record",
+                "fields":
+                [
+                    {
+                        "name": "owner",
+                        "type": "ContactPointer"
+                    },
+                    {
+                        "name": "referrers",
+                        "type":
+                        {
+                            "type": "array",
+                            "items": "ContactPointer"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

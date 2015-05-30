@@ -1,0 +1,36 @@
+{
+    "name": "ContactPointer",
+    "namespace": "com.kareebo.contacts.server.gora",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "userId",
+            "type": "long"
+        },
+        {
+            "name": "pointers",
+            "type":
+            {
+                "type": "array",
+                "items":
+                {
+                    "name": "ContactPointerInternal",
+                    "namespace": "com.kareebo.contacts.server.gora",
+                    "type": "record",
+                    "fields":
+                    [
+                        {
+                            "name": "clientId",
+                            "type": "long"
+                        },
+                        {
+                            "name": "contactId",
+                            "type": "long"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,24 @@
+{
+    "name": "RegistrationCode",
+    "namespace": "com.kareebo.contacts.server.gora",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "userId",
+            "type": "long"
+        },
+        {
+            "name": "clientId",
+            "type": "long"
+        },
+        {
+            "name": "code",
+            "type": "string"
+        },
+        {
+            "name": "created",
+            "type": "long"
+        }
+    ]
+}

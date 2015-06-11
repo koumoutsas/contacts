@@ -154,7 +154,7 @@ This structure is a representation of the type of client. It is built at process
 \subsubsection{Id}
 
 \begin{verbbox}
-Id = 64-bit unsigned integer
+Id = 64-bit signed integer
 \end{verbbox}
 \begin{center}
 \theverbbox
@@ -165,7 +165,7 @@ Id = 64-bit unsigned integer
 \end{inparaitem}
 
 \paragraph*{Comments}
-Type alias for id types.
+Type alias for id types. It is defined as a signed data type instead of unsigned due to the unsigned type not being supported by most languages and systems.
 
 \subsubsection{Client}
 
@@ -184,13 +184,16 @@ Client extends UserAgent
 \end{inparaitem}
 
 \paragraph*{Comments}
-This structure extends a user agent with a unique id across a user. The $id$ field is not a primary key for the system, it is a primary key inside a User clients map 
+This structure extends a user agent with a unique id across a user. The $id$ field is not a primary key for the system, it is a primary key inside a User clients set
 (see~\ref{sec:structure:server:user}).
 
 \subsubsection{User}
 
 \begin{verbbox}
-User = Id
+User
+{
+  id, Id
+}
 \end{verbbox}
 \begin{center}
 \theverbbox
@@ -201,7 +204,7 @@ User = Id
 \end{inparaitem}
 
 \paragraph*{Comments}
-This is the base for any type of User. It is a simple typedef to an id, which acts as the key of any subtype.
+This is the base for any type of User. It is a simple wrapper around an id, which acts as the key of any subtype.
 
 \subsubsection{TimeoutMap}
 
@@ -224,6 +227,8 @@ TimeoutMap<T>
 \end{inparaitem}
 
 \paragraph*{Comments}
+This is a structure whose implementation depends a lot on the data storage backend. On RDBMSs it is straightforward to implement it, but NoSQL backends can only implement a simplified version of it, where the garbage-collection is done by the server. The following is specified with RDBMSs in mind. For NoSQL the specification is used to define the functionality of the garbage collector.
+
 This structure is a map for expirable objects and for periodically garbage-collecting items that have expired. The garbage collection can be triggered periodically (the period 
 should not be less than two times the timeout value) or when the map size has exceeded some threshold.
 
@@ -242,13 +247,29 @@ collection can start from the oldest entry and proceed until an unexpired entry 
 doesn't support iterators, the entry id can be used as the value type.
 \end{description}
 
-\subsubsection{PublicKeys}
+\subsubsection{HashAlgorithm}
 
 \begin{verbbox}
-PublicKeys
+HashAlgorithm = { SHA-256 }
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+HashAlgorithm is an enum of all the acceptable hash algorithms in the system. For the moment only SHA-256 is accepted.
+
+\subsubsection{HashBuffer}
+
+\begin{verbbox}
+HashBuffer
 {
-  encryption, ECDH public key
-  verification, ECDSA verification key
+  buffer, bytearray
+  algorithm, HashAlgorithm
 }
 \end{verbbox}
 \begin{center}
@@ -260,25 +281,92 @@ PublicKeys
 \end{inparaitem}
 
 \paragraph*{Comments}
-This is the counterpart structure of PrivateKeys \ref{sec:structure:client:private_keys}.
+A HashBuffer is a hash with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
 
 \SpecialItem
 \begin{description}
- \item[encryption] The encryption elliptic curve key.
- \item[verification] The verification elliptic curve key.
+ \item[buffer] A buffer with the hash. The buffer is unencoded.
+ \item[algorithm] Normally SHA-256.
 \end{description}
 
-\subsection{Client}
-\label{sec:structure:client}
+\SpecialItem
+\begin{description}
+ \item[Primary Key] All fields.
+\end{description}
 
-\subsubsection{PrivateKeys}
-\label{sec:structure:client:private_keys}
+\subsubsection{AssymetricKeyAlgorithm}
+\begin{verbbox}
+AssymetricKeyAlgorithm = { ECDSA-prime192v1 }
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+AssymetricKeyAlgorithm is an enum of all the acceptable assymetric key generation algorithms in the system. For the moment only ECDSA-prime192v1 is accepted.
+
+\subsubsection{EncryptedBuffer}
 
 \begin{verbbox}
-PrivateKeys
+EncryptedBuffer
 {
-  decryption, ECDH private key
-  signing, ECDSA signing key
+  buffer, bytearray
+  algorithm, AssymetricKeyAlgorithm
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+An EncryptedBuffer is a ciphertext payload with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
+
+\SpecialItem
+\begin{description}
+ \item[buffer] A buffer with the ciphertext
+ \item[algorithm] The encryption algorithm. It should be the same as that of the key used to produce it.
+\end{description}
+
+\SpecialItem
+\begin{description}
+ \item[Primary Key] All fields.
+\end{description}
+
+\subsubsection{PublicKey}
+
+\begin{verbbox}
+PublicKey
+{
+  buffer, bytearray with X.509 encoding of the key
+  algorithm, AssymetricKeyAlgorithm
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+A PublicKey is a buffer with the X.509 encoding of the key with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
+
+\subsubsection{PublicKeys}
+
+\begin{verbbox}
+PublicKeys
+{
+  encryption, PublicKey
+  verification, PublicKey
 }
 \end{verbbox}
 \begin{center}
@@ -291,8 +379,175 @@ PrivateKeys
 
 \SpecialItem
 \begin{description}
- \item[decryption] The decryption elliptic curve key.
- \item[signing] The signing elliptic curve key.
+ \item[encryption] The encryption key.
+ \item[verification] The signature verification key.
+\end{description}
+
+\subsubsection{ContactOperationType}
+
+\begin{verbbox}
+HashAlgorithm = { Add, Delete }
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+What kind of operation for a contact is requested by the client.
+
+\subsubsection{HashedContact}
+\label{sec:structure:common:hashed_contact}
+
+\begin{verbbox}
+HashedContact
+{
+  id, Id
+  hash, HashBuffer
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This structure doesn't leak any client information.
+
+\SpecialItem
+\begin{description}
+ \item[id] This id is generated by the client and it is used to match contacts between the blinded representation stored at the server and the full representation stored at the 
+client.
+ \item[hash] This is the blinded representation generated at the client. It is a cryptographically secure hash of the target and type of a contact.
+\end{description}
+
+\subsubsection{ContactOperation}
+
+\begin{verbbox}
+ContactOperation
+{
+  contact, HashedContact
+  type, ContactOperationType
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\SpecialItem\paragraph*{Comments}
+This structure is used for the protocol between client and server.
+
+\begin{description}
+ \item[contact] The blinded contact.
+ \item[type] The type of operation.
+\end{description}
+
+\subsubsection{ContactOperationSet}
+
+\begin{verbbox}
+ContactOperation = set(ContactOperation)
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \unsecure
+\end{inparaitem}
+
+\subsubsection{EncryptedContact}
+
+\begin{verbbox}
+EncryptedContact
+{
+  hashedContact, HashedContact
+  encrypted, EncryptedBuffer
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\SpecialItem\paragraph*{Comments}
+This structure is used for the protocol between client and server. It is used to transport contact information from one client to another.
+
+\begin{description}
+ \item[contact] The blinded contact.
+ \item[type] The encrypted contact information
+\end{description}
+
+\subsubsection{EncryptedContactSet}
+
+\begin{verbbox}
+EncryptedContactSet = set(EncryptedContact)
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \unsecure
+\end{inparaitem}
+
+\subsection{Client}
+\label{sec:structure:client}
+
+\subsubsection{PrivateKey}
+
+\begin{verbbox}
+PrivateKey
+{
+  buffer, bytearray with PKCS#8 encoding of the key
+  algorithm, AssymetricKeyAlgorithm
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+A PrivateKey is a buffer with the PKCS\#8 encoding of the key with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
+
+\subsubsection{PrivateKeys}
+\label{sec:structure:client:private_keys}
+
+\begin{verbbox}
+PrivateKeys
+{
+  decryption, PrivateKey
+  signing, PrivateKey
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\SpecialItem
+\begin{description}
+ \item[decryption] The decryption key.
+ \item[signing] The signing key.
 \end{description}
 
 \subsubsection{User}
@@ -452,11 +707,7 @@ This is the internal representation of the contact book of the device. It is ind
 \label{sec:structure:server:contact}
 
 \begin{verbbox}
-Contact
-{
-  id, Id
-  hash, SHA-256
-}
+HashedContact = Common.HashedContact
 \end{verbbox}
 \begin{center}
 \theverbbox
@@ -467,14 +718,7 @@ Contact
 \end{inparaitem}
 
 \paragraph*{Comments}
-This structure doesn't leak any client information.
-
-\SpecialItem
-\begin{description}
- \item[id] This id is generated by the client and it is used to match contacts between the blinded representation stored at the server and the full representation stored at the 
-client.
- \item[hash] This is the blinded representation generated at the client. It is a cryptographically secure hash of the target and type of a contact.
-\end{description}
+Server-side typedef for defining the foreign key constraint.
 
 \SpecialItem
 \begin{description}
@@ -673,7 +917,7 @@ up the client that needs to be contacted by the server if something changes.
 \label{sec:structure:server:hashes}
 
 \begin{verbbox}
-Hashes = map(SHA-256:ContactNode)
+Hashes = map(HashBuffer:ContactNode)
 \end{verbbox}
 \begin{center}
 \theverbbox

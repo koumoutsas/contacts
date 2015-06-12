@@ -1,6 +1,6 @@
 include "Common.thrift"
 
-namespace java org.kareebo.contacts.client
+namespace java com.kareebo.contacts.client
 
 struct PrivateKeys
 {

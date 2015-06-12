@@ -105,7 +105,46 @@ def configurePom(def pom) {
 }
 
 apply plugin: 'java'
-apply plugin: 'idea'
+
+def thriftOutputDir = 'src/thrift/main'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir thriftOutputDir
+        }
+    }
+}
+
+apply plugin: "org.apache.gora"
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.apache.gora.gradle:gora-gradle-plugin:0.6.1"
+        classpath 'org.codehaus.groovy:groovy-backports-compat23:2.3.5'
+    }
+}
+
+dependencies {
+    compile "org.apache.gora:gora-core:0.6.1-SNAPSHOT"
+}
+
+def jvmTestFlags = '''
+-Dlocally=true
+-ea
+- ...
+'''.split().toList()
+
+def IDEA_MODULE_NAME = 'Contacts'
+def IDEA_BUILD_DIR = 'build'
+
+// make sure build dir exists
+new File(IDEA_BUILD_DIR).mkdirs()
 
 apply plugin: 'thrift'
 
@@ -126,48 +165,28 @@ repositories {
 }
 
 dependencies {
-    compile 'org.apache.thrift:libthrift:0.9.2'
     compile 'org.apache.thrift:libthrift-vertx-java:1.0-SNAPSHOT'
 }
 
 generateThriftSource {
-    //
-    // The output directory (optional)
-    //
-    out file('build/generated-src/thrift/main')
+    out file(thriftOutputDir)
 
-    //
-    // -verbose / -debug / -strict (all optional)
-    //
     verbose false
     debug false
     strict true
 
-    //
-    // Modify the include path (optional)
-    //
-    path file('vendor/thrift')
-
-    //
-    // Set the thrift executable (optional)
-    //
-    //executable '/usr/bin/thrift'
+    executable '/usr/local/bin/thrift-for-vertx'
 
     generators {
-        //
-        // --gen java:hashcode,beans
-        //
         java {
-            //
-            // Options passed to the `java` generator
-            //
             option 'hashcode'
             option 'beans'
+            option 'vertx'
         }
     }
 }
 
-idea.module.sourceDirs += file('build/generated-src/thrift/main')
+idea.module.sourceDirs += file(thriftOutputDir)
 
 buildscript {
     repositories {

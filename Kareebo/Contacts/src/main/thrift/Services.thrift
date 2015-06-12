@@ -1,7 +1,7 @@
 include "Client.thrift"
 include "Common.thrift"
 
-namespace java org.kareebo.contacts.thrift
+namespace java com.kareebo.contacts.thrift
 
 typedef string RegistrationCode
 

@@ -1,7 +1,7 @@
-namespace java org.kareebo.contacts.common
+namespace java com.kareebo.contacts.common
 
-typedef i64 Id;
-typedef binary ByteArray;
+typedef i64 Id
+typedef binary ByteArray
 
 struct UserAgent
 {

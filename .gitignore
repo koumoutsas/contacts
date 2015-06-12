@@ -30,3 +30,4 @@ test-tmp
 *.class
 mods
 **/src/main/java/com/kareebo/contacts/server/gora/
+**/src/thrift/

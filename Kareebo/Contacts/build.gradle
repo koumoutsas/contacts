@@ -186,21 +186,57 @@ generateThriftSource {
     }
 }
 
-idea.module.sourceDirs += file(thriftOutputDir)
+apply plugin: 'idea'
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
+idea {
+    // see 'http://www.gradle.org/docs/current/dsl/org.gradle.plugins.ide.idea.model.IdeaModule.html'
+    module {
+        name = IDEA_MODULE_NAME
+
+        outputDir = file(IDEA_BUILD_DIR)
+        testOutputDir = file(IDEA_BUILD_DIR)
+
+        downloadSources = true
+        downloadJavadoc = false
+        sourceDirs += file(thriftOutputDir)
     }
-    dependencies {
-        classpath "org.apache.gora.gradle:gora-gradle-plugin:0.6.1"
-        classpath 'org.codehaus.groovy:groovy-backports-compat23:2.3.5'
+
+    project {
+        ipr.withXml { xmlFile ->
+            // enable 'Annotation Processors'
+            xmlFile.asNode().component.find { it.@name == 'CompilerConfiguration' }['annotationProcessing'][0].replaceNode {
+                annotationProcessing {
+                    profile(default: true, name: 'Default', useClasspath: 'true', enabled: true)
+                }
+            }
+
+            // setup Git root
+            xmlFile.asNode().component.find { it.@name == 'VcsDirectoryMappings' }.replaceNode {
+                component(name: 'VcsDirectoryMappings') {
+                    mapping(directory: "",  vcs: "")
+                    mapping(directory: "\$PROJECT_DIR\$/../..", vcs: 'Git')
+                }
+            }
+
+            // setup compiler output directory
+            xmlFile.asNode().component.find { it.@name == 'ProjectRootManager' }['output'][0].replaceNode {
+                output(url: "file://\$PROJECT_DIR\$/$IDEA_BUILD_DIR/out")
+            }
+        }
     }
-}
 
-apply plugin: "org.apache.gora"
+    workspace {
+        iws.withXml { xmlFile ->
+            def runManager = xmlFile.asNode().component.find { it.@name == 'RunManager' }
 
-dependencies {
-    compile "org.apache.gora:gora-core:0.6.1-SNAPSHOT"
+            // setup JUnit's default run configuration
+            def junitDefaults = runManager.configuration.find { it.@default == 'true' && it.@type == 'JUnit' }
+            junitDefaults.option.find { it.@name == 'VM_PARAMETERS' }.replaceNode {
+                option(name: 'VM_PARAMETERS', value: jvmTestFlags.join(" "))
+            }
+            junitDefaults.module.replaceNode {
+                module(name: IDEA_MODULE_NAME)
+            }
+        }
+    }
 }

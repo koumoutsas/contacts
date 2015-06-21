@@ -3,6 +3,7 @@ package com.kareebo.contacts.server.crypto;
 import com.kareebo.contacts.server.gora.Algorithm;
 import com.kareebo.contacts.server.gora.CryptoBuffer;
 
+import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -37,9 +38,16 @@ public class Utils
 		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException
 	{
 		final Vector<String> characteristics=decompose(verificationKey.getAlgorithm());
+		if(characteristics.size()!=2)
+		{
+			throw new NoSuchAlgorithmException();
+		}
 		final Signature verify=Signature.getInstance(characteristics.get(1),provider);
-		verify.initVerify(KeyFactory.getInstance(characteristics.get(0),provider).generatePublic(new
-			                                                                                         X509EncodedKeySpec(verificationKey.getBuffer().array())));
+		final ByteBuffer byteBuffer=verificationKey.getBuffer();
+		final byte[] bb=new byte[byteBuffer.remaining()];
+		byteBuffer.get(bb);
+		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(
+			                                                                                                      bb)));
 		for(final Object aPlaintext : plaintext)
 		{
 			verify.update((byte[])aPlaintext);
@@ -70,6 +78,14 @@ public class Utils
 		}
 		return ret;
 	}
+
+	/**
+	 * Get the security provider
+	 *
+	 * @return The security provider's name
+	 */
+	public static String getProvider()
+	{
+		return provider;
+	}
 }
-
-

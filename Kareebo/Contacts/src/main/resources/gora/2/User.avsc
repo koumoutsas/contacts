@@ -41,8 +41,8 @@
             "name": "clients",
             "type":
             {
-                "type": "array",
-                "items":
+                "type": "map",
+                "values":
                 {
                     "name": "Client",
                     "namespace": "com.kareebo.contacts.server.gora",
@@ -68,10 +68,6 @@
                                     }
                                 ]
                             }
-                        },
-                        {
-                            "name": "id",
-                            "type": "long"
                         },
                         {
                             "name": "registered",

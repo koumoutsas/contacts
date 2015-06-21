@@ -18,7 +18,7 @@ struct Client
 enum Algorithm
 {
     SHA256 = 1,
-    ECprime239v1 = 2,
+    SHA256withECDSAprime239v1 = 2,
 }
 
 

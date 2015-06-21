@@ -36,12 +36,6 @@ service DeviceRegistration
     void deviceRegistration2(1: RegistrationCode code, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
 }
 
-service LogInClient
-{
-    void logInClient1(1: IdPair ids) throws (1: InvalidArgument invalidArgument),
-    void logInClient2(1: RegistrationCode code, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
-}
-
 service ModifyKeys
 {
     void modifyKeys1(1: Common.PublicKeys newPublicKeys, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
@@ -56,12 +50,6 @@ service ModifyHandle
 {
     void modifyHandle1(1: Common.Handle newHandle, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
     void modifyHandle2(1: RegistrationCode code, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
-}
-
-service TestKeys
-{
-    EncryptedData testKeys1(1: string fixed, 2: IdPair ids) throws (1: InvalidArgument invalidArgument),
-    bool testKeys2(1: string fixed, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
 }
 
 enum ContactOperationType

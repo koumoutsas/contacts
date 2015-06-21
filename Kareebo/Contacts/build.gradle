@@ -59,7 +59,7 @@ dependencies {
   provided "org.scala-lang:scala-library:$scalaVersion"
   provided "io.vertx:lang-scala:$scalaLangModVersion@jar"
 
-
+  provided "org.apache.hadoop:hadoop-core:1.2.1"
 }
 
 test {

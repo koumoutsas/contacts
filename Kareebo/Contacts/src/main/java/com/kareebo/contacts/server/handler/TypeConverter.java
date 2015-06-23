@@ -24,7 +24,9 @@ class TypeConverter
 	{
 		final CryptoBuffer ret=new CryptoBuffer();
 		ret.setAlgorithm(convert(cryptoBuffer.getAlgorithm()));
-		ret.setBuffer(ByteBuffer.wrap(cryptoBuffer.getBuffer()));
+		final ByteBuffer buffer=cryptoBuffer.bufferForBuffer();
+		buffer.mark();
+		ret.setBuffer(buffer);
 		return ret;
 	}
 
@@ -43,6 +45,6 @@ class TypeConverter
 
 	static CharSequence convert(final long id)
 	{
-		return new String(ByteBuffer.allocate(8).putLong(id).array());
+		return String.valueOf(id);
 	}
 }

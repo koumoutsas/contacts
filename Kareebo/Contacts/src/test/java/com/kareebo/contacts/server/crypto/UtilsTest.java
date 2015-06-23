@@ -19,7 +19,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for crypto utils
+ * Unit tests for {@link Utils}
  */
 public class UtilsTest
 {

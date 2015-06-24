@@ -1,3 +1,5 @@
+def SLF4J_VERSION = '1.6.4'
+
 apply from: "gradle/vertx.gradle"
 
 /*
@@ -60,6 +62,9 @@ dependencies {
   provided "io.vertx:lang-scala:$scalaLangModVersion@jar"
 
   provided "org.apache.hadoop:hadoop-core:1.2.1"
+  provided "org.slf4j:slf4j-api:${SLF4J_VERSION}"
+  provided "org.slf4j:slf4j-log4j12:${SLF4J_VERSION}"
+  provided 'log4j:log4j:1.2.14'
 }
 
 test {

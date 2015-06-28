@@ -3,9 +3,11 @@ package com.kareebo.contacts.server.handler;
 import com.kareebo.contacts.common.PublicKeys;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.Client;
+import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.InvalidArgument;
 import com.kareebo.contacts.thrift.ModifyKeys;
 import com.kareebo.contacts.thrift.Signature;
+import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
 import java.security.InvalidKeyException;
@@ -20,6 +22,16 @@ import java.util.Vector;
  */
 public class ModifyKeysAsyncIface extends ClientDBAccessor implements ModifyKeys.AsyncIface
 {
+	/**
+	 * Constructor from a datastore
+	 *
+	 * @param dataStore The datastore
+	 */
+	ModifyKeysAsyncIface(final DataStore<Long,User> dataStore)
+	{
+		super(dataStore);
+	}
+
 	@Override
 	/**
 	 * The client sends the new keys signed with the old keys
@@ -53,7 +65,7 @@ public class ModifyKeysAsyncIface extends ClientDBAccessor implements ModifyKeys
 			future.setFailure(new InvalidArgument());
 			return;
 		}
-		set(client);
+		put(client);
 		close();
 	}
 }

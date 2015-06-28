@@ -5,10 +5,8 @@ import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.IdPair;
 import com.kareebo.contacts.thrift.InvalidArgument;
 import org.apache.gora.store.DataStore;
-import org.apache.gora.store.DataStoreFactory;
-import org.apache.hadoop.conf.Configuration;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,7 +19,7 @@ class ClientDBAccessor
 	 */
 	private static final String[] queryFields={"clients"};
 	/**
-	 * The datastore is initialized in the ctor and is never null
+	 * The datastore is initialized in the constructor and is never null
 	 */
 	private DataStore<Long,User> dataStore;
 	/**
@@ -32,18 +30,34 @@ class ClientDBAccessor
 	private Map<CharSequence,Client> clients;
 
 	/**
-	 * Sets the datastore
+	 * Constructor from a datastore
+	 * @param dataStore The datastore
 	 */
-	ClientDBAccessor()
+	ClientDBAccessor(final DataStore<Long,User> dataStore)
 	{
-		try
+		this.dataStore=dataStore;
+	}
+
+	private void resetState()
+	{
+		user=null;
+		idPair=null;
+		clients=null;
+	}
+
+	private void getClients(final IdPair idPair) throws InvalidArgument
+	{
+		this.idPair=idPair;
+		user=dataStore.get(idPair.getUserId(),queryFields);
+		if(user==null)
 		{
-			dataStore=DataStoreFactory.getDataStore(Long.class,User.class,
-				                                       new Configuration());
+			resetState();
+			throw new InvalidArgument();
 		}
-		catch(IOException ex)
+		clients=user.getClients();
+		if(clients==null)
 		{
-			throw new RuntimeException(ex);
+			clients=new HashMap<>();
 		}
 	}
 
@@ -52,47 +66,52 @@ class ClientDBAccessor
 	 *
 	 * @param idPair The user and client ids
 	 * @return The client
-	 * @throws InvalidArgument When the user or client cannot be found in the DB
+	 * @throws InvalidArgument If there is no such client
 	 */
 	Client get(final IdPair idPair) throws InvalidArgument
 	{
-		user=dataStore.get(idPair.getUserId(),queryFields);
-		if(user==null)
-		{
-			throw new InvalidArgument();
-		}
-		clients=user.getClients();
-		if(clients==null)
-		{
-			user=null;
-			throw new InvalidArgument();
-		}
+		getClients(idPair);
 		final Client client=clients.get(TypeConverter.convert(idPair.getClientId()));
 		if(client==null)
 		{
-			user=null;
-			clients=null;
+			resetState();
 			throw new InvalidArgument();
 		}
-		this.idPair=idPair;
 		return client;
 	}
 
-	void set(final Client client)
+	/**
+	 * Set a client for a user that has been retrieved before with get. The client can exist already, in
+	 * which case it's an update, or not, in which case it's an insert.
+	 * @param client The client
+	 */
+	void put(final Client client)
 	{
-		if(user==null||clients==null)
+		if(user==null||clients==null||idPair==null)
 		{
 			throw new IllegalStateException();
-		}
-		if(client==null)
-		{
-			throw new IllegalArgumentException();
 		}
 		clients.put(TypeConverter.convert(idPair.getClientId()),client);
 		user.setClients(clients);
 		dataStore.put(idPair.getUserId(),user);
 	}
 
+	/**
+	 * Set a client for a user, without calling get first. The client can exist already, in
+	 * which case it's an update, or not, in which case it's an insert.
+	 * @param idPair The ids
+	 * @param client The client
+	 * @throws InvalidArgument When the user cannot be found in the DB
+	 */
+	void put(final IdPair idPair,final Client client) throws InvalidArgument
+	{
+		getClients(idPair);
+		put(client);
+	}
+
+	/**
+	 * Call this method to commit to the DB
+	 */
 	void close()
 	{
 		dataStore.close();

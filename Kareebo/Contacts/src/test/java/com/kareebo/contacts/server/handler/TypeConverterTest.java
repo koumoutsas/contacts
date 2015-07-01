@@ -14,14 +14,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class TypeConverterTest
 {
-	private CryptoBuffer create(final com.kareebo.contacts.common.Algorithm algorithm,final byte[] buffer)
-	{
-		final CryptoBuffer cryptoBuffer=new CryptoBuffer();
-		cryptoBuffer.setAlgorithm(algorithm);
-		cryptoBuffer.setBuffer(buffer);
-		return cryptoBuffer;
-	}
-
 	@Test
 	public void testConvertPublicKeys() throws Exception
 	{
@@ -36,6 +28,14 @@ public class TypeConverterTest
 		final com.kareebo.contacts.server.gora.PublicKeys converted=TypeConverter.convert(publicKeys);
 		assertEquals(TypeConverter.convert(encryptionKey),converted.getEncryption());
 		assertEquals(TypeConverter.convert(verificationKey),converted.getVerification());
+	}
+
+	private CryptoBuffer create(final com.kareebo.contacts.common.Algorithm algorithm,final byte[] buffer)
+	{
+		final CryptoBuffer cryptoBuffer=new CryptoBuffer();
+		cryptoBuffer.setAlgorithm(algorithm);
+		cryptoBuffer.setBuffer(buffer);
+		return cryptoBuffer;
 	}
 
 	@Test

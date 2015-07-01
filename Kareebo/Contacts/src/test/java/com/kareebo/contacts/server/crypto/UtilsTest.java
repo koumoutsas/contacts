@@ -23,28 +23,30 @@ import static org.junit.Assert.assertTrue;
  */
 public class UtilsTest
 {
-	final private Vector<byte[]>plaintext=new Vector<>(2);
-	private byte[] signature;
-	final private CryptoBuffer verificationKey=new CryptoBuffer();
 	final static private String ecdsa="ECDSA";
+	final private Vector<byte[]> plaintext=new Vector<>(2);
+	final private CryptoBuffer verificationKey=new CryptoBuffer();
+	@Rule
+	public ExpectedException exception=ExpectedException.none();
+	private byte[] signature;
 
 	@Before
 	public void setUp() throws Exception
 	{
 		Security.addProvider(new BouncyCastleProvider());
-		final ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("prime192v1");
-		final KeyPairGenerator g = KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
-		g.initialize(ecSpec, new SecureRandom());
+		final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
+		final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
+		g.initialize(ecSpec,new SecureRandom());
 		final KeyPair keyPair=g.generateKeyPair();
 		plaintext.add("abc".getBytes());
 		plaintext.add("cde".getBytes());
-		Signature ecdsaSign = Signature.getInstance("SHA256withECDSA",Utils.getProvider());
+		Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
-		for(final Object a:plaintext)
+		for(final Object a : plaintext)
 		{
 			ecdsaSign.update((byte[])a);
 		}
-		signature = ecdsaSign.sign();
+		signature=ecdsaSign.sign();
 		final ByteBuffer buffer=ByteBuffer.wrap(new X509EncodedKeySpec(
 			                                                              keyPair.getPublic().getEncoded
 				                                                                                  ())
@@ -53,9 +55,6 @@ public class UtilsTest
 		verificationKey.setBuffer(buffer);
 		verificationKey.setAlgorithm(Algorithm.SHA256withECDSAprime239v1);
 	}
-
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
 
 	@Test
 	public void testVerifySignature() throws Exception

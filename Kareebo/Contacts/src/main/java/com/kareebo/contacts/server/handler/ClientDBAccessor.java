@@ -6,7 +6,6 @@ import com.kareebo.contacts.thrift.IdPair;
 import com.kareebo.contacts.thrift.InvalidArgument;
 import org.apache.gora.store.DataStore;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,34 +30,12 @@ class ClientDBAccessor
 
 	/**
 	 * Constructor from a datastore
+	 *
 	 * @param dataStore The datastore
 	 */
 	ClientDBAccessor(final DataStore<Long,User> dataStore)
 	{
 		this.dataStore=dataStore;
-	}
-
-	private void resetState()
-	{
-		user=null;
-		idPair=null;
-		clients=null;
-	}
-
-	private void getClients(final IdPair idPair) throws InvalidArgument
-	{
-		this.idPair=idPair;
-		user=dataStore.get(idPair.getUserId(),queryFields);
-		if(user==null)
-		{
-			resetState();
-			throw new InvalidArgument();
-		}
-		clients=user.getClients();
-		if(clients==null)
-		{
-			clients=new HashMap<>();
-		}
 	}
 
 	/**
@@ -80,9 +57,43 @@ class ClientDBAccessor
 		return client;
 	}
 
+	private void getClients(final IdPair idPair) throws InvalidArgument
+	{
+		this.idPair=idPair;
+		user=dataStore.get(idPair.getUserId(),queryFields);
+		if(user==null)
+		{
+			resetState();
+			throw new InvalidArgument();
+		}
+		clients=user.getClients();
+	}
+
+	private void resetState()
+	{
+		user=null;
+		idPair=null;
+		clients=null;
+	}
+
+	/**
+	 * Set a client for a user, without calling get first. The client can exist already, in
+	 * which case it's an update, or not, in which case it's an insert.
+	 *
+	 * @param idPair The ids
+	 * @param client The client
+	 * @throws InvalidArgument When the user cannot be found in the DB
+	 */
+	void put(final IdPair idPair,final Client client) throws InvalidArgument
+	{
+		getClients(idPair);
+		put(client);
+	}
+
 	/**
 	 * Set a client for a user that has been retrieved before with get. The client can exist already, in
 	 * which case it's an update, or not, in which case it's an insert.
+	 *
 	 * @param client The client
 	 */
 	void put(final Client client)
@@ -94,19 +105,6 @@ class ClientDBAccessor
 		clients.put(TypeConverter.convert(idPair.getClientId()),client);
 		user.setClients(clients);
 		dataStore.put(idPair.getUserId(),user);
-	}
-
-	/**
-	 * Set a client for a user, without calling get first. The client can exist already, in
-	 * which case it's an update, or not, in which case it's an insert.
-	 * @param idPair The ids
-	 * @param client The client
-	 * @throws InvalidArgument When the user cannot be found in the DB
-	 */
-	void put(final IdPair idPair,final Client client) throws InvalidArgument
-	{
-		getClients(idPair);
-		put(client);
 	}
 
 	/**

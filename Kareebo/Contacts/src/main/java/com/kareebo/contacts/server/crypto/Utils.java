@@ -32,7 +32,7 @@ public class Utils
 	 * @throws InvalidKeyException
 	 * @throws InvalidKeySpecException
 	 */
-	public static boolean verifySignature(final CryptoBuffer verificationKey,final byte[] signature,final
+	public static boolean verifySignature(final CryptoBuffer verificationKey,final ByteBuffer signature,final
 	Vector<byte[]> plaintext)
 		throws
 		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException
@@ -43,16 +43,18 @@ public class Utils
 			throw new NoSuchAlgorithmException();
 		}
 		final Signature verify=Signature.getInstance(characteristics.get(1),provider);
-		final ByteBuffer byteBuffer=verificationKey.getBuffer();
-		final byte[] bb=new byte[byteBuffer.remaining()];
-		byteBuffer.get(bb);
+		final ByteBuffer verificationByteBuffer=verificationKey.getBuffer();
+		final byte[] verificationBytes=new byte[verificationByteBuffer.remaining()];
+		verificationByteBuffer.get(verificationBytes);
 		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(
-			                                                                                                      bb)));
+			                                                                                                      verificationBytes)));
 		for(final Object aPlaintext : plaintext)
 		{
 			verify.update((byte[])aPlaintext);
 		}
-		return verify.verify(signature);
+		final byte[] signatureBytes=new byte[signature.remaining()];
+		signature.get(signatureBytes);
+		return verify.verify(signatureBytes);
 	}
 
 	/**

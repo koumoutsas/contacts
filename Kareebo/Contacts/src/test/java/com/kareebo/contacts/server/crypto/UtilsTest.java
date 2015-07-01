@@ -28,7 +28,7 @@ public class UtilsTest
 	final private CryptoBuffer verificationKey=new CryptoBuffer();
 	@Rule
 	public ExpectedException exception=ExpectedException.none();
-	private byte[] signature;
+	private ByteBuffer signature;
 
 	@Before
 	public void setUp() throws Exception
@@ -46,7 +46,8 @@ public class UtilsTest
 		{
 			ecdsaSign.update((byte[])a);
 		}
-		signature=ecdsaSign.sign();
+		signature=ByteBuffer.wrap(ecdsaSign.sign());
+		signature.mark();
 		final ByteBuffer buffer=ByteBuffer.wrap(new X509EncodedKeySpec(
 			                                                              keyPair.getPublic().getEncoded
 				                                                                                  ())
@@ -59,9 +60,11 @@ public class UtilsTest
 	@Test
 	public void testVerifySignature() throws Exception
 	{
+		signature.rewind();
 		assertTrue(Utils.verifySignature(verificationKey,signature,plaintext));
 		final Vector<byte[]> plainTextWrong=new Vector<>(1);
 		plainTextWrong.add(plaintext.get(0));
+		signature.rewind();
 		assertFalse(Utils.verifySignature(verificationKey,signature,plainTextWrong));
 		final CryptoBuffer wrongKey=verificationKey;
 		wrongKey.setAlgorithm(Algorithm.SHA256);

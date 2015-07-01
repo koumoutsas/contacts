@@ -10,6 +10,7 @@ import com.kareebo.contacts.thrift.Signature;
 import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
+import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -53,7 +54,9 @@ public class ModifyKeysAsyncIface extends ClientDBAccessor implements ModifyKeys
 		plaintext.add(newPublicKeys.getVerification().getBuffer());
 		try
 		{
-			if(!Utils.verifySignature(client.getKeys().getVerification(),signature.getSignature(),plaintext))
+			final ByteBuffer signatureBuffer=signature.bufferForSignature();
+			signatureBuffer.rewind();
+			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,plaintext))
 			{
 				future.setFailure(new InvalidArgument());
 				return;
@@ -67,5 +70,6 @@ public class ModifyKeysAsyncIface extends ClientDBAccessor implements ModifyKeys
 		}
 		put(client);
 		close();
+		future.setResult(null);
 	}
 }

@@ -44,6 +44,7 @@ public class Utils
 		}
 		final Signature verify=Signature.getInstance(characteristics.get(1),provider);
 		final ByteBuffer verificationByteBuffer=verificationKey.getBuffer();
+		verificationByteBuffer.rewind();
 		final byte[] verificationBytes=new byte[verificationByteBuffer.remaining()];
 		verificationByteBuffer.get(verificationBytes);
 		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(

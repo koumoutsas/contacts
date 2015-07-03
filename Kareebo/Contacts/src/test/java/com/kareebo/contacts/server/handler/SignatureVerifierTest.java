@@ -25,12 +25,6 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	private final IdPair idPairInvalid=new IdPair();
 
 	@Override
-	SignatureVerifier construct(final DataStore<Long,User> dataStore)
-	{
-		return new SignatureVerifierMock(dataStore);
-	}
-
-	@Override
 	Vector<byte[]> constructPlaintext()
 	{
 		final Vector<byte[]> ret=new Vector<>(2);
@@ -46,6 +40,12 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		super.setUp();
 		idPairInvalid.setClientId(idPairValid.getClientId()+1);
 		idPairInvalid.setUserId(idPairValid.getUserId());
+	}
+
+	@Override
+	SignatureVerifier construct(final DataStore<Long,User> dataStore)
+	{
+		return new SignatureVerifierMock(dataStore);
 	}
 
 	@Test

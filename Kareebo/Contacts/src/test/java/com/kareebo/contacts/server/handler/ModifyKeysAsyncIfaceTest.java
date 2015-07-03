@@ -1,6 +1,8 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.common.Algorithm;
 import com.kareebo.contacts.server.gora.User;
+import com.kareebo.contacts.thrift.InvalidArgument;
 import org.apache.gora.store.DataStore;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,12 +22,6 @@ public class ModifyKeysAsyncIfaceTest extends SignatureVerifierTestBase
 	private final com.kareebo.contacts.common.PublicKeys newPublicKeys=new com.kareebo.contacts.common.PublicKeys();
 
 	@Override
-	SignatureVerifier construct(final DataStore<Long,User> dataStore)
-	{
-		return new ModifyKeysAsyncIface(dataStore);
-	}
-
-	@Override
 	Vector<byte[]> constructPlaintext()
 	{
 		final Vector<byte[]> ret=new Vector<>(2);
@@ -43,6 +39,12 @@ public class ModifyKeysAsyncIfaceTest extends SignatureVerifierTestBase
 		newPublicKeys.setVerification(setUpCryptoBuffer(plaintext.elementAt(1)));
 	}
 
+	@Override
+	SignatureVerifier construct(final DataStore<Long,User> dataStore)
+	{
+		return new ModifyKeysAsyncIface(dataStore);
+	}
+
 	@Test
 	public void testModifyKeys1() throws Exception
 	{
@@ -50,5 +52,20 @@ public class ModifyKeysAsyncIfaceTest extends SignatureVerifierTestBase
 		((ModifyKeysAsyncIface)signatureVerifier).modifyKeys1(newPublicKeys,signature,result);
 		assertTrue(result.succeeded());
 		assertEquals(TypeConverter.convert(newPublicKeys),clientValid.getKeys());
+	}
+
+	@Test
+	public void testInvalidAlgorithm() throws Exception
+	{
+		final Future<Void> result=new DefaultFutureResult<>();
+		final com.kareebo.contacts.common.PublicKeys fakePublicKeys=new com.kareebo.contacts.common
+			                                                                .PublicKeys();
+		fakePublicKeys.setEncryption(setUpCryptoBuffer(plaintext.elementAt(0)));
+		fakePublicKeys.setVerification(setUpCryptoBuffer(plaintext.elementAt(1)));
+		fakePublicKeys.getEncryption().setAlgorithm(Algorithm.Fake);
+		((ModifyKeysAsyncIface)signatureVerifier).modifyKeys1(fakePublicKeys,null,result);
+		assertTrue(result.failed());
+		//noinspection ThrowableResultOfMethodCallIgnored
+		assertEquals(InvalidArgument.class,result.cause().getClass());
 	}
 }

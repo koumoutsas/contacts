@@ -6,9 +6,7 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.security.*;
@@ -26,13 +24,13 @@ public class UtilsTest
 	final static private String ecdsa="ECDSA";
 	final private Vector<byte[]> plaintext=new Vector<>(2);
 	final private CryptoBuffer verificationKey=new CryptoBuffer();
-	@Rule
-	public ExpectedException exception=ExpectedException.none();
 	private ByteBuffer signature;
 
 	@Before
 	public void setUp() throws Exception
 	{
+		// Only for 100% coverage
+		new Utils();
 		Security.addProvider(new BouncyCastleProvider());
 		final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
 		final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
@@ -57,7 +55,7 @@ public class UtilsTest
 		verificationKey.setAlgorithm(Algorithm.SHA256withECDSAprime239v1);
 	}
 
-	@Test
+	@Test(expected=NoSuchAlgorithmException.class)
 	public void testVerifySignature() throws Exception
 	{
 		signature.rewind();
@@ -68,7 +66,6 @@ public class UtilsTest
 		assertFalse(Utils.verifySignature(verificationKey,signature,plainTextWrong));
 		final CryptoBuffer wrongKey=verificationKey;
 		wrongKey.setAlgorithm(Algorithm.SHA256);
-		exception.expect(NoSuchAlgorithmException.class);
 		Utils.verifySignature(wrongKey,signature,plaintext);
 	}
 }

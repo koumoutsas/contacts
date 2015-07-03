@@ -4,9 +4,11 @@ import com.kareebo.contacts.common.CryptoBuffer;
 import com.kareebo.contacts.common.PublicKeys;
 import com.kareebo.contacts.common.UserAgent;
 import com.kareebo.contacts.server.gora.Algorithm;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,6 +17,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class TypeConverterTest
 {
+	@Before
+	public void setUp() throws Exception
+	{
+		// Only for getting to 100% coverage
+		new TypeConverter();
+	}
+
 	@Test
 	public void testConvertPublicKeys() throws Exception
 	{
@@ -50,11 +59,12 @@ public class TypeConverterTest
 		assertEquals(ByteBuffer.wrap(buffer),converted.getBuffer());
 	}
 
-	@Test
+	@Test(expected=NoSuchAlgorithmException.class)
 	public void testConvertAlgorithm() throws Exception
 	{
 		assertEquals(Algorithm.SHA256,TypeConverter.convert(com.kareebo.contacts.common.Algorithm.SHA256));
 		assertEquals(Algorithm.SHA256withECDSAprime239v1,TypeConverter.convert(com.kareebo.contacts.common.Algorithm.SHA256withECDSAprime239v1));
+		TypeConverter.convert(com.kareebo.contacts.common.Algorithm.Fake);
 	}
 
 	@Test

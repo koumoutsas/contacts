@@ -19,6 +19,7 @@ enum Algorithm
 {
     SHA256 = 1,
     SHA256withECDSAprime239v1 = 2,
+    Fake = 3,
 }
 
 

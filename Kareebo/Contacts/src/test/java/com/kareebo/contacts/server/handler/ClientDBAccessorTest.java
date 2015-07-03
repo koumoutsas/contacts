@@ -8,9 +8,7 @@ import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -33,8 +31,6 @@ public class ClientDBAccessorTest
 	private final Client clientNew=new Client();
 	private final Client clientPreset=new Client();
 	private final byte[] bufferBytes={'a','b'};
-	@Rule
-	public ExpectedException exception=ExpectedException.none();
 	private DataStore<Long,User> dataStore;
 	private ClientDBAccessor clientDBAccessor;
 
@@ -99,17 +95,15 @@ public class ClientDBAccessorTest
 		assertArrayEquals(bufferBytes,duplicateBytes);
 	}
 
-	@Test
+	@Test(expected=InvalidArgument.class)
 	public void testGetInvalidUser() throws Exception
 	{
-		exception.expect(InvalidArgument.class);
 		clientDBAccessor.get(idPairInvalidUser);
 	}
 
-	@Test
+	@Test(expected=InvalidArgument.class)
 	public void testGetInvalidClient() throws Exception
 	{
-		exception.expect(InvalidArgument.class);
 		clientDBAccessor.get(idPairInvalidClient);
 	}
 
@@ -123,7 +117,7 @@ public class ClientDBAccessorTest
 		assertTrue(user.getClients().containsKey(TypeConverter.convert(idPairPreset.getClientId())));
 	}
 
-	@Test
+	@Test(expected=IllegalStateException.class)
 	public void testPutInvalidState() throws Exception
 	{
 		try
@@ -135,7 +129,6 @@ public class ClientDBAccessorTest
 		{
 			assertTrue(true);
 		}
-		exception.expect(IllegalStateException.class);
 		clientDBAccessor.put(clientNew);
 	}
 
@@ -148,10 +141,9 @@ public class ClientDBAccessorTest
 		assertTrue(user.getClients().containsKey(TypeConverter.convert(idPairNew.getClientId())));
 	}
 
-	@Test
+	@Test(expected=InvalidArgument.class)
 	public void testPut2InvalidUser() throws Exception
 	{
-		exception.expect(InvalidArgument.class);
 		clientDBAccessor.put(idPairInvalidUser,clientNew);
 	}
 }

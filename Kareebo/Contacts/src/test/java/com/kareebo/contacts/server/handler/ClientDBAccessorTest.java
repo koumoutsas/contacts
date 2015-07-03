@@ -14,13 +14,11 @@ import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link ClientDBAccessor}
@@ -98,7 +96,7 @@ public class ClientDBAccessorTest
 		assertEquals(bufferBytes.length,byteBuffer.remaining());
 		final byte[] duplicateBytes=new byte[bufferBytes.length];
 		byteBuffer.get(duplicateBytes);
-		assertTrue(Arrays.equals(bufferBytes,duplicateBytes));
+		assertArrayEquals(bufferBytes,duplicateBytes);
 	}
 
 	@Test

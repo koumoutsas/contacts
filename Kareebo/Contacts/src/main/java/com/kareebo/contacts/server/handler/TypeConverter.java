@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.common.UserAgent;
 import com.kareebo.contacts.server.gora.Algorithm;
 import com.kareebo.contacts.server.gora.CryptoBuffer;
 import com.kareebo.contacts.server.gora.PublicKeys;
@@ -46,5 +47,13 @@ class TypeConverter
 	static CharSequence convert(final long id)
 	{
 		return String.valueOf(id);
+	}
+
+	static com.kareebo.contacts.server.gora.UserAgent convert(final UserAgent userAgent)
+	{
+		final com.kareebo.contacts.server.gora.UserAgent ret=new com.kareebo.contacts.server.gora.UserAgent();
+		ret.setPlatform(userAgent.getPlatform());
+		ret.setVersion(userAgent.getVersion());
+		return ret;
 	}
 }

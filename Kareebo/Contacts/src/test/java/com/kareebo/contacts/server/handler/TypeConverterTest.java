@@ -2,6 +2,7 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.common.CryptoBuffer;
 import com.kareebo.contacts.common.PublicKeys;
+import com.kareebo.contacts.common.UserAgent;
 import com.kareebo.contacts.server.gora.Algorithm;
 import org.junit.Test;
 
@@ -62,5 +63,16 @@ public class TypeConverterTest
 		final long expected=12234;
 		final long calculated=Long.valueOf((String)(TypeConverter.convert(expected)));
 		assertEquals(expected,calculated);
+	}
+
+	@Test
+	public void testConvertUserAgent() throws Exception
+	{
+		final UserAgent userAgent=new UserAgent();
+		userAgent.setPlatform("A");
+		userAgent.setVersion("B");
+		final com.kareebo.contacts.server.gora.UserAgent converted=TypeConverter.convert(userAgent);
+		assertEquals(userAgent.getPlatform(),converted.getPlatform());
+		assertEquals(userAgent.getVersion(),converted.getVersion());
 	}
 }

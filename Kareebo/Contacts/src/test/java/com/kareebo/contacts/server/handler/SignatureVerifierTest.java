@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.Algorithm;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
@@ -25,12 +26,12 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	private final IdPair idPairInvalid=new IdPair();
 
 	@Override
-	Vector<byte[]> constructPlaintext()
+	PlaintextSerializer constructPlaintext()
 	{
 		final Vector<byte[]> ret=new Vector<>(2);
 		ret.add("abc".getBytes());
 		ret.add("cde".getBytes());
-		return ret;
+		return new TestPlaintextSerializer(ret);
 	}
 
 	@Before

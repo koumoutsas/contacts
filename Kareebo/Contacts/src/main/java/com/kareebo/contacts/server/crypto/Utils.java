@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.crypto;
 
+import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.Algorithm;
 import com.kareebo.contacts.server.gora.CryptoBuffer;
 
@@ -24,7 +25,7 @@ public class Utils
 	 *
 	 * @param verificationKey The verification key
 	 * @param signature       The signature
-	 * @param plaintext       The plaintext as a list of byte arrays
+	 * @param plaintextSerializer       The plaintext serializer
 	 * @return Whether the signature is correct
 	 * @throws NoSuchProviderException
 	 * @throws NoSuchAlgorithmException
@@ -33,7 +34,7 @@ public class Utils
 	 * @throws InvalidKeySpecException
 	 */
 	public static boolean verifySignature(final CryptoBuffer verificationKey,final ByteBuffer signature,final
-	Vector<byte[]> plaintext)
+	PlaintextSerializer plaintextSerializer)
 		throws
 		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException
 	{
@@ -49,7 +50,7 @@ public class Utils
 		verificationByteBuffer.get(verificationBytes);
 		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(
 			                                                                                                      verificationBytes)));
-		for(final Object aPlaintext : plaintext)
+		for(final Object aPlaintext : plaintextSerializer.serialize())
 		{
 			verify.update((byte[])aPlaintext);
 		}

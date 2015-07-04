@@ -2,6 +2,7 @@ package com.kareebo.contacts.server.crypto;
 
 import com.kareebo.contacts.server.gora.Algorithm;
 import com.kareebo.contacts.server.gora.CryptoBuffer;
+import com.kareebo.contacts.server.handler.TestPlaintextSerializer;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
@@ -59,13 +60,14 @@ public class UtilsTest
 	public void testVerifySignature() throws Exception
 	{
 		signature.rewind();
-		assertTrue(Utils.verifySignature(verificationKey,signature,plaintext));
+		final TestPlaintextSerializer plaintextSerializer=new TestPlaintextSerializer(plaintext);
+		assertTrue(Utils.verifySignature(verificationKey,signature,plaintextSerializer));
 		final Vector<byte[]> plainTextWrong=new Vector<>(1);
 		plainTextWrong.add(plaintext.get(0));
 		signature.rewind();
-		assertFalse(Utils.verifySignature(verificationKey,signature,plainTextWrong));
+		assertFalse(Utils.verifySignature(verificationKey,signature,new TestPlaintextSerializer(plainTextWrong)));
 		final CryptoBuffer wrongKey=verificationKey;
 		wrongKey.setAlgorithm(Algorithm.SHA256);
-		Utils.verifySignature(wrongKey,signature,plaintext);
+		Utils.verifySignature(wrongKey,signature,plaintextSerializer);
 	}
 }

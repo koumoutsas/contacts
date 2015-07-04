@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
@@ -14,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Vector;
 
 /**
  * Base class for all services that verify a signature and modify the client state upon successful verification
@@ -34,11 +34,11 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	/**
 	 * Verify the signature
 	 *
-	 * @param plaintext The plaintext
+	 * @param plaintextSerializer The plaintext serializer
 	 * @param signature The signature
 	 * @param future    The future used to communicate the result
 	 */
-	void verify(final Vector<byte[]> plaintext,final Signature signature,final Future<Void> future)
+	void verify(final PlaintextSerializer plaintextSerializer,final Signature signature,final Future<Void> future)
 	{
 		final Client client;
 		try
@@ -54,7 +54,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 		{
 			final ByteBuffer signatureBuffer=signature.bufferForSignature();
 			signatureBuffer.rewind();
-			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,plaintext))
+			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,plaintextSerializer))
 			{
 				future.setFailure(new InvalidArgument());
 				return;

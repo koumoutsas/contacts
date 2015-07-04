@@ -1,13 +1,13 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.PlaintextSerializer;
+import com.kareebo.contacts.base.UserAgentPlaintextSerializer;
 import com.kareebo.contacts.server.gora.User;
 import org.apache.gora.store.DataStore;
 import org.junit.Before;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
-
-import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,25 +18,20 @@ import static org.junit.Assert.assertTrue;
 public class ModifyUserAgentAsyncIfaceTest extends SignatureVerifierTestBase
 {
 	private final com.kareebo.contacts.common.UserAgent newUserAgent=new com.kareebo.contacts.common.UserAgent();
-	private final String platform="platform";
-	private final String version="version";
 
 	@Override
-	Vector<byte[]> constructPlaintext()
+	PlaintextSerializer constructPlaintext()
 	{
-		final Vector<byte[]> ret=new Vector<>(2);
-		ret.add(platform.getBytes());
-		ret.add(version.getBytes());
-		return ret;
+		return new UserAgentPlaintextSerializer(newUserAgent);
 	}
 
 	@Before
 	@Override
 	public void setUp() throws Exception
 	{
+		newUserAgent.setPlatform("platform");
+		newUserAgent.setVersion("version");
 		super.setUp();
-		newUserAgent.setPlatform(platform);
-		newUserAgent.setVersion(version);
 	}
 
 	@Override

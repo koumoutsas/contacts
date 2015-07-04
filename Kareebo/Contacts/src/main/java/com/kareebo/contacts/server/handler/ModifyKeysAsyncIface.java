@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.PublicKeysPlaintextSerializer;
 import com.kareebo.contacts.common.PublicKeys;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
@@ -10,7 +11,6 @@ import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Vector;
 
 /**
  * Key modification operation
@@ -50,9 +50,6 @@ public class ModifyKeysAsyncIface extends SignatureVerifier implements ModifyKey
 			future.setFailure(new InvalidArgument());
 			return;
 		}
-		final Vector<byte[]> plaintext=new Vector<>(2);
-		plaintext.add(newPublicKeys.getEncryption().getBuffer());
-		plaintext.add(newPublicKeys.getVerification().getBuffer());
-		verify(plaintext,signature,future);
+		verify(new PublicKeysPlaintextSerializer(newPublicKeys),signature,future);
 	}
 }

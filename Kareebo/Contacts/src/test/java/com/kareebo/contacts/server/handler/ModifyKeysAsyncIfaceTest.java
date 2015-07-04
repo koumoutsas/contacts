@@ -1,5 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.PlaintextSerializer;
+import com.kareebo.contacts.base.PublicKeysPlaintextSerializer;
 import com.kareebo.contacts.common.Algorithm;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.InvalidArgument;
@@ -8,8 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
-
-import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,21 +22,18 @@ public class ModifyKeysAsyncIfaceTest extends SignatureVerifierTestBase
 	private final com.kareebo.contacts.common.PublicKeys newPublicKeys=new com.kareebo.contacts.common.PublicKeys();
 
 	@Override
-	Vector<byte[]> constructPlaintext()
+	PlaintextSerializer constructPlaintext()
 	{
-		final Vector<byte[]> ret=new Vector<>(2);
-		ret.add("abc".getBytes());
-		ret.add("cde".getBytes());
-		return ret;
+		return new PublicKeysPlaintextSerializer(newPublicKeys);
 	}
 
 	@Before
 	@Override
 	public void setUp() throws Exception
 	{
+		newPublicKeys.setEncryption(setUpCryptoBuffer("abc".getBytes()));
+		newPublicKeys.setVerification(setUpCryptoBuffer("efg".getBytes()));
 		super.setUp();
-		newPublicKeys.setEncryption(setUpCryptoBuffer(plaintext.elementAt(0)));
-		newPublicKeys.setVerification(setUpCryptoBuffer(plaintext.elementAt(1)));
 	}
 
 	@Override
@@ -60,8 +57,8 @@ public class ModifyKeysAsyncIfaceTest extends SignatureVerifierTestBase
 		final Future<Void> result=new DefaultFutureResult<>();
 		final com.kareebo.contacts.common.PublicKeys fakePublicKeys=new com.kareebo.contacts.common
 			                                                                .PublicKeys();
-		fakePublicKeys.setEncryption(setUpCryptoBuffer(plaintext.elementAt(0)));
-		fakePublicKeys.setVerification(setUpCryptoBuffer(plaintext.elementAt(1)));
+		fakePublicKeys.setEncryption(newPublicKeys.getEncryption());
+		fakePublicKeys.setVerification(newPublicKeys.getVerification());
 		fakePublicKeys.getEncryption().setAlgorithm(Algorithm.Fake);
 		((ModifyKeysAsyncIface)signatureVerifier).modifyKeys1(fakePublicKeys,null,result);
 		assertTrue(result.failed());

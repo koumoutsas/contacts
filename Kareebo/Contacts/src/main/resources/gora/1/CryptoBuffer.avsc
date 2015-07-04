@@ -18,7 +18,8 @@
                 "symbols":
                 [
                     "SHA256",
-                    "SHA256withECDSAprime239v1"
+                    "SHA256withECDSAprime239v1",
+                    "Fake"
                 ]
             }
         }

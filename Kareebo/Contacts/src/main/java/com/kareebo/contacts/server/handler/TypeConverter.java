@@ -21,6 +21,13 @@ class TypeConverter
 		return ret;
 	}
 
+	static com.kareebo.contacts.common.PublicKeys convert(final PublicKeys publicKeys) throws NoSuchAlgorithmException
+	{
+		return new com.kareebo.contacts.common.PublicKeys(convert(publicKeys.getEncryption()),convert(publicKeys
+			                                                                                              .getVerification
+				                                                                                               ()));
+	}
+
 	static CryptoBuffer convert(final com.kareebo.contacts.common.CryptoBuffer cryptoBuffer) throws NoSuchAlgorithmException
 	{
 		final CryptoBuffer ret=new CryptoBuffer();
@@ -31,6 +38,12 @@ class TypeConverter
 		return ret;
 	}
 
+	static com.kareebo.contacts.common.CryptoBuffer convert(final CryptoBuffer cryptoBuffer) throws NoSuchAlgorithmException
+	{
+		return new com.kareebo.contacts.common.CryptoBuffer(cryptoBuffer.getBuffer(),convert(cryptoBuffer
+			                                                                                     .getAlgorithm()));
+	}
+
 	static Algorithm convert(final com.kareebo.contacts.common.Algorithm algorithm) throws NoSuchAlgorithmException
 	{
 		switch(algorithm)
@@ -39,6 +52,19 @@ class TypeConverter
 				return Algorithm.SHA256withECDSAprime239v1;
 			case SHA256:
 				return Algorithm.SHA256;
+			default:
+				throw new NoSuchAlgorithmException(algorithm.toString());
+		}
+	}
+
+	static com.kareebo.contacts.common.Algorithm convert(final Algorithm algorithm) throws NoSuchAlgorithmException
+	{
+		switch(algorithm)
+		{
+			case SHA256withECDSAprime239v1:
+				return com.kareebo.contacts.common.Algorithm.SHA256withECDSAprime239v1;
+			case SHA256:
+				return com.kareebo.contacts.common.Algorithm.SHA256;
 			default:
 				throw new NoSuchAlgorithmException(algorithm.toString());
 		}
@@ -55,5 +81,10 @@ class TypeConverter
 		ret.setPlatform(userAgent.getPlatform());
 		ret.setVersion(userAgent.getVersion());
 		return ret;
+	}
+
+	static UserAgent convert(final com.kareebo.contacts.server.gora.UserAgent userAgent)
+	{
+		return new UserAgent(userAgent.getPlatform().toString(),userAgent.getVersion().toString());
 	}
 }

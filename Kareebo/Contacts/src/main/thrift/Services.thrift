@@ -26,8 +26,8 @@ exception InvalidArgument
 
 service UserRegistration
 {
-    IdPair userRegistration1(1: Common.UserAgent userAgent, 2: Common.PublicKeys publicKeys) throws (1: InvalidArgument invalidArgument),
-    void userRegistration2(1: RegistrationCode code, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
+    void userRegistration1(1: RegistrationCode code, 2: Signature signature,3: Common.UserAgent userAgent,
+    4: Common.PublicKeys publicKeys) throws (1: InvalidArgument invalidArgument),
 }
 
 service ModifyKeys

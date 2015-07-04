@@ -18,6 +18,8 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Base class for all test suites for {@link SignatureVerifier} subclasses
  */
@@ -74,13 +76,13 @@ abstract class SignatureVerifierTestBase
 		publicKeys.setVerification(verificationKey);
 		client.setUserAgent(userAgent);
 		client.setKeys(publicKeys);
-		client.setRegistered(true);
 		client.setContacts(new ArrayList<HashedContact>());
 		final User user=new User();
 		user.setClients(new HashMap<CharSequence,Client>());
 		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(userId,user);
 		signatureVerifier=construct(dataStore);
+		assertNotNull(signatureVerifier);
 		signatureVerifier.put(idPairValid,client);
 		clientValid=signatureVerifier.get(idPairValid);
 	}

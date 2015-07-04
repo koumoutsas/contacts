@@ -5,16 +5,28 @@
     "fields":
     [
         {
-            "name": "userId",
-            "type": "long"
-        },
-        {
-            "name": "clientId",
-            "type": "long"
-        },
-        {
-            "name": "code",
-            "type": "string"
+            "name": "id",
+            "namespace": "com.kareebo.contacts.server.gora",
+            "type":
+            {
+                "name": "RegistrationCodeId",
+                "type": "record",
+                "fields":
+                [
+                    {
+                        "name": "userId",
+                        "type": "long"
+                    },
+                    {
+                        "name": "clientId",
+                        "type": "long"
+                    },
+                    {
+                        "name": "code",
+                        "type": "string"
+                    }
+                ]
+            }
         },
         {
             "name": "created",

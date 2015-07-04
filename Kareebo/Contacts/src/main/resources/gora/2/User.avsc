@@ -41,11 +41,6 @@
                             }
                         },
                         {
-                            "name": "registered",
-                            "type": "boolean",
-                            "default": "false"
-                        },
-                        {
                             "name": "keys",
                             "type":
                             {

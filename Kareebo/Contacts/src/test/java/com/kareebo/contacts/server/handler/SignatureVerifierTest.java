@@ -15,8 +15,7 @@ import org.vertx.java.core.impl.DefaultFutureResult;
 import java.nio.ByteBuffer;
 import java.util.Vector;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link SignatureVerifier}
@@ -52,17 +51,15 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	@Test
 	public void testVerify() throws Exception
 	{
-		final boolean registered=signatureVerifier.get(signature.getIds()).getRegistered();
 		final Future<Void> result=new DefaultFutureResult<>();
 		signatureVerifier.verify(plaintext,signature,result);
 		assertTrue(result.succeeded());
-		assertEquals(!registered,clientValid.getRegistered());
+		assertNull(clientValid.getUserAgent());
 	}
 
 	@Test
 	public void testInvalidUser() throws Exception
 	{
-		final boolean registered=signatureVerifier.get(signature.getIds()).getRegistered();
 		final Future<Void> result=new DefaultFutureResult<>();
 		signature.setIds(idPairInvalid);
 		try
@@ -78,13 +75,12 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		assertTrue(result.failed());
 		//noinspection ThrowableResultOfMethodCallIgnored
 		assertEquals(InvalidArgument.class,result.cause().getClass());
-		assertEquals(registered,signatureVerifier.get(signature.getIds()).getRegistered());
+		assertNotNull(signatureVerifier.get(signature.getIds()).getUserAgent());
 	}
 
 	@Test
 	public void testCorruptedSignature() throws Exception
 	{
-		final boolean registered=signatureVerifier.get(signature.getIds()).getRegistered();
 		final Future<Void> result=new DefaultFutureResult<>();
 		final ByteBuffer signatureBuffer=signature.bufferForSignature();
 		signatureBuffer.rewind();
@@ -100,13 +96,12 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		assertTrue(result.failed());
 		//noinspection ThrowableResultOfMethodCallIgnored
 		assertEquals(InvalidArgument.class,result.cause().getClass());
-		assertEquals(registered,signatureVerifier.get(signature.getIds()).getRegistered());
+		assertNotNull(signatureVerifier.get(signature.getIds()).getUserAgent());
 	}
 
 	@Test
 	public void testInvalidAlgorithm() throws Exception
 	{
-		final boolean registered=signatureVerifier.get(signature.getIds()).getRegistered();
 		final Future<Void> result=new DefaultFutureResult<>();
 		final Client client=signatureVerifier.get(idPairValid);
 		final Algorithm algorithm=client.getKeys().getVerification().getAlgorithm();
@@ -125,19 +120,18 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		assertTrue(result.failed());
 		//noinspection ThrowableResultOfMethodCallIgnored
 		assertEquals(InvalidArgument.class,result.cause().getClass());
-		assertEquals(registered,signatureVerifier.get(signature.getIds()).getRegistered());
+		assertNotNull(signatureVerifier.get(signature.getIds()).getUserAgent());
 	}
 
 	@Test
 	public void testInvalidSignature() throws Exception
 	{
-		final boolean registered=signatureVerifier.get(signature.getIds()).getRegistered();
 		final Future<Void> result=new DefaultFutureResult<>();
 		signatureVerifier.verify(plaintext,wrongSignature,result);
 		assertTrue(result.failed());
 		//noinspection ThrowableResultOfMethodCallIgnored
 		assertEquals(InvalidArgument.class,result.cause().getClass());
-		assertEquals(registered,signatureVerifier.get(signature.getIds()).getRegistered());
+		assertNotNull(signatureVerifier.get(signature.getIds()).getUserAgent());
 	}
 
 	private class SignatureVerifierMock extends SignatureVerifier
@@ -155,7 +149,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		@Override
 		void afterVerification(final Client client)
 		{
-			client.setRegistered(!client.getRegistered());
+			client.setUserAgent(null);
 		}
 	}
 }

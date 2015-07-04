@@ -57,7 +57,6 @@ public class ClientDBAccessorTest
 		publicKeys.setVerification(cryptoBuffer);
 		clientPreset.setUserAgent(userAgent);
 		clientPreset.setKeys(publicKeys);
-		clientPreset.setRegistered(false);
 		clientPreset.setContacts(new ArrayList<HashedContact>());
 		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		final User user=new User();

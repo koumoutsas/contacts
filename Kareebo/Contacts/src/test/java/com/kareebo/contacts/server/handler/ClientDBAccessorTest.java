@@ -61,10 +61,6 @@ public class ClientDBAccessorTest
 		clientPreset.setContacts(new ArrayList<HashedContact>());
 		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		final User user=new User();
-		final Handle handle=new Handle();
-		handle.setType(HandleType.EmailAddress);
-		handle.setContents("a");
-		user.setHandle(handle);
 		final HashMap<CharSequence,Client> clients=new HashMap<>();
 		clients.put(TypeConverter.convert(idPairPreset.getClientId()),clientPreset);
 		user.setClients(clients);

@@ -35,17 +35,6 @@ struct PublicKeys
     2: CryptoBuffer verification,
 }
 
-enum HandleType
-{
-    EmailAddress = 1,
-}
-
-struct Handle
-{
-    1: string contents,
-    2: HandleType type,
-}
-
 struct HashedContact
 {
     1: Id id,

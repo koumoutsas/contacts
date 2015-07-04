@@ -9,35 +9,6 @@
             "type": "long"
         },
         {
-            "name": "handle",
-            "type":
-            {
-                "name": "Handle",
-                "namespace": "com.kareebo.contacts.server.gora",
-                "type": "record",
-                "fields":
-                [
-                    {
-                        "name": "contents",
-                        "type": "string"
-                    },
-                    {
-                        "name": "type",
-                        "type":
-                        {
-                            "name": "HandleType",
-                            "namespace": "com.kareebo.contacts.server.gora",
-                            "type": "enum",
-                            "symbols":
-                            [
-                                "EmailAddress"
-                            ]
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "name": "clients",
             "type":
             {

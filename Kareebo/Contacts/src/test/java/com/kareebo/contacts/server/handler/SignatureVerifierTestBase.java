@@ -77,10 +77,6 @@ abstract class SignatureVerifierTestBase
 		client.setRegistered(true);
 		client.setContacts(new ArrayList<HashedContact>());
 		final User user=new User();
-		final Handle handle=new Handle();
-		handle.setType(HandleType.EmailAddress);
-		handle.setContents("a");
-		user.setHandle(handle);
 		user.setClients(new HashMap<CharSequence,Client>());
 		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(userId,user);

@@ -26,14 +26,8 @@ exception InvalidArgument
 
 service UserRegistration
 {
-    IdPair userRegistration1(1: Common.Handle handle, 2: Common.UserAgent userAgent, 3: Common.PublicKeys publicKeys) throws (1: InvalidArgument invalidArgument),
+    IdPair userRegistration1(1: Common.UserAgent userAgent, 2: Common.PublicKeys publicKeys) throws (1: InvalidArgument invalidArgument),
     void userRegistration2(1: RegistrationCode code, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
-}
-
-service DeviceRegistration
-{
-    IdPair deviceRegistration1(1: Common.Handle handle,2: Common.UserAgent userAgent, 3: Common.PublicKeys publicKeys) throws (1: InvalidArgument invalidArgument),
-    void deviceRegistration2(1: RegistrationCode code, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
 }
 
 service ModifyKeys
@@ -44,12 +38,6 @@ service ModifyKeys
 service ModifyUserAgent
 {
     void modifyUserAgent1(1: Common.UserAgent userAgent, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
-}
-
-service ModifyHandle
-{
-    void modifyHandle1(1: Common.Handle newHandle, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
-    void modifyHandle2(1: RegistrationCode code, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
 }
 
 enum ContactOperationType

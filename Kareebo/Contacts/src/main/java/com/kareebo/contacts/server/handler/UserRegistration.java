@@ -7,7 +7,6 @@ import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.thrift.IdPair;
 import com.kareebo.contacts.thrift.InvalidArgument;
 import com.kareebo.contacts.thrift.Signature;
-import com.kareebo.contacts.thrift.UserRegistration;
 import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
@@ -20,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * User registration operation
  */
-public class UserRegistrationAsyncIface extends SignatureVerifier implements UserRegistration.AsyncIface
+public class UserRegistration extends SignatureVerifier implements com.kareebo.contacts.thrift.UserRegistration.AsyncIface
 {
 	final private DataStore<RegistrationCodeId,RegistrationCode> registrationCodeDataStore;
 	final private DataStore<Long,User> userDataStore;
@@ -34,8 +33,8 @@ public class UserRegistrationAsyncIface extends SignatureVerifier implements Use
 	 * @param registrationCodeDataStore The registration code datastore
 	 * @param expirationTime            The expiration time of a registration code in seconds
 	 */
-	UserRegistrationAsyncIface(final DataStore<Long,User> clientDataStore,final DataStore<RegistrationCodeId,
-		                                                                                     RegistrationCode> registrationCodeDataStore,final long expirationTime)
+	UserRegistration(final DataStore<Long,User> clientDataStore,final DataStore<RegistrationCodeId,
+		                                                                           RegistrationCode> registrationCodeDataStore,final long expirationTime)
 	{
 		super(clientDataStore);
 		this.registrationCodeDataStore=registrationCodeDataStore;

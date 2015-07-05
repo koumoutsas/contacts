@@ -24,9 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit test for {@link UserRegistrationAsyncIface}
+ * Unit test for {@link UserRegistration}
  */
-public class UserRegistrationAsyncIfaceTest extends SignatureVerifierTestBase
+public class UserRegistrationTest extends SignatureVerifierTestBase
 {
 	final private long expirationTime=100;
 	final private String code="abc";
@@ -52,7 +52,7 @@ public class UserRegistrationAsyncIfaceTest extends SignatureVerifierTestBase
 		{
 			registrationCodeDataStore=DataStoreFactory.getDataStore(RegistrationCodeId.class,
 				                                                       RegistrationCode.class,new Configuration());
-			return new UserRegistrationAsyncIface(dataStore,registrationCodeDataStore,expirationTime);
+			return new UserRegistration(dataStore,registrationCodeDataStore,expirationTime);
 		}
 		catch(GoraException e)
 		{
@@ -73,7 +73,7 @@ public class UserRegistrationAsyncIfaceTest extends SignatureVerifierTestBase
 		registrationCode.setCreated(new Date().getTime());
 		registrationCodeDataStore.put(registrationCodeId,registrationCode);
 		final Future<Void> result=new DefaultFutureResult<>();
-		((UserRegistrationAsyncIface)signatureVerifier).userRegistration1(code,signature,TypeConverter
+		((UserRegistration)signatureVerifier).userRegistration1(code,signature,TypeConverter
 			                                                                                 .convert(clientValid
 				                                                                                          .getUserAgent()),TypeConverter
 					                                                                                                           .convert(clientValid.getKeys()),result);
@@ -92,7 +92,7 @@ public class UserRegistrationAsyncIfaceTest extends SignatureVerifierTestBase
 		registrationCode.setCreated(new Date().getTime()-TimeUnit.SECONDS.toMillis(expirationTime+1));
 		registrationCodeDataStore.put(registrationCodeId,registrationCode);
 		final Future<Void> result=new DefaultFutureResult<>();
-		((UserRegistrationAsyncIface)signatureVerifier).userRegistration1(code,signature,TypeConverter
+		((UserRegistration)signatureVerifier).userRegistration1(code,signature,TypeConverter
 			                                                                                 .convert(clientValid
 				                                                                                          .getUserAgent()),TypeConverter
 					                                                                                                           .convert(clientValid.getKeys()),result);
@@ -115,7 +115,7 @@ public class UserRegistrationAsyncIfaceTest extends SignatureVerifierTestBase
 		final Future<Void> result=new DefaultFutureResult<>();
 		final PublicKeys publicKeys=TypeConverter.convert(clientValid.getKeys());
 		publicKeys.getEncryption().setAlgorithm(Algorithm.Fake);
-		((UserRegistrationAsyncIface)signatureVerifier).userRegistration1(code,signature,TypeConverter
+		((UserRegistration)signatureVerifier).userRegistration1(code,signature,TypeConverter
 			                                                                                 .convert(clientValid
 				                                                                                          .getUserAgent()),publicKeys,result);
 		assertTrue(result.failed());
@@ -127,7 +127,7 @@ public class UserRegistrationAsyncIfaceTest extends SignatureVerifierTestBase
 	public void testUserRegistration1InvalidCode() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		((UserRegistrationAsyncIface)signatureVerifier).userRegistration1(code,signature,TypeConverter
+		((UserRegistration)signatureVerifier).userRegistration1(code,signature,TypeConverter
 			                                                                                 .convert(clientValid
 				                                                                                          .getUserAgent()),TypeConverter
 					                                                                                                           .convert(clientValid.getKeys()),result);

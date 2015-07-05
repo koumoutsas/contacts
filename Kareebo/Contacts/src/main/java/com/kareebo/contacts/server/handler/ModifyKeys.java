@@ -5,7 +5,6 @@ import com.kareebo.contacts.common.PublicKeys;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.InvalidArgument;
-import com.kareebo.contacts.thrift.ModifyKeys;
 import com.kareebo.contacts.thrift.Signature;
 import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
@@ -15,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Key modification operation
  */
-public class ModifyKeysAsyncIface extends SignatureVerifier implements ModifyKeys.AsyncIface
+public class ModifyKeys extends SignatureVerifier implements com.kareebo.contacts.thrift.ModifyKeys.AsyncIface
 {
 	private com.kareebo.contacts.server.gora.PublicKeys newPublicKeys;
 
@@ -24,7 +23,7 @@ public class ModifyKeysAsyncIface extends SignatureVerifier implements ModifyKey
 	 *
 	 * @param dataStore The datastore
 	 */
-	ModifyKeysAsyncIface(final DataStore<Long,User> dataStore)
+	ModifyKeys(final DataStore<Long,User> dataStore)
 	{
 		super(dataStore);
 	}

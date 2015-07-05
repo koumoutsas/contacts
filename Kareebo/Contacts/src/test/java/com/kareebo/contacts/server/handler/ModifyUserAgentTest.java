@@ -13,9 +13,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for {@link ModifyUserAgentAsyncIface}
+ * Unit tests for {@link ModifyUserAgent}
  */
-public class ModifyUserAgentAsyncIfaceTest extends SignatureVerifierTestBase
+public class ModifyUserAgentTest extends SignatureVerifierTestBase
 {
 	private final com.kareebo.contacts.common.UserAgent newUserAgent=new com.kareebo.contacts.common.UserAgent();
 
@@ -37,14 +37,14 @@ public class ModifyUserAgentAsyncIfaceTest extends SignatureVerifierTestBase
 	@Override
 	SignatureVerifier construct(final DataStore<Long,User> dataStore)
 	{
-		return new ModifyUserAgentAsyncIface(dataStore);
+		return new ModifyUserAgent(dataStore);
 	}
 
 	@Test
 	public void testModifyUserAgent1() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		((ModifyUserAgentAsyncIface)signatureVerifier).modifyUserAgent1(newUserAgent,signature,result);
+		((ModifyUserAgent)signatureVerifier).modifyUserAgent1(newUserAgent,signature,result);
 		assertTrue(result.succeeded());
 		assertEquals(TypeConverter.convert(newUserAgent),clientValid.getUserAgent());
 	}

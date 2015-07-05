@@ -15,9 +15,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for {@link ModifyKeysAsyncIface}
+ * Unit tests for {@link ModifyKeys}
  */
-public class ModifyKeysAsyncIfaceTest extends SignatureVerifierTestBase
+public class ModifyKeysAsyncTest extends SignatureVerifierTestBase
 {
 	private final com.kareebo.contacts.common.PublicKeys newPublicKeys=new com.kareebo.contacts.common.PublicKeys();
 
@@ -39,14 +39,14 @@ public class ModifyKeysAsyncIfaceTest extends SignatureVerifierTestBase
 	@Override
 	SignatureVerifier construct(final DataStore<Long,User> dataStore)
 	{
-		return new ModifyKeysAsyncIface(dataStore);
+		return new ModifyKeys(dataStore);
 	}
 
 	@Test
 	public void testModifyKeys1() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		((ModifyKeysAsyncIface)signatureVerifier).modifyKeys1(newPublicKeys,signature,result);
+		((ModifyKeys)signatureVerifier).modifyKeys1(newPublicKeys,signature,result);
 		assertTrue(result.succeeded());
 		assertEquals(TypeConverter.convert(newPublicKeys),clientValid.getKeys());
 	}
@@ -60,7 +60,7 @@ public class ModifyKeysAsyncIfaceTest extends SignatureVerifierTestBase
 		fakePublicKeys.setEncryption(newPublicKeys.getEncryption());
 		fakePublicKeys.setVerification(newPublicKeys.getVerification());
 		fakePublicKeys.getEncryption().setAlgorithm(Algorithm.Fake);
-		((ModifyKeysAsyncIface)signatureVerifier).modifyKeys1(fakePublicKeys,null,result);
+		((ModifyKeys)signatureVerifier).modifyKeys1(fakePublicKeys,null,result);
 		assertTrue(result.failed());
 		//noinspection ThrowableResultOfMethodCallIgnored
 		assertEquals(InvalidArgument.class,result.cause().getClass());

@@ -4,7 +4,6 @@ import com.kareebo.contacts.base.UserAgentPlaintextSerializer;
 import com.kareebo.contacts.common.UserAgent;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
-import com.kareebo.contacts.thrift.ModifyUserAgent;
 import com.kareebo.contacts.thrift.Signature;
 import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
@@ -12,7 +11,7 @@ import org.vertx.java.core.Future;
 /**
  * User agent modification operation
  */
-public class ModifyUserAgentAsyncIface extends SignatureVerifier implements ModifyUserAgent.AsyncIface
+public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.contacts.thrift.ModifyUserAgent.AsyncIface
 {
 	/**
 	 * Stores the user agent for modifying the client state on success
@@ -24,7 +23,7 @@ public class ModifyUserAgentAsyncIface extends SignatureVerifier implements Modi
 	 *
 	 * @param dataStore The datastore
 	 */
-	ModifyUserAgentAsyncIface(final DataStore<Long,User> dataStore)
+	ModifyUserAgent(final DataStore<Long,User> dataStore)
 	{
 		super(dataStore);
 	}

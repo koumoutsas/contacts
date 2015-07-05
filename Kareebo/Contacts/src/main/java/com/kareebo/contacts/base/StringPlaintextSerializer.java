@@ -3,7 +3,7 @@ package com.kareebo.contacts.base;
 import java.util.Vector;
 
 /**
- * Plaintext serializer for strings
+ * {@link PlaintextSerializer} for {@link String}
  */
 public class StringPlaintextSerializer implements PlaintextSerializer
 {

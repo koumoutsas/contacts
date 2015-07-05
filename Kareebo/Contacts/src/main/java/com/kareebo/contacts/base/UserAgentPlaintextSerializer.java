@@ -5,7 +5,7 @@ import com.kareebo.contacts.common.UserAgent;
 import java.util.Vector;
 
 /**
- * Plaintext serializer for user agent
+ * {@link PlaintextSerializer} for {@link UserAgent}
  */
 public class UserAgentPlaintextSerializer implements PlaintextSerializer
 {

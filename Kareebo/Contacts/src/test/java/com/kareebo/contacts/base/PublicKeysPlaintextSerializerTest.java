@@ -26,8 +26,12 @@ public class PublicKeysPlaintextSerializerTest
 		verification.setBuffer("abc".getBytes());
 		final PublicKeys publicKeys=new PublicKeys(encryption,verification);
 		final Vector<byte[]> plaintext=new PublicKeysPlaintextSerializer(publicKeys).serialize();
-		assertEquals(2,plaintext.size());
-		assertArrayEquals(publicKeys.getEncryption().getBuffer(),plaintext.elementAt(0));
-		assertArrayEquals(publicKeys.getVerification().getBuffer(),plaintext.elementAt(1));
+		assertEquals(2*CryptoBufferPlaintextSerializer.LENGTH,plaintext.size());
+		final Vector<byte[]> expected=new CryptoBufferPlaintextSerializer(encryption).serialize();
+		expected.addAll(new CryptoBufferPlaintextSerializer(verification).serialize());
+		for(int i=0;i<expected.size();++i)
+		{
+			assertArrayEquals(expected.elementAt(i),plaintext.elementAt(i));
+		}
 	}
 }

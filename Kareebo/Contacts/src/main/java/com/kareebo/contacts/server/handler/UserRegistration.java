@@ -11,7 +11,6 @@ import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +69,7 @@ public class UserRegistration extends SignatureVerifier implements com.kareebo.c
 			userDataStore.put(idPair.getUserId(),user);
 			final Client client=new Client();
 			client.setUserAgent(TypeConverter.convert(userAgent));
-			client.setContacts(new ArrayList<HashedContact>());
+			client.setContacts(new HashMap<CharSequence,HashedContact>());
 			try
 			{
 				client.setKeys(TypeConverter.convert(publicKeys));

@@ -66,6 +66,11 @@ abstract class SignatureVerifier extends ClientDBAccessor
 			future.setFailure(new InvalidArgument());
 			return;
 		}
+		catch(InvalidArgument invalidArgument)
+		{
+			future.setFailure(invalidArgument);
+			return;
+		}
 		put(client);
 		close();
 		future.setResult(null);
@@ -76,5 +81,5 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	 *
 	 * @param client The client
 	 */
-	abstract void afterVerification(final Client client);
+	abstract void afterVerification(final Client client) throws InvalidArgument;
 }

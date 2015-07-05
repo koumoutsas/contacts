@@ -15,7 +15,6 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertNotNull;
@@ -76,7 +75,7 @@ abstract class SignatureVerifierTestBase
 		publicKeys.setVerification(verificationKey);
 		client.setUserAgent(userAgent);
 		client.setKeys(publicKeys);
-		client.setContacts(new ArrayList<HashedContact>());
+		client.setContacts(new HashMap<CharSequence,HashedContact>());
 		final User user=new User();
 		user.setClients(new HashMap<CharSequence,Client>());
 		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());

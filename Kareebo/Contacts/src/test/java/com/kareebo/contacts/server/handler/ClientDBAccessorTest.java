@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -57,7 +56,7 @@ public class ClientDBAccessorTest
 		publicKeys.setVerification(cryptoBuffer);
 		clientPreset.setUserAgent(userAgent);
 		clientPreset.setKeys(publicKeys);
-		clientPreset.setContacts(new ArrayList<HashedContact>());
+		clientPreset.setContacts(new HashMap<CharSequence,HashedContact>());
 		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		final User user=new User();
 		final HashMap<CharSequence,Client> clients=new HashMap<>();

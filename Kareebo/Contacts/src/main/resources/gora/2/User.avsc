@@ -62,20 +62,16 @@
                         },
                         {
                             "name": "contacts",
-                            "type": 
+                            "type":
                             {
-                                "type": "array",
-                                "items":
+                                "type": "map",
+                                "values":
                                 {
                                     "name": "HashedContact",
                                     "namespace": "com.kareebo.contacts.server.gora",
                                     "type": "record",
                                     "fields":
                                     [
-                                        {
-                                            "name": "id",
-                                            "type": "long"
-                                        },
                                         {
                                             "name": "hash",
                                             "type": "com.kareebo.contacts.server.gora.CryptoBuffer"

@@ -4,7 +4,7 @@ def GORA_VERSION = '0.6.1-SNAPSHOT'
 allprojects {
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+            options.compilerArgs << "-Xlint:deprecation"
         }
     }
 }

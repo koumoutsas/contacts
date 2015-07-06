@@ -1,7 +1,7 @@
 {
+    "namespace": "com.kareebo.contacts.server.gora",
     "name": "User",
     "type": "record",
-    "namespace": "com.kareebo.contacts.server.gora",
     "fields":
     [
         {
@@ -16,7 +16,6 @@
                 "values":
                 {
                     "name": "Client",
-                    "namespace": "com.kareebo.contacts.server.gora",
                     "type": "record",
                     "fields":
                     [
@@ -25,7 +24,6 @@
                             "type":
                             {
                                 "name": "UserAgent",
-                                "namespace": "com.kareebo.contacts.server.gora",
                                 "type": "record",
                                 "fields":
                                 [
@@ -45,7 +43,6 @@
                             "type":
                             {
                                 "name": "PublicKeys",
-                                "namespace": "com.kareebo.contacts.server.gora",
                                 "type": "record",
                                 "fields":
                                 [
@@ -59,26 +56,61 @@
                                     }
                                 ]
                             }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "identities",
+            "type": 
+            {
+                "type": "map",
+                "values":
+                {
+                    "name": "Identity",
+                    "type": "record",
+                    "fields":
+                    [
+                        {
+                            "name": "hash",
+                            "type": "com.kareebo.contacts.server.gora.CryptoBuffer"
                         },
                         {
-                            "name": "contacts",
+                            "name": "referers",
                             "type":
                             {
-                                "type": "map",
-                                "values":
-                                {
-                                    "name": "HashedContact",
-                                    "namespace": "com.kareebo.contacts.server.gora",
-                                    "type": "record",
-                                    "fields":
-                                    [
-                                        {
-                                            "name": "hash",
-                                            "type": "com.kareebo.contacts.server.gora.CryptoBuffer"
-                                        }
-                                    ]
-                                }
+                                "type": "array",
+                                "items": "long"
                             }
+                        },
+                        {
+                            "name": "guarantors",
+                            "type":
+                            {
+                                "type": "array",
+                                "items": "long"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "contacts",
+            "type": 
+            {
+                "type": "map",
+                "values":
+                {
+                    "name": "Contact",
+                    "namespace": "com.kareebo.contacts.server.gora",
+                    "type": "record",
+                    "fields":
+                    [
+                        {
+                            "name": "hash",
+                            "type": "com.kareebo.contacts.server.gora.CryptoBuffer"
                         }
                     ]
                 }

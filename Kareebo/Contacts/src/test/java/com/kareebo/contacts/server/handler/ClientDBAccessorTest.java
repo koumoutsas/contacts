@@ -56,9 +56,10 @@ public class ClientDBAccessorTest
 		publicKeys.setVerification(cryptoBuffer);
 		clientPreset.setUserAgent(userAgent);
 		clientPreset.setKeys(publicKeys);
-		clientPreset.setContacts(new HashMap<CharSequence,HashedContact>());
 		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		final User user=new User();
+		user.setContacts(new HashMap<CharSequence,Contact>());
+		user.setIdentities(new HashMap<CharSequence,Identity>());
 		final HashMap<CharSequence,Client> clients=new HashMap<>();
 		clients.put(TypeConverter.convert(idPairPreset.getClientId()),clientPreset);
 		user.setClients(clients);

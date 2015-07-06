@@ -29,7 +29,7 @@ public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.co
 	}
 
 	@Override
-	void afterVerification(final Client client)
+	void afterVerification(final User user,final Client client)
 	{
 		client.setUserAgent(TypeConverter.convert(userAgent));
 	}

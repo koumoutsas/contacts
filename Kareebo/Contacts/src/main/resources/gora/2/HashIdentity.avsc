@@ -1,0 +1,35 @@
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "HashIdentity",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "hash",
+            "type": "bytes"
+        },
+        {
+            "name": "algorithm",
+            "type": "com.kareebo.contacts.server.gora.Algorithm"
+        },
+        {
+            "name": "identity",
+            "type":
+            {
+                "name": "IdentityPointer",
+                "type": "record",
+                "fields":
+                [
+                    {
+                        "name": "userId",
+                        "type": "long"
+                    },
+                    {
+                        "name": "contactId",
+                        "type": "long"
+                    }
+                ]
+            }
+        }
+    ]
+}

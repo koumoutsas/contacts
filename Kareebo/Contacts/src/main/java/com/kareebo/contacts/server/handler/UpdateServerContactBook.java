@@ -2,7 +2,7 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.ContactOperationSetPlaintextSerializer;
 import com.kareebo.contacts.server.gora.Client;
-import com.kareebo.contacts.server.gora.HashedContact;
+import com.kareebo.contacts.server.gora.Contact;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.ContactOperation;
 import com.kareebo.contacts.thrift.InvalidArgument;
@@ -40,25 +40,25 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 	}
 
 	@Override
-	void afterVerification(final Client client) throws InvalidArgument
+	void afterVerification(final User user,final Client client) throws InvalidArgument
 	{
-		final Map<CharSequence,HashedContact> contacts=client.getContacts();
+		final Map<CharSequence,Contact> contacts=user.getContacts();
 		for(ContactOperation contactOperation:contactOperationSet)
 		{
 			final com.kareebo.contacts.common.HashedContact hashedContact=contactOperation.getContact();
 			final CharSequence id=TypeConverter.convert(hashedContact.getId());
-			HashedContact dbHashedContact=contacts.get(id);
+			Contact dbContact=contacts.get(id);
 			switch(contactOperation.getType())
 			{
 				case Add:
 					try
 					{
-						if(dbHashedContact==null)
+						if(dbContact==null)
 						{
-							dbHashedContact=new HashedContact();
+							dbContact=new Contact();
 						}
-						dbHashedContact.setHash(TypeConverter.convert(hashedContact.getHash()));
-						contacts.put(id,dbHashedContact);
+						dbContact.setHash(TypeConverter.convert(hashedContact.getHash()));
+						contacts.put(id,dbContact);
 					}
 					catch(NoSuchAlgorithmException e)
 					{
@@ -66,7 +66,7 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 					}
 					break;
 				case Delete:
-					if(dbHashedContact==null)
+					if(dbContact==null)
 					{
 						throw new InvalidArgument();
 					}

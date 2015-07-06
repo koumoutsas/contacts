@@ -56,7 +56,6 @@ public class UserRegistrationTest extends SignatureVerifierTestBase
 		}
 		catch(GoraException e)
 		{
-			e.printStackTrace();
 			return null;
 		}
 	}

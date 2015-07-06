@@ -147,7 +147,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		}
 
 		@Override
-		void afterVerification(final Client client)
+		void afterVerification(final User user,final Client client)
 		{
 			client.setUserAgent(null);
 		}

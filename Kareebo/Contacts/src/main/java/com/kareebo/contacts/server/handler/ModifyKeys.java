@@ -29,7 +29,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	}
 
 	@Override
-	void afterVerification(final Client client)
+	void afterVerification(final User user,final Client client)
 	{
 		client.setKeys(newPublicKeys);
 	}

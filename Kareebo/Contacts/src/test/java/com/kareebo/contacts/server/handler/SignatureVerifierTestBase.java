@@ -3,6 +3,7 @@ package com.kareebo.contacts.server.handler;
 import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
+import com.kareebo.contacts.server.gora.Identity;
 import com.kareebo.contacts.thrift.IdPair;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
@@ -75,8 +76,9 @@ abstract class SignatureVerifierTestBase
 		publicKeys.setVerification(verificationKey);
 		client.setUserAgent(userAgent);
 		client.setKeys(publicKeys);
-		client.setContacts(new HashMap<CharSequence,HashedContact>());
 		final User user=new User();
+		user.setContacts(new HashMap<CharSequence,Contact>());
+		user.setIdentities(new HashMap<CharSequence,Identity>());
 		user.setClients(new HashMap<CharSequence,Client>());
 		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(userId,user);

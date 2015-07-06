@@ -1,0 +1,16 @@
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "CryptoBuffer",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "buffer",
+            "type": "bytes"
+        },
+        {
+            "name": "algorithm",
+            "type": "com.kareebo.contacts.server.gora.Algorithm"
+        }
+    ]
+}

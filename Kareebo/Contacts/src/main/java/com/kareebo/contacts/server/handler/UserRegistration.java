@@ -66,10 +66,11 @@ public class UserRegistration extends SignatureVerifier implements com.kareebo.c
 			final long userId=idPair.getUserId();
 			user.setId(userId);
 			user.setClients(new HashMap<CharSequence,Client>());
+			user.setIdentities(new HashMap<CharSequence,Identity>());
 			userDataStore.put(idPair.getUserId(),user);
 			final Client client=new Client();
 			client.setUserAgent(TypeConverter.convert(userAgent));
-			client.setContacts(new HashMap<CharSequence,HashedContact>());
+			user.setContacts(new HashMap<CharSequence,Contact>());
 			try
 			{
 				client.setKeys(TypeConverter.convert(publicKeys));
@@ -91,7 +92,7 @@ public class UserRegistration extends SignatureVerifier implements com.kareebo.c
 	}
 
 	@Override
-	void afterVerification(final Client client)
+	void afterVerification(final User user,final Client client)
 	{
 		deleteRegistrationCode();
 	}

@@ -59,7 +59,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 				future.setFailure(new InvalidArgument());
 				return;
 			}
-			afterVerification(client);
+			afterVerification(user,client);
 		}
 		catch(NoSuchProviderException|NoSuchAlgorithmException|SignatureException|InvalidKeyException|InvalidKeySpecException e)
 		{
@@ -77,9 +77,10 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	}
 
 	/**
-	 * Abstract method for modifying the state of the client after a successful verification
+	 * Abstract method for modifying the state of the user after a successful verification
 	 *
+	 * @param user The user
 	 * @param client The client
 	 */
-	abstract void afterVerification(final Client client) throws InvalidArgument;
+	abstract void afterVerification(final User user,final Client client) throws InvalidArgument;
 }

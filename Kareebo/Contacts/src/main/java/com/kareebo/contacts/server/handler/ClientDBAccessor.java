@@ -24,7 +24,7 @@ class ClientDBAccessor
 	/**
 	 * Caches of intermediate structures used to get to the client.
 	 */
-	private User user;
+	User user;
 	private IdPair idPair;
 	private Map<CharSequence,Client> clients;
 

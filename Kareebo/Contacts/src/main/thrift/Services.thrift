@@ -3,8 +3,6 @@ include "Common.thrift"
 
 namespace java com.kareebo.contacts.thrift
 
-typedef string RegistrationCode
-
 struct IdPair
 {
     1: Common.Id userId,
@@ -21,13 +19,6 @@ typedef Common.ByteArray EncryptedData
 
 exception InvalidArgument
 {
-    1: string what,
-}
-
-service UserRegistration
-{
-    void userRegistration1(1: RegistrationCode code, 2: Signature signature,3: Common.UserAgent userAgent,
-    4: Common.PublicKeys publicKeys) throws (1: InvalidArgument invalidArgument),
 }
 
 service ModifyKeys

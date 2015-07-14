@@ -10,7 +10,7 @@
         },
         {
             "name": "algorithm",
-            "type": "com.kareebo.contacts.server.gora.Algorithm"
+            "type": "com.kareebo.contacts.server.gora.HashAlgorithm"
         },
         {
             "name": "identity",

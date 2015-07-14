@@ -48,11 +48,11 @@
                                 [
                                     {
                                         "name": "encryption",
-                                        "type": "com.kareebo.contacts.server.gora.CryptoBuffer"
+                                        "type": "com.kareebo.contacts.server.gora.AssymetricCryptoBuffer"
                                     },
                                     {
                                         "name": "verification",
-                                        "type": "com.kareebo.contacts.server.gora.CryptoBuffer"
+                                        "type": "com.kareebo.contacts.server.gora.AssymetricCryptoBuffer"
                                     }
                                 ]
                             }
@@ -74,7 +74,7 @@
                     [
                         {
                             "name": "hash",
-                            "type": "com.kareebo.contacts.server.gora.CryptoBuffer"
+                            "type": "com.kareebo.contacts.server.gora.HashBuffer"
                         },
                         {
                             "name": "referers",
@@ -110,7 +110,7 @@
                     [
                         {
                             "name": "hash",
-                            "type": "com.kareebo.contacts.server.gora.CryptoBuffer"
+                            "type": "com.kareebo.contacts.server.gora.HashBuffer"
                         }
                     ]
                 }

@@ -1,0 +1,26 @@
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "AssymetricCryptoBuffer",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "buffer",
+            "type": "bytes"
+        },
+        {
+            "name": "algorithm",
+            "type":
+            {
+                "type": "enum",
+                "name": "AssymetricKeyAlgorithm",
+                "symbols":
+                [
+                    "SHA256withECDSAprime239v1",
+                    "Fake"
+                ]
+
+            }
+        }
+    ]
+}

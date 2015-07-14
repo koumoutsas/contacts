@@ -6,7 +6,7 @@
 \newcommand{\encryptedData}{\emph{encryptedData}}
 \newcommand{\newPublicKeys}{\emph{newPublicKeys}}
 \newcommand{\newPrivateKeys}{\emph{newPrivateKeys}}
-\newcommand{\code}{\emph{code}}
+\newcommand{\code}{\emph{code}} 
 \newcommand{\serverVerified}{\emph{serverVerified}}
 \newcommand{\personalData}{\emph{personalData}}
 \newcommand{\registrationCode}{\emph{registrationCode}}
@@ -23,6 +23,8 @@
 \newcommand{\fixedString}{\emph{fixedString}}
 \newcommand{\removeUser}{\emph{removeUser}}
 \newcommand{\contactOperationSet}{\emph{contactOperationSet}}
+\newcommand{\identity}[1]{{\em identity(#1)}}
+\newcommand{\link}[1]{{\em link(#1)}}
 
 \title{\longProduct{} System Flows and Protocols Specification}
 
@@ -47,9 +49,11 @@ system, see \cite{project_spec}. Entities are denoted in all uppercase.
 
 \begin{description}
  \item[\Server{}] includes the central business logic, the database and all interfaces to third-party systems for, among others, sending out notifications and mail.
- \item[\Client{}] is an abstraction of a user agent. It usually refers to the mobile app that a customer uses, but it can extend to desktop applications, test clients, etc.
- \item[\User{}] This is a special entity that refers to the human using \Client{}. It is used for flow steps that require interaction between the client user agent and the human 
-user. This entity is not used for protocol specifications. It is used in flow specifications to disambiguate the origin and target of some steps.
+ \item[\Client{}] is an abstraction of a user agent. It usually refers to the mobile app that a customer uses, but it can extend to desktop applications, test clients, etc. When 
+more than one \client{} entities participate in a flow, let's say on behalf of users $A$ and $B$, they are denoted as \client[A] and \client[B].
+ \item[\User{}] This is an entity that refers to the human using \Client{}. It is used for flow steps that require interaction between the client user agent and the human user. 
+This entity is not used for protocol specifications. It is used in flow specifications to disambiguate the origin and target of some steps. When more than one \user{} entities 
+participate in the flow, corresponding to let's say human users $A$ and $B$, they are denoted as \user[A] and \user[B].
 \end{description}
 
 \subsection{Notation for Variables}
@@ -75,8 +79,7 @@ cryptography, such as registration codes and elliptic curve keys, see \cite{cryp
 
 All variable names are small camelCase.
 
-\subsection{Flow Specifications Organization and 
-Format}\label{sec:flow_spec_def}
+\subsection{Flow Specifications Organization and Format}\label{sec:flow_spec_def}
 Each flow description is organized in the following sections:
 
 \begin{description}
@@ -118,17 +121,6 @@ alternatives can be found in accompanying footnotes.
 \subsection{Implicit Flow Branches}
 Some flow branches are repeated and are followed under common triggers. To avoid cluttering the main flows, we define them here.
 
-\subsubsection{Registration Code Verification}
-When a step states that \Server{} checks the registration code, the following steps are implied:
-
-\begin{enumerate}
- \item \Server{} checks the registration code in $RegistrationCodeMap$, with the key being \userId{} and \clientId{}.
- \begin{enumerate}
-  \item If the checks succeeds, \Server{} removes the entry from\\$RegistrationCodeMap$.
-  \item If the checks fails, \Server{} sends error to the entity that requested the check and terminates the flow.
- \end{enumerate}
-\end{enumerate}
-
 \subsubsection{Flow Termination with Error on Failed Commit}
 Steps which state that entity $X$ commits $Y$ to the DB imply a flow branch that is followed when the commit operation fails. In this case, $X$ terminates the flow with an error. 
 In most cases, error flows are inferable from other error branches. When this is not possible, the branch is declared explicitly. 
@@ -137,6 +129,92 @@ In most cases, error flows are inferable from other error branches. When this is
 All flows involving \Server{} and another entity may fail for various reasons, such as \userId{} or \clientId{} being unknown or the signature verification failing. For security, 
 \Server{} does not reveal the specific reason the operation failed. Therefore, when, for example, a registration code verification fails, the message from \Server{} to \Client{} 
 does not differentiate between all the reasons the verification may fail.
+
+\subsection{Identity Registration}
+\label{identity_registration_flow}
+This flow is followed when a user $A$ wants to enter the system. This is done by requesting a user $B$ who is already in the system to confirm $A$'s identity.
+
+\paragraph{Participants} \User[A], \User[B], \Client[A], \Client[B], \Server{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\identity{A}:Client.Identity] From \Client[A]. This may come from the contact book of \User[A] or by \User[A] manually entering the value.
+ \item[\identity{B}:Client.Identity] From the contact book of \User[A].
+\end{description}
+
+\paragraph{Outputs}
+For \Client[A] either success, if \Server{} accepts the registration, error otherwise. In case of error, \User[A] is notified. \Client[B] removes the temporary mappings for 
+\identity{A} after a certain period without confirmation from \Server{} has passed.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\link{A}:RegistrationLink] A registration link constructed by \Client[B] and sent to \User[A].
+ \item[\link{B}:InvitationRequestLink] An invitation request link constructed by \Client[A] and sent to \User[B].
+ \item[$N(A)$:RandomHashPad] A random blind for \identity{A}.
+ \item[$U(A)$:HashBuffer] The blinded \identity{A} generated by \Client[B].
+ \item[$U_{id}(A)$:Server.IdentityId] A pair of user id and identity id for \identity{A} generated by \Server{}.
+ \item[$N_S(A)$:RandomHashPad] A random blind for \identity{A} generated by \Server{}.
+ \item[$X(A)$:RandomHashPad] The XOR of two random blinds.
+ \item[\privateKeys{}:PrivateKeys] The new private keys for \Client[A].
+ \item[\publicKeys{}:PublicKeys] The new public keys for \Client[B].
+ \item[$N_C(A)$:RandomHashPad] A random blind for \identity{A} generated by \Client[A].
+ \item[\signedData{}:ECDSA signature] The ECDSA signature with \signingKey{} of \Client[A] registration data. See \cite{crypto_spec} for details.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \User[A] requests \Client[A] to notify \User[B].
+ \item \Client[A] constructs \link{B} from \identity{A}.
+ \item \Client[A] sends \link{B} to \identity{B}.
+ \item \User[B] clicks on \link{B} and the flow passes to \Client[B]. If \User[B] doesn't react in this step, the flow terminates.
+ \item \Client[B] extracts \identity{A} from \link{B}.
+ \item If \Client[B] knows \identity{A} already, it populates $U(A)$ from its local storage and it goes to step~\ref{identity_registration_flow:send_hash}.
+ \item \Client[B] generates $N(A)$.
+ \item \Client[B] stores locally the triplet $\langle$\identity{A}$,U(A),N(A)$ to the PendingIdentitiesSet.
+ \item \Client[B] calculates $U(A)=Hash($\identity{A}$,N(A))$.
+ \item \Client[B] stores $U(A)$ as a HashBuffer mapped to \identity{A} in UnconfirmedIdentities.
+ \item\label{identity_registration_flow:send_hash} \Client[B] sends to \Server{} request for registering $U(A)$.
+ \item \Server{} checks in HashIdentityMap if there is a mapping for $U(A)$.
+ \begin{enumerate}
+  \item If there is, it populates $U_id(A)$ with the value of the mapping.
+  \item If there isn't, it generates a new $U_{id}{A}$ and creates a mapping from $U(A)$ to $U_{id}(A)$ in HashIdentityMap. It creates an entry in UserMap with $U_{id}(A).userId$ 
+and adds to it the mapping $U_{id}(A).identityId:U(A)$.
+ \end{enumerate}
+ \item \Server{} adds \Client[B] to the list of confirmers of $U_{id}(A).identityId$ in UserMap.
+ \item \Server{} populates $N_S(A)$ and adds it to the mapping for $U_{id}(A)$ in UserMap.
+ \item \Server{} sends to \Client[B] $U_{id}(A)$ and $N_S(A)$.
+ \item \Client[B] calculates $X(A)=N(A)\oplus N_S(A)$.
+ \item \Client[B] generates \link{A} from $U_{id}(A)$ and $X(A)$.
+ \item \Client[B] sends \link{A} to \identity{A}.
+ \item \Client[A] retrieves $U_{id}(A)$ and $X(A)$ from \link{A}.
+ \item \Client[A] sends to \Server{} $U_{id}(A)$.
+ \item \Server{} retrieves $N_S(A)$ from UserMap and key $U_{id}(A)$.
+ \begin{enumerate}
+  \item If the retrieval fails, \Server{} sends failure to \Client[A] and terminates the flow.
+ \end{enumerate}
+ \item \Server{} sends $N_S(A)$ to \Client[A].
+ \item \Client[A] calculates $N(A)=N_S(A)\oplus X(A)$.
+ \item \Client[A] calculates $U(A)=Hash($\identity{A}$,N(A)\oplus N(A)$.
+ \item \Client[A] populates $N_C(A)$, \privateKeys{} and \publicKeys{}.
+ \item \Client[A] stores $N_C(A)$ to local storage.
+ \item For every identitiy $i$ that \Client[A] wants to register with \Server{}, including \identity{A}, it generates $U_i(A)=Hash(i,N_C(A)$.
+ \item \Client[A] populates \signedData{} from \signingKey{} and \identity{B},\publicKeys{},$U(A),U_{id}(A),\lbrace U_1(A),\ldots,U_i(A),\ldots\rbrace,j$, where $j$ is the index 
+for \identity{A}.
+ \item \Server{} verifies the signature and that $U(A)$ maps to $U_{id}(A)$ in HashIdentityMap.
+ \begin{enumerate}
+  \item If the verification fails, \Server{} sends failure to \Client[A] and terminates the flow.
+ \end{enumerate}
+ \item \Server{} registers $\lbrace U_1(A),\ldots,U_i(A),\ldots\rbrace$ for $U_{id}(A)$ in HashIdentityMap and UserMap.
+ \item \Server{} removes $U(A)$ from UserMap and adds it as alias in UserMap for $U_j(A)$. It merges the confirmer sets for the two.
+ \item \Server{} replies with success to \Client[A].
+ \item \Server{} sends to \Client[B] confirmation that $U(A)$ is confirmed.
+ \item \Client[B] executes the Send Contact Card flow with \Client[A].
+ \item \Client[B] removes from UnconfirmedIdentities $U(A)$ and adds \identity{A} to the \longProduct{} contact book.
+ \item \Client[B] executes the identity broadcast protocol for \identity{A}.
+\end{enumerate}
 
 \subsection{Modify Keys}
 \label{modify_keys_flow}

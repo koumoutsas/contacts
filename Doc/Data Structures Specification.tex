@@ -108,7 +108,7 @@ We define where applicable what the primary key is for a structure, which fields
 this is implicitly the primary key. If a structure has a primary key that is not named $id$, we explicitly define it.
 
 \subsubsection{State}
-Some of the operations on server structures involve manipulating state (\ref{sec:structure:RegistrationCodeMap}). These operations must be performed in the database, not the 
+Some of the operations on server structures involve manipulating state. These operations must be performed in the database, not the 
 server code, which is stateless. If the database does not have the appropriate mechanisms to execute them, in the manner of MySQL triggers (\cite{mysql_trigger}), then some 
 creative solution, like a garbage collection process, must be implemented.
 
@@ -268,7 +268,7 @@ HashAlgorithm is an enum of all the acceptable hash algorithms in the system. Fo
 \begin{verbbox}
 HashBuffer
 {
-  buffer, bytearray
+  buffer, byte array
   algorithm, HashAlgorithm
 }
 \end{verbbox}
@@ -309,12 +309,12 @@ AssymetricKeyAlgorithm = { ECDSA-prime192v1 }
 \paragraph*{Comments}
 AssymetricKeyAlgorithm is an enum of all the acceptable assymetric key generation algorithms in the system. For the moment only ECDSA-prime192v1 is accepted.
 
-\subsubsection{EncryptedBuffer}
+\subsubsection{AssymetricCryptoBuffer}
 
 \begin{verbbox}
-EncryptedBuffer
+AssymetricCryptoBuffer
 {
-  buffer, bytearray
+  buffer, byte array
   algorithm, AssymetricKeyAlgorithm
 }
 \end{verbbox}
@@ -327,7 +327,7 @@ EncryptedBuffer
 \end{inparaitem}
 
 \paragraph*{Comments}
-An EncryptedBuffer is a ciphertext payload with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
+An AssymetricCryptoBuffer is a ciphertext payload with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
 
 \SpecialItem
 \begin{description}
@@ -345,7 +345,7 @@ An EncryptedBuffer is a ciphertext payload with the algorithm used to produce it
 \begin{verbbox}
 PublicKey
 {
-  buffer, bytearray with X.509 encoding of the key
+  buffer, byte array with X.509 encoding of the key
   algorithm, AssymetricKeyAlgorithm
 }
 \end{verbbox}
@@ -471,7 +471,7 @@ ContactOperation = set(ContactOperation)
 EncryptedContact
 {
   hashedContact, HashedContact
-  encrypted, EncryptedBuffer
+  encrypted, AssymetricCryptoBuffer
 }
 \end{verbbox}
 \begin{center}
@@ -503,6 +503,22 @@ EncryptedContactSet = set(EncryptedContact)
  \item \unsecure
 \end{inparaitem}
 
+\subsubsection{RandomHashPad}
+
+\begin{verbbox}
+RandomHashPad = 128-bit signed integer
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\SpecialItem\paragraph*{Comments}
+This is a type definition for the randomness added to hashed data sent to \Server{}.
+
 \subsection{Client}
 \label{sec:structure:client}
 
@@ -511,7 +527,7 @@ EncryptedContactSet = set(EncryptedContact)
 \begin{verbbox}
 PrivateKey
 {
-  buffer, bytearray with PKCS#8 encoding of the key
+  buffer, byte array with PKCS#8 encoding of the key
   algorithm, AssymetricKeyAlgorithm
 }
 \end{verbbox}
@@ -703,36 +719,12 @@ This is the internal representation of the contact book of the device. It is ind
 \subsection{Server}
 \label{sec:structure:server}
 
-\subsubsection{Contact}
-\label{sec:structure:server:contact}
-
-\begin{verbbox}
-HashedContact = Common.HashedContact
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\paragraph*{Comments}
-Server-side typedef for defining the foreign key constraint.
-
-\SpecialItem
-\begin{description}
- \item[Foreign Key] hash in Hashes~\ref{sec:structure:server:hashes}.
-\end{description}
-
 \subsubsection{Client}
 
 \begin{verbbox}
 Client extends Common.Client
 {
-  registered, boolean, initial value is false
   keys, PublicKeys
-  contacts, set(Contact)
 }
 \end{verbbox}
 \begin{center}
@@ -749,10 +741,7 @@ The structure extends a client description with a field to indicate whether this
 
 \SpecialItem
 \begin{description}
- \item[registered] If false, the structure is liable for garbage collection. If true, it means the client has completed the full registration cycle.
  \item[keys]  The public keys of the client.
- \item[contacts] This is the set of all the contacts reported by the client. Note that these are Server.Contact~\ref{sec:structure:server:contact}, not to be confused with 
-Client.Contact \ref{sec:structure:client:contact}.
 \end{description}
 
 \subsubsection{User}
@@ -763,6 +752,7 @@ User
 {
   id, Id
   clients, set(Client)
+  identities, map(HashBuffer:Identity)
 }
 \end{verbbox}
 \begin{center}
@@ -780,6 +770,7 @@ This data structure holds the information related to a user and its registered c
 \begin{description}
  \item[id] This number uniquely identifies the user across the system. It is a primary key in the user's table in the server DB. The server generates this id.
  \item[clients] A set of $Client$.
+ \item[identities] A map from hash to Identity.
 \end{description}
 
 \subsubsection{UserSet}
@@ -799,130 +790,6 @@ UserSet = set(User)
 
 \paragraph*{Comments}
 A set of $User$ objects, indexed by $User.id$. This is the global user table and entry point for retrieving user related information.
-
-\subsubsection{RegistrationCode}
-
-\begin{verbbox}
-RegistrationCode
-{
-  userId, Id
-  clientId, Id
-  code, 6-digit decimal number
-}
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\paragraph*{Comments}
-A registration code is a four digit code that is generated by the server to authenticate a client.
-
-\SpecialItem
-\begin{description}
- \item[Primary Key] All three fields.
- \item[Foreign Key] The pair of userId and clientId is a foreign key, in the sense that userId needs to be in UserSet and clientId needs to be in the clients set for the user.
-\end{description}
-
-\subsubsection{RegistrationCodeMap}
-\label{sec:structure:RegistrationCodeMap}
-
-\begin{verbbox}
-RegistrationCodeMap = TimeoutMap<RegistrationCode>
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \unique
- \item \persistent
- \item \secure
-\end{inparaitem}
-
-\paragraph*{Comments}
-Registration codes expire. When the server receives a registration code, it looks it up in this map and if it exists and it hasn't timed out, it authorizes the action.
-
-When a registration code expires, we need to perform some cleanup in UserSet to remove clients that were not activated and users that never completed the registration. When entry 
-$E=\langle code_E,userId_E,clientId_E\rangle$ expires, we look up $userId_E$ in UserSet. We retrieve UserSet($userId_E$).clients($clientId_E$) from that and check if the 
-registered field is false. If it is, we remove the entry. If UserSet($userId_E$).clients is empty now, we remove UserSet($userId_E$), because the user never completed the 
-registration flow.
-
-\subsubsection{ContactPointer}
-
-\begin{verbbox}
-ContactPointer
-{
-  userId, Id
-  pointers, set({
-    clientId, Id
-    contactId, Id
-    }
-}
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\paragraph*{Comments}
-This structure represents all the occurrences of a contact in a user's client's contact books. It is used as a building block for 
-ContactNode~\ref{sec:structure:server:contact_node}.
-
-\SpecialItem
-\begin{description}
- \item[Foreign Key] userId is a foreign key in UserSet. Also, clientId is a foreign key in the set of clients in corresponding User and contactId is a foreign key in the latter's 
-set of contacts.
-\end{description}
-
-\subsubsection{ContactNode}
-\label{sec:structure:server:contact_node}
-
-\begin{verbbox}
-ContactNode
-{
-  owner, ContactPointer
-  referrers, set(ContactPointer)
-}
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\paragraph*{Comments}
-This is a node in the directed graph of contact relationships. This structure denotes that a set of users (the referrers) have the owner's contact in their contact book. Therefore 
-in the graph for each user in referrers there is a directed edge to owner (\ref{sec:structure:server:hashes}). The client and contact ids are kept together to facilitate looking 
-up the client that needs to be contacted by the server if something changes.
-
-\subsubsection{Hashes}
-\label{sec:structure:server:hashes}
-
-\begin{verbbox}
-Hashes = map(HashBuffer:ContactNode)
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \unique
- \item \persistent
- \item \secure
-\end{inparaitem}
-
-\paragraph*{Comments}
-This is the contact relationship directed graph. It is the data structure used to discover relationships between contacts. Each member is a hash of a contact, accompanied by the 
-user that owns it and other users that refer to it.
 
 \bibliography{spec,dataStructures}
 \bibliographystyle{plain}

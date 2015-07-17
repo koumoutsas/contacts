@@ -227,7 +227,9 @@ TimeoutMap<T>
 \end{inparaitem}
 
 \paragraph*{Comments}
-This is a structure whose implementation depends a lot on the data storage backend. On RDBMSs it is straightforward to implement it, but NoSQL backends can only implement a simplified version of it, where the garbage-collection is done by the server. The following is specified with RDBMSs in mind. For NoSQL the specification is used to define the functionality of the garbage collector.
+This is a structure whose implementation depends a lot on the data storage back-end. On RDBMSs it is straightforward to implement it, but NoSQL backends can only implement a 
+simplified version of it, where the garbage-collection is done by the server. The following is specified with RDBMSs in mind. For NoSQL the specification is used to define the 
+functionality of the garbage collector.
 
 This structure is a map for expirable objects and for periodically garbage-collecting items that have expired. The garbage collection can be triggered periodically (the period 
 should not be less than two times the timeout value) or when the map size has exceeded some threshold.
@@ -281,7 +283,7 @@ HashBuffer
 \end{inparaitem}
 
 \paragraph*{Comments}
-A HashBuffer is a hash with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
+A HashBuffer is a hash with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
 
 \SpecialItem
 \begin{description}
@@ -294,9 +296,9 @@ A HashBuffer is a hash with the algorithm used to produce it. The algorithm acoo
  \item[Primary Key] All fields.
 \end{description}
 
-\subsubsection{AssymetricKeyAlgorithm}
+\subsubsection{AsymmetricKeyAlgorithm}
 \begin{verbbox}
-AssymetricKeyAlgorithm = { ECDSA-prime192v1 }
+AsymmetricKeyAlgorithm = { ECDSA-prime192v1 }
 \end{verbbox}
 \begin{center}
 \theverbbox
@@ -307,15 +309,15 @@ AssymetricKeyAlgorithm = { ECDSA-prime192v1 }
 \end{inparaitem}
 
 \paragraph*{Comments}
-AssymetricKeyAlgorithm is an enum of all the acceptable assymetric key generation algorithms in the system. For the moment only ECDSA-prime192v1 is accepted.
+AsymmetricKeyAlgorithm is an enum of all the acceptable asymmetric key generation algorithms in the system. For the moment only ECDSA-prime192v1 is accepted.
 
-\subsubsection{AssymetricCryptoBuffer}
+\subsubsection{AsymmetricCryptoBuffer}
 
 \begin{verbbox}
-AssymetricCryptoBuffer
+AsymmetricCryptoBuffer
 {
   buffer, byte array
-  algorithm, AssymetricKeyAlgorithm
+  algorithm, AsymmetricKeyAlgorithm
 }
 \end{verbbox}
 \begin{center}
@@ -327,7 +329,7 @@ AssymetricCryptoBuffer
 \end{inparaitem}
 
 \paragraph*{Comments}
-An AssymetricCryptoBuffer is a ciphertext payload with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
+An AsymmetricCryptoBuffer is a ciphertext payload with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
 
 \SpecialItem
 \begin{description}
@@ -346,7 +348,7 @@ An AssymetricCryptoBuffer is a ciphertext payload with the algorithm used to pro
 PublicKey
 {
   buffer, byte array with X.509 encoding of the key
-  algorithm, AssymetricKeyAlgorithm
+  algorithm, AsymmetricKeyAlgorithm
 }
 \end{verbbox}
 \begin{center}
@@ -358,7 +360,7 @@ PublicKey
 \end{inparaitem}
 
 \paragraph*{Comments}
-A PublicKey is a buffer with the X.509 encoding of the key with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
+A PublicKey is a buffer with the X.509 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
 
 \subsubsection{PublicKeys}
 
@@ -386,7 +388,7 @@ PublicKeys
 \subsubsection{ContactOperationType}
 
 \begin{verbbox}
-HashAlgorithm = { Add, Delete }
+ContactOperationType = { Add, Delete }
 \end{verbbox}
 \begin{center}
 \theverbbox
@@ -471,7 +473,7 @@ ContactOperation = set(ContactOperation)
 EncryptedContact
 {
   hashedContact, HashedContact
-  encrypted, AssymetricCryptoBuffer
+  encrypted, AsymmetricCryptoBuffer
 }
 \end{verbbox}
 \begin{center}
@@ -528,7 +530,7 @@ This is a type definition for the randomness added to hashed data sent to \Serve
 PrivateKey
 {
   buffer, byte array with PKCS#8 encoding of the key
-  algorithm, AssymetricKeyAlgorithm
+  algorithm, AsymmetricKeyAlgorithm
 }
 \end{verbbox}
 \begin{center}
@@ -540,7 +542,7 @@ PrivateKey
 \end{inparaitem}
 
 \paragraph*{Comments}
-A PrivateKey is a buffer with the PKCS\#8 encoding of the key with the algorithm used to produce it. The algorithm acoompanies the buffer for forward-compatibility.
+A PrivateKey is a buffer with the PKCS\#8 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
 
 \subsubsection{PrivateKeys}
 \label{sec:structure:client:private_keys}

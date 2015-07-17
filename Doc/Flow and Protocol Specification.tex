@@ -17,14 +17,19 @@
 \newcommand{\verificationKey}{\publicKeys{}.\emph{verification}}
 \newcommand{\encryptionKey}{\publicKeys{}.\emph{encryption}}
 \newcommand{\decryptionKey}{\privateKeys{}.\emph{decryption}}
-\newcommand{\userId}{\emph{userId}}
-\newcommand{\clientId}{\emph{clientId}}
+\newcommand{\userId}[1]{\parenthesize{userId}{#1}}
+\newcommand{\clientId}[1]{\parenthesize{clientId}{#1}}
 \newcommand{\loggedIn}{\emph{loggedIn}}
 \newcommand{\fixedString}{\emph{fixedString}}
 \newcommand{\removeUser}{\emph{removeUser}}
 \newcommand{\contactOperationSet}{\emph{contactOperationSet}}
-\newcommand{\identity}[1]{{\em identity(#1)}}
-\newcommand{\link}[1]{{\em link(#1)}}
+\newcommand{\identity}[1]{\parenthesize{identity}{#1}}
+\newcommand{\link}[1]{\parenthesize{link}{#1}}
+\newcommand{\addedContacts}{{\em addedContacts}}
+\newcommand{\deletedContacts}{{\em deletedContacts}}
+\newcommand{\updatedContacts}{{\em updatedContacts}}
+\newcommand{\publicKeysSet}[1]{\parenthesize{publicKeysSet}{#1}}
+\newcommand{\contactCard}[1]{\parenthesize{contactCard}{#1}}
 
 \title{\longProduct{} System Flows and Protocols Specification}
 
@@ -49,11 +54,9 @@ system, see \cite{project_spec}. Entities are denoted in all uppercase.
 
 \begin{description}
  \item[\Server{}] includes the central business logic, the database and all interfaces to third-party systems for, among others, sending out notifications and mail.
- \item[\Client{}] is an abstraction of a user agent. It usually refers to the mobile app that a customer uses, but it can extend to desktop applications, test clients, etc. When 
-more than one \client{} entities participate in a flow, let's say on behalf of users $A$ and $B$, they are denoted as \client[A] and \client[B].
- \item[\User{}] This is an entity that refers to the human using \Client{}. It is used for flow steps that require interaction between the client user agent and the human user. 
-This entity is not used for protocol specifications. It is used in flow specifications to disambiguate the origin and target of some steps. When more than one \user{} entities 
-participate in the flow, corresponding to let's say human users $A$ and $B$, they are denoted as \user[A] and \user[B].
+ \item[\Client{A}] is an abstraction of a user agent of user $A$. It usually refers to the mobile app that a customer uses, but it can extend to desktop applications, test clients, etc.
+ \item[\User{A}] This is an entity that refers to the human using \Client{A}. It is used for flow steps that require interaction between the client user agent and the human user. 
+This entity is not used for protocol specifications. It is used in flow specifications to disambiguate the origin and target of some steps.
 \end{description}
 
 \subsection{Notation for Variables}
@@ -86,27 +89,17 @@ Each flow description is organized in the following sections:
  \item[Description] What the flow does.
  \item[Participants] A list of participating entities.
  \item[Inputs] A list of the inputs to the flow. See \ref{sec:variable_notation} for the variable syntax.
- \item[Outputs] A list of the expected outputs to the flow. The syntax is the same as for inputs. Their description may be simplified when their meaning can be inferred from a 
-more informal description.
+ \item[Outputs] The output of flows is normally success or failure and it can usually be inferred implicitly. We note here interesting state changes for the involved entities.
  \item[Other variables] Any other variables that are instantiated during the flow.
- \item[Local definitions] Definitions of functions that are local to the flow. We provide in \ref{sec:definitions} some common global definitions, but there may be local functions 
-that only make sense in the context of a flow.
- \item[Steps] An enumeration of the steps. The first word in each step is the initiating entity, meaning the entity that sends a message in this step.
+ \item[Flow] An enumeration of the steps. The first word in each step is the initiating entity, meaning the entity that sends a message in this step.
 \end{description}
 
 \subsection{Protocol Specifications Organization and Format}
 
-\subsection{Definitions}\label{sec:definitions}
+\subsection{Signatures}\label{sec:signatures}
 
-\begin{description}
- \item[Public/Private Key] The public and private keys for entity $A$ are denoted as $K_{public}^A$ and $K_{private}^A$. The encryption of message $m$ for entity $A$ with key 
-$K_{public}^A$ is denoted as $E(A,m)$. The decryption of encrypted message $d$ by entity $A$ with key $K_{private}^A$ is denoted as $D(A,d)$. The identity $m=D(A,E(A,m))$ holds.
- \item[Signature and Verification] The signing and verification keys for entity $A$ are denoted as $K_{sign}^A$ and $K_{verify}^A$. The signature of message $m$ by entity $A$ is 
-denoted as $S(A,m)$. The verification of signature $s$ produced by $A$ is denoted as $V(A,s)$. The identity $m=V(A,S(A,m))$ holds.
-
-Note that signing a message $m$ involves signing a hash of $m$ and accompanying the signature with $m$. This means that when \Client{} signs a message $m$ and sends the signature 
-$s$ to \Server{}, \Server{} knows from $s$ the details of the message, like the client id, without having to decrypt $s$ first. See \cite{crypto_spec} for more details.
-\end{description}
+Signing a message $m$ involves signing a hash of $m$ and accompanying the signature with $m$. This means that when \Client{A} signs a message $m$ and sends the signature 
+$s$ to \Server{}, \Server{} knows from $s$ the details of the message, like the client id and the payload. See \cite{crypto_spec} for more details.
 
 \subsection{Alternative Steps}
 Some parts of the flow may have alternative specifications. These alternatives originate from usability concerns or uncertainty about hardware components, which may require 
@@ -126,130 +119,254 @@ Steps which state that entity $X$ commits $Y$ to the DB imply a flow branch that
 In most cases, error flows are inferable from other error branches. When this is not possible, the branch is declared explicitly. 
 
 \subsubsection{Server Errors}
-All flows involving \Server{} and another entity may fail for various reasons, such as \userId{} or \clientId{} being unknown or the signature verification failing. For security, 
-\Server{} does not reveal the specific reason the operation failed. Therefore, when, for example, a registration code verification fails, the message from \Server{} to \Client{} 
+All flows involving \Server{} and another entity may fail for various reasons, such as \userId{A} or \clientId{A} being unknown or the signature verification failing. For security, 
+\Server{} does not reveal the specific reason the operation failed. Therefore, when, for example, a signature verification fails, the message from \Server{} to \Client{A} 
 does not differentiate between all the reasons the verification may fail.
 
-\subsection{Identity Registration}
-\label{identity_registration_flow}
-This flow is followed when a user $A$ wants to enter the system. This is done by requesting a user $B$ who is already in the system to confirm $A$'s identity.
+\subsection{Register Identity}
+\label{register_identity_flow}
+This flow is executed when \user{A} wants to enter the system. This is done by requesting a \user{B} who is already in the system to confirm \user{A}'s identity.
 
-\paragraph{Participants} \User[A], \User[B], \Client[A], \Client[B], \Server{}
+\paragraph{Participants} \User{A}, \User{B}, \Client{A}, \Client{B}, \Server{}
 
 \paragraph{Inputs}
 \SpecialItem
 \begin{description}
- \item[\identity{A}:Client.Identity] From \Client[A]. This may come from the contact book of \User[A] or by \User[A] manually entering the value.
- \item[\identity{B}:Client.Identity] From the contact book of \User[A].
+ \item[\identity{A} : Client.Identity] From \Client{A}. This may come from the contact book of \User{A} or by \User{A} manually entering the value.
+ \item[\identity{B} : Client.Identity] From the contact book of \User{A}.
 \end{description}
 
 \paragraph{Outputs}
-For \Client[A] either success, if \Server{} accepts the registration, error otherwise. In case of error, \User[A] is notified. \Client[B] removes the temporary mappings for 
-\identity{A} after a certain period without confirmation from \Server{} has passed.
+For \Client{A} either success, if \Server{} accepts the registration, error otherwise. In case of error, \User{A} is notified. \Client{B} removes the temporary mappings for 
+\identity{A} after a certain period without confirmation from \Server{} has passed, as part of a separate flow.
 
 \paragraph{Other Variables}
 \SpecialItem
 \begin{description}
- \item[\link{A}:RegistrationLink] A registration link constructed by \Client[B] and sent to \User[A].
- \item[\link{B}:InvitationRequestLink] An invitation request link constructed by \Client[A] and sent to \User[B].
- \item[$N(A)$:RandomHashPad] A random blind for \identity{A}.
- \item[$U(A)$:HashBuffer] The blinded \identity{A} generated by \Client[B].
- \item[$U_{id}(A)$:Server.IdentityId] A pair of user id and identity id for \identity{A} generated by \Server{}.
- \item[$N_S(A)$:RandomHashPad] A random blind for \identity{A} generated by \Server{}.
- \item[$X(A)$:RandomHashPad] The XOR of two random blinds.
- \item[\privateKeys{}:PrivateKeys] The new private keys for \Client[A].
- \item[\publicKeys{}:PublicKeys] The new public keys for \Client[B].
- \item[$N_C(A)$:RandomHashPad] A random blind for \identity{A} generated by \Client[A].
- \item[\signedData{}:ECDSA signature] The ECDSA signature with \signingKey{} of \Client[A] registration data. See \cite{crypto_spec} for details.
+ \item[\link{A} : RegistrationLink] A registration link constructed by \Client{B} and sent to \User{A}.
+ \item[\link{B} : InvitationRequestLink] An invitation request link constructed by \Client{A} and sent to \User{B}.
+ \item[\parenthesize{N}{A} : RandomHashPad] A random blind for \identity{A}.
+ \item[\parenthesize{U}{A} : HashBuffer] The blinded \identity{A} generated by \Client{B}.
+ \item[\parenthesize{Id}{A} : Server.IdentityId] A pair of user id and identity id for \identity{A} generated by \Server{}.
+ \item[\parenthesize{$N_S$}{A} : RandomHashPad] A random blind for \identity{A} generated by \Server{}.
+ \item[\parenthesize{X}{A} : RandomHashPad] The XOR of two random blinds.
+ \item[\privateKeys{} : PrivateKeys] The new private keys for \Client{A}.
+ \item[\publicKeys{} : PublicKeys] The new public keys for \Client{B}.
+ \item[\parenthesize{$N_C$}{A} : RandomHashPad]\label{register_identity_flow:NCA} A random blind for \identity{A} generated by \Client{A}.
+ \item[\signedData{} : ECDSA signature] The ECDSA signature with \signingKey{} of \Client{A} registration data. See \cite{crypto_spec} for details.
 \end{description}
 
 \paragraph{Flow}
 
 \begin{enumerate}
- \item \User[A] requests \Client[A] to notify \User[B].
- \item \Client[A] constructs \link{B} from \identity{A}.
- \item \Client[A] sends \link{B} to \identity{B}.
- \item \User[B] clicks on \link{B} and the flow passes to \Client[B]. If \User[B] doesn't react in this step, the flow terminates.
- \item \Client[B] extracts \identity{A} from \link{B}.
- \item If \Client[B] knows \identity{A} already, it populates $U(A)$ from its local storage and it goes to step~\ref{identity_registration_flow:send_hash}.
- \item \Client[B] generates $N(A)$.
- \item \Client[B] stores locally the triplet $\langle$\identity{A}$,U(A),N(A)$ to the PendingIdentitiesSet.
- \item \Client[B] calculates $U(A)=Hash($\identity{A}$,N(A))$.
- \item \Client[B] stores $U(A)$ as a HashBuffer mapped to \identity{A} in UnconfirmedIdentities.
- \item\label{identity_registration_flow:send_hash} \Client[B] sends to \Server{} request for registering $U(A)$.
+ \item \User{A} requests \Client{A} to notify \User{B}.
+ \item \Client{A} constructs \link{B} from \identity{A}.
+ \item \Client{A} sends \link{B} to \identity{B}.
+ \item \User{B} clicks on \link{B} and the flow passes to \Client{B}. If \User{B} doesn't react in this step, the flow terminates.
+ \item \Client{B} extracts \identity{A} from \link{B}.
+ \item If \Client{B} knows \identity{A} already, it populates $U(A)$ from its local storage and it goes to step~\ref{identity_registration_flow:send_hash}.
+ \item \Client{B} generates $N(A)$.
+ \item \Client{B} calculates $U(A)=Hash($\identity{A}$,N(A))$.
+ \item \Client{B} stores locally the triplet $\langle$\identity{A}$,U(A),N(A)\rangle$ to the PendingIdentitiesSet.
+ \item\label{identity_registration_flow:send_hash} \Client{B} sends to \Server{} request for registering $U(A)$.
  \item \Server{} checks in HashIdentityMap if there is a mapping for $U(A)$.
  \begin{enumerate}
-  \item If there is, it populates $U_id(A)$ with the value of the mapping.
-  \item If there isn't, it generates a new $U_{id}{A}$ and creates a mapping from $U(A)$ to $U_{id}(A)$ in HashIdentityMap. It creates an entry in UserMap with $U_{id}(A).userId$ 
-and adds to it the mapping $U_{id}(A).identityId:U(A)$.
+  \item If there is, it populates $U_{id}(A)$ with the value of the mapping.
+  \item If there isn't, it generates a new $U_{id}{A}$ and creates a mapping from $U(A)$ to $U_{id}(A)$ in HashIdentityMap. It creates an entry in UserMap with $U_{id}(A).userId$ and adds $U(A)$ to the UserMap.Identities for $U_{id}(A).identityId$.
  \end{enumerate}
- \item \Server{} adds \Client[B] to the list of confirmers of $U_{id}(A).identityId$ in UserMap.
- \item \Server{} populates $N_S(A)$ and adds it to the mapping for $U_{id}(A)$ in UserMap.
- \item \Server{} sends to \Client[B] $U_{id}(A)$ and $N_S(A)$.
- \item \Client[B] calculates $X(A)=N(A)\oplus N_S(A)$.
- \item \Client[B] generates \link{A} from $U_{id}(A)$ and $X(A)$.
- \item \Client[B] sends \link{A} to \identity{A}.
- \item \Client[A] retrieves $U_{id}(A)$ and $X(A)$ from \link{A}.
- \item \Client[A] sends to \Server{} $U_{id}(A)$.
- \item \Server{} retrieves $N_S(A)$ from UserMap and key $U_{id}(A)$.
+ \item \Server{} adds \Client{B} to the list of confirmers of $U_{id}(A).identityId$ in UserMap.
+ \item \Server{} populates $N_S(A)$ and sets UserMap.Blind for $U_{id}(A)$ to it.
+ \item \Server{} sends to \Client{B} $U_{id}(A)$ and $N_S(A)$.
+ \item \Client{B} calculates $X(A)=N(A)\oplus N_S(A)$, where $\oplus$ denotes the XOR operation.
+ \item \Client{B} generates \link{A} from $U_{id}(A)$ and $X(A)$.
+ \item \Client{B} sends \link{A} to \identity{A}.
+ \item \Client{A} retrieves $U_{id}(A)$ and $X(A)$ from \link{A}.
+ \item \Client{A} sends to \Server{} $U_{id}(A)$.
+ \item \Server{} retrieves $N_S(A)$ from UserMap.Blind and key $U_{id}(A)$.
  \begin{enumerate}
-  \item If the retrieval fails, \Server{} sends failure to \Client[A] and terminates the flow.
+  \item If the retrieval fails, \Server{} sends failure to \Client{A} and terminates the flow.
  \end{enumerate}
- \item \Server{} sends $N_S(A)$ to \Client[A].
- \item \Client[A] calculates $N(A)=N_S(A)\oplus X(A)$.
- \item \Client[A] calculates $U(A)=Hash($\identity{A}$,N(A)\oplus N(A)$.
- \item \Client[A] populates $N_C(A)$, \privateKeys{} and \publicKeys{}.
- \item \Client[A] stores $N_C(A)$ to local storage.
- \item For every identitiy $i$ that \Client[A] wants to register with \Server{}, including \identity{A}, it generates $U_i(A)=Hash(i,N_C(A)$.
- \item \Client[A] populates \signedData{} from \signingKey{} and \identity{B},\publicKeys{},$U(A),U_{id}(A),\lbrace U_1(A),\ldots,U_i(A),\ldots\rbrace,j$, where $j$ is the index 
-for \identity{A}.
+ \item \Server{} sends $N_S(A)$ to \Client{A}.
+ \item \Client{A} calculates $N(A)=N_S(A)\oplus X(A)$.
+ \item \Client{A} calculates $U(A)=Hash($\identity{A}$,N(A))$.
+ \item \Client{A} populates $N_C(A)$, \privateKeys{} and \publicKeys{}.
+ \item \Client{A} stores $N_C(A)$ to local storage as Blind.
+ \item For every identity $i$ that \Client{A} wants to register with \Server{}, including \identity{A}, it generates $U_i(A)=Hash(i,N_C(A))$.
+ \item \Client{A} populates \signedData{} from \signingKey{} and \identity{B}, \publicKeys{}, $U(A)$, $U_{id}(A)$, $\lbrace U_1(A),\ldots,U_n(A)\rbrace$, $j$, where $j$ is the index for \identity{A} in the set of identities.
  \item \Server{} verifies the signature and that $U(A)$ maps to $U_{id}(A)$ in HashIdentityMap.
  \begin{enumerate}
-  \item If the verification fails, \Server{} sends failure to \Client[A] and terminates the flow.
+  \item If the verification fails, \Server{} sends failure to \Client{A} and terminates the flow.
  \end{enumerate}
- \item \Server{} registers $\lbrace U_1(A),\ldots,U_i(A),\ldots\rbrace$ for $U_{id}(A)$ in HashIdentityMap and UserMap.
+ \item \Server{} registers $\lbrace U_1(A),\ldots,U_n(A)\rbrace$ for $U_{id}(A)$ in HashIdentityMap and UserMap.
  \item \Server{} removes $U(A)$ from UserMap and adds it as alias in UserMap for $U_j(A)$. It merges the confirmer sets for the two.
- \item \Server{} replies with success to \Client[A].
- \item \Server{} sends to \Client[B] confirmation that $U(A)$ is confirmed.
- \item \Client[B] executes the Send Contact Card flow with \Client[A].
- \item \Client[B] removes from UnconfirmedIdentities $U(A)$ and adds \identity{A} to the \longProduct{} contact book.
- \item \Client[B] executes the identity broadcast protocol for \identity{A}.
+ \item \Server{} replies with success to \Client{A}.
+ \item \Server{} sends to \Client{B} confirmation that $U(A)$ is confirmed.
+ \item \Client{B} executes the Send Contact Card flow \ref{send_contact_card_flow} with \Client{A}.
+ \item \Client{B} removes from PendingIdentitiesSet $U(A)$ and adds \identity{A} to the \longProduct{} contact book.
+ \item \Client{B} executes the Broadcast New Contact Identity flow \ref{broadcast_new_contact_identity_flow} for \identity{A}, for all of its contacts.
+\end{enumerate}
+
+\subsection{Register Unconfirmed Identity}
+\label{register_unconfirmed_identity_flow}
+This flow registers an unconfirmed identity with \server{}.
+
+\paragraph{Participants} \Client{A}, \User{A}, \Server{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\identity{} : Client.Identity] From \Client{A}. This may come from the contact book of \User{A} or by \User{A} manually entering the value.
+\end{description}
+
+\paragraph{Outputs}
+For \Client{A} either success, if \Server{} register the identity, error otherwise.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[N : RandomHashPad] A random blind for \identity{}. The same as $N_C(A)$ in \ref{register_identity_flow:NCA}.
+ \item[$U_N$ : HashBuffer] The primary blinded \identity{} generated by \Client{A}.
+ \item[\privateKeys{} : PrivateKeys] The client private keys.
+ \item[\signedData{} : ECDSA signature] The ECDSA signature with \signingKey{} of $U_R$. See \cite{crypto_spec} for details.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \User{A} enters \identity{} in contact card.
+ \item \Client{A} detects that \identity{} has been added.
+ \item \Client{A} asks \User{A} if \identity{} should be registered.
+ \item \User{A} answers the request.
+ \begin{enumerate}
+  \item If \User{A} answers no, the flow terminates.
+ \end{enumerate}
+ \item \Client{A} populates $N$ from Blind in local storage.
+ \begin{enumerate}
+  \item If \Client{A} doesn't have one in local storage, the flow terminate with error.
+ \end{enumerate}
+ \item \Client{A} calculates $U_N=Hash($\identity{}$,N)$.
+ \item \Client{A} calculates \signedData{} from \signingKey{} and $U_N$.
+ \item \Client{A} sends to \Server{} \signedData{}.
+ \item \Server{} verifies the signature.
+ \item \Server{} stores $U_N$ to UserMap.Identities for \userId{A}.
+ \item \Server{} stores $U_N$ to HashIdentityMap mapped to \userId{A}, \clientId{A}.
+\end{enumerate}
+
+\paragraph{Implementation Notes} The above flow is described for one identity, but it should be implemented to accept as input a list of identities.
+The reason for accepting a list of identities is that a user may enter multiple identities in the contact card and there is no implementation complexity in doing all of them 
+together.
+
+\subsection{Broadcast New Contact Identity}
+\label{broadcast_new_contact_identity_flow}
+This flow is triggered when a client is notified about a new identity from one of its contacts, as, for example, at the end of \ref{register_identity_flow} or at the end of this 
+flow.
+
+\paragraph{Participants} \Client{A}, all clients for \userId{B}, \Server{}
+
+\paragraph{Inputs}
+\SpecialItem
+\begin{description}
+ \item[\identity{C} : Client.Identity] From \Client{A}. This is the identity that is being broadcast.
+ \item[\parenthesize{U}{C} : HashBuffer] The blinded \identity{C} \Client{A} knows.
+\end{description}
+
+\paragraph{Outputs}
+If \Client{B} has \identity{C} in its contact book, it receives $U(C)$, and \Server{} connects \identity{C} with \Client{B}.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\userId{A} : Id] The user id of \Client{A}, known by \Server{}.
+ \item[\clientId{A} : Id] The client id of \Client{A}, known by \Server{}.
+ \item[\userId{B} : Id] The user id of \Client{B}, known by \Server{}.
+ \item[\clientId{B} : Id] The client id of \Client{B}, known by \Server{}.
+ \item[\privateKeys{} : PrivateKeys] The set of private keys.
+ \item[\encryptedData{} : AsymmetricCryptoBuffer] Encrypted payload exchanged between \Client{A} and \Client{B}. See \cite{crypto_spec} for details.
+ \item[\signedData{} : ECDSA signature] The ECDSA signature of \encryptedData{} with \signingKey{}. See \cite{crypto_spec} for details.
+ \item[\publicKeys{} : PublicKeys] The set of public keys.
+ \item[R : RandomHashPad] A random blind for \identity{C}.
+ \item[\publicKeysSet{B}] The set of public keys for all clients of \userId{B}. Generated by \Server{}.
+ \item[I : AsymmetricCryptoBuffer] A double encryption of \identity{C}
+ \item[$I_R$ : AsymmetricCryptoBuffer] A double encryption of $R$.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \Client{A} sends to \Server{} request for contact comparison for \userId{B}.
+ \item \Server{} populates \publicKeysSet{B}.
+ \item \Server{} sends to \Client{A} \publicKeysSet{B}.
+ \item \Client{A} populates \privateKeys{} from local storage.
+ \item \Client{A} generates $R$.
+\end{enumerate}
+The following is executed for each member of \publicKeysSet{B} and each \Client{B} corresponding to this member. Each communication round between \Client{A} and \Server{} 
+aggregates the values for each run of the rest of the flow.
+\begin{enumerate}[resume]
+ \item \Client{A} calculates $I=$\identity{C}$^{-1}$ for \encryptionKey{} and sets $I=E(A,E(B,i\odot R))$. The inverse is calculated according to the homomorphism of the crypto 
+system, denoted with $\odot$. For RSA it is multiplication.
+ \item \Client{A} calculates $I_R=E(A,E(B,R))$.
+ \item \Client{A} populates \signedData{} from \signingKey{} and $I$ and $I_R$.
+ \item \Client{A} sends \signedData{} to \Server{}.
+ \item \Server{} populates \publicKeys{} from UserMap and \userId{A} and \clientId{a}.
+ \item \Server{} verifies \signedData{}.
+ \item \Server{} retrieves ComparisonIdentities from UserMap for \userId{B} and \clientId{B} and for each member $i$
+ \begin{enumerate}
+  \item It calculates $i\odot I$ and compares it to $I_R$. If they are equal the contacts match.
+ \end{enumerate}
+ \item If there is a match, \Server{} sends to \Client{A} a notification with \userId{B}, \clientId{B}, otherwise, the flow terminates.
+ \item \Server{} notifies \Client{A} with contact comparison response \userId{B}, \clientId{B}, \signedData{}, and \publicKeys{}.
+\end{enumerate}
+Steps \ref{broadcast_new_contact_identity_flow:one}-\ref{broadcast_new_contact_identity_flow:two} can be executed when the first match is found and their results stored for the 
+entire flow.
+\begin{enumerate}[resume]
+ \item\label{broadcast_new_contact_identity_flow:one} \Client{A} populates \privateKeys{} from local storage.
+ \item \Client{A} calculates \encryptedData{} from \encryptionKey{} and \identity{C} and $U(C)$.
+ \item\label{broadcast_new_contact_identity_flow:two} \Client{A} calculates \signedData{} from \signingKey{} and \encryptedData{}.
+ \item \Client{A} sends to \Server{} \signedData{}, \userId{B}, \clientId{B}.
+ \item \Server{} populates \publicKeys{} from \userId{A}, \clientId{A}.
+ \item \Server{} verifies \signedData{}.
+ \item \Server{} sends to \Client{B} \signingKey{}, \signedData{}.
+ \item \Client{B} verifies \signedData{}.
+ \item \Client{B} retrieves \identity{C} and $U(C)$ from \encryptedData{}.
+ \item \Client{B} adds \identity{C} to contact book with blinded identity $U(C)$.
+ \item If the mapping doesn't exist already, \Client{B} executes the flow for all its contacts.
+ \item \Client{B} triggers the Send Contact Card \ref{send_contact_card_flow} with \User{C}.
 \end{enumerate}
 
 \subsection{Modify Keys}
 \label{modify_keys_flow}
 This flow is triggered periodically from the client. For details about when it is triggered see \cite{crypto_spec}.
 
-\paragraph{Participants} \Client{}, \Server{}
+\paragraph{Participants} \Client{A}, \Server{}
 
 \paragraph{Inputs}
 \SpecialItem
 \begin{description}
- \item[\userId{}:Id] From \Client{} local storage.
- \item[\clientId{}:Id] From \Client{} local storage.
- \item[\privateKeys{}:PrivateKeys] The private keys that are valid at the start of the flow. From \Client{} local storage.
+ \item[\userId{A} : Id] From \Client{A} local storage.
+ \item[\clientId{A} : Id] From \Client{A} local storage.
+ \item[\privateKeys{} : PrivateKeys] The private keys that are valid at the start of the flow. From \Client{A} local storage.
 \end{description}
 
 \paragraph{Outputs}
-For \Client{} either success, if \Server{} applied the changes, error otherwise. In case of error, the new keys are discarded and the flow is repeated according to the 
+For \Client{A} either success, if \Server{} applied the changes, error otherwise. In case of error, the new keys are discarded and the flow is repeated according to the 
 specification in \cite{crypto_spec}.
 
 \paragraph{Other Variables}
 \SpecialItem
 \begin{description}
- \item[\newPrivateKeys{}:PrivateKeys] The new private keys.
- \item[\newPublicKeys{}:PublicKeys] The new public keys.
- \item[\signedData{}:ECDSA signature] The ECDSA signature of \newPublicKeys{} with \signingKey{}. See \cite{crypto_spec} for details.
- \item[\publicKeys{}:PublicKeys] The public keys of \Client{} stored in the DB of \Server{}.
+ \item[\newPrivateKeys{} : PrivateKeys] The new private keys.
+ \item[\newPublicKeys{} : PublicKeys] The new public keys.
+ \item[\signedData{} : ECDSA signature] The ECDSA signature of \newPublicKeys{} with \signingKey{}. See \cite{crypto_spec} for details.
+ \item[\publicKeys{} : PublicKeys] The public keys of \Client{A} stored in the DB of \Server{}.
 \end{description}
 
 \paragraph{Flow}
 
 \begin{enumerate}
- \item \Client{} constructs \newPrivateKeys{}, \newPublicKeys{}.
- \item \Client{} generates \signedData{}.
- \item \Client{} sends \signedData{}, \newPublicKeys{}, \userId{} and \clientId{} to \Server{}.
- \item \Server{} retrieves \publicKeys{} based on \userId{} and \clientId{}.
+ \item \Client{A} constructs \newPrivateKeys{}, \newPublicKeys{}.
+ \item \Client{A} generates \signedData{}.
+ \item \Client{A} sends \signedData{}, \newPublicKeys{}, \userId{A} and \clientId{A} to \Server{}.
+ \item \Server{} retrieves \publicKeys{} based on \userId{A} and \clientId{A}.
  \item \Server{} verifies the signature of \signedData{}.
  \begin{enumerate}
   \item If the above step fails, \Server{} replies with error.
@@ -260,7 +377,7 @@ specification in \cite{crypto_spec}.
  \end{enumerate}
  \item \Server{} commits \newPublicKeys{} to the DB.
  \item \Server{} replies with success.
- \item\label{modify_keys_flow:local_storage} \Client{} commits \newPrivateKeys{} to secure local storage.
+ \item\label{modify_keys_flow:local_storage} \Client{A} commits \newPrivateKeys{} to secure local storage.
 \end{enumerate}
 
 \subsection{Modify User Agent}
@@ -271,46 +388,176 @@ signs the new user agent, instead of \newPublicKeys{}. The implementation must b
 \subsection{Update Server Contact Book}
 This flow updates the contact book that is stored server-side.
 
-\paragraph{Participants} \Client{}, \Server{}
+\paragraph{Participants} \Client{A}, \Server{}
 
 \paragraph{Inputs}
 \SpecialItem
 \begin{description}
- \item[\userId{}:Id] From \Client{} local storage.
- \item[\clientId{}:Id] From \Client{} local storage.
- \item[\contactOperationSet{}: ContactOperationSet] Generated by \Client{}.
+ \item[\userId{A} : Id] From \Client{A} local storage.
+ \item[\clientId{A} : Id] From \Client{A} local storage.
+ \item[\addedContacts{} : set(Contact)] The set of added contacts. This set results from contact book operations.
+ \item[\deletedContacts{} : set(Contact)] The set of deleted contacts. This set results from contact book operations.
+ \item[\updatedContacts{} : set(Contact)] The set of contacts for which a hash has become known since added.
 \end{description}
 
 \paragraph{Outputs}
-For \Client{} either success, if \Server{} updated all contacts successfully, failure if something went wrong during the update. In case of failure the entire set is rejected.
+For \Client{A} either success, if \Server{} updated all contacts successfully, failure if something went wrong during the update. In case of failure the entire set is rejected.
 
 \paragraph{Other Variables}
 \SpecialItem
 \begin{description}
- \item[\publicKeys{}:PublicKeys] The public keys of  \Client{}. 
- \item[\privateKeys{}:PrivateKeys] Theprivate keys of \Client{}.
- \item[\signedData{}:ECDSA signature] \contactOperationSet{} signed with
-\privateKeys{}. See \cite{crypto_spec} for details.
+ \item[\publicKeys{} : PublicKeys] The public keys of \Client{A}.
+ \item[\privateKeys{} : PrivateKeys] The private keys of \Client{A}.
+ \item[\signedData{} : ECDSA signature] \contactOperationSet{} signed with \privateKeys{}. See \cite{crypto_spec} for details.
+ \item[\contactOperationSet{} : ContactOperationSet] The set of contact operations to be performed by \Server{}.
 \end{description}
 
 \paragraph{Flow}
 
 \begin{enumerate}
- \item \Client{} generates \contactOperationSet{}.
- \item \Client{} generates \signedData{} from \contactOperationSet{} and \privateKeys{}.
- \item \Client{} sends \contactOperationSet{}, \signedData{}, \userId{} and \clientId{} to \Server{}.
- \item \Server{} retrieves \publicKeys{} from its DB based on \userId{} and 
-\clientId{}.
- \item \Server{} verifies \signedData{} based on \contactOperationSet{} and \publicKeys{}.
+ \item \Client{A} generates \contactOperationSet{}.
+ \item \Client{A} populates \privateKeys{} from local storage.
  \begin{enumerate}
-  \item If the above step failed, \Server{} sends error to \Client{}.
-  \item \Client{} terminates the flow.
+  \item For each $c$ in \addedContacts{}, \Client{A} adds to \contactOperationSet{} a ContactOperation with type $Add$, contact $c.hash$, and comparisonIdentity $E(A,c.target)$. Note that $c.hash$ may be empty for those contacts for which the hash is not known yet.
+  \item For each $c$ in \deletedContacts{}, \Client{A} adds to \contactOperationSet{} a ContactOperation with type $Delete$, contact $c.hash$, and comparisonIdentity $E(A,c.target)$. Note that $c.hash$ may be empty for those contacts for which the hash is not known yet.
+  \item For each $c$ in \updatedContacts{}, \Client{A} adds to \contactOperationSet{} a ContactOperation with type $Update$, contact $c.hash$, and empty comparisonIdentity. Note that $c.hash$ cannot be empty for these contacts, since the update operation is executed only for these contacts for which the hash became known through \ref{broadcast_new_contact_identity_flow}.
  \end{enumerate}
- \item For each entry $A$ in \contactOperationSet{}
+ \item \Client{A} generates \signedData{} from \signingKey{} and \contactOperationSet{}.
+ \item \Client{A} sends \signedData{}, \userId{A} and \clientId{A} to \Server{}.
+ \item \Server{} retrieves \publicKeys{} from its DB based on \userId{A} and \clientId{A}.
+ \item \Server{} verifies \signedData{} based on \contactOperationSet{}.
+ \item For each entry $a$ in \contactOperationSet{}
  \begin{enumerate}
-  \item If the operation is {\em Add} \Server{} updates the graph and generates the appropriate notifications to \Client{}.
-  \item If the operation is {\em Delete} \Server{} updates the graph.
+  \item If the operation is {\em Add}
+  \begin{enumerate}
+   \item \Server{} adds $a.comparisonIdentity$ to UserMap.ComparisonIdentities for \userId{A} and \clientId{A}. If the entry exists, the flow terminates with error.
+   \item \Server{} updates the graph and generates the appropriate notifications to \Client{A}.
+  \end{enumerate}
+  \item If the operation is {\em Delete}
+  \begin{enumerate}
+   \item \Server{} deletes $a.comparisonIdentity$ from UserMap.ComparisonIdentities for \userId{A} and \clientId{A}. If the entry doesn't exist, the flow terminates with error.
+   \item \Server{} updates the graph.
+  \end{enumerate}
+  \item If the operation is {\em Update}
+  \begin{enumerate}
+   \item \Server{} updates the graph.
+  \end{enumerate}
  \end{enumerate}
+\end{enumerate}
+
+\paragraph{Implementation Note} If one of the add and delete operations for the comparison identities fails, the flow terminates with error. This means that the graph update steps 
+must be triggered after the flow finishes, to avoid having generated spurious results if the DB is rolled back.
+
+\subsection{Send Contact Card}
+\label{send_contact_card_flow}
+This flow is executed when \user{A} wants to share their contact card with \user{B}.
+
+\paragraph{Participants} \User{A}, \User{B}, \Client{A}, \Client{B}, \Server{}
+
+\paragraph{Outputs}
+If the flow succeeds, \Client{A} has the contact card of \Client{B}.
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[U : HashBuffer] The blinded identity of \User{B} known to \Client{B}.
+ \item[\privateKeys{} : PrivateKeys] The private keys of the client.
+ \item[\publicKeys{} : PublicKeys] The public keys of the client.
+ \item[\signedData{} : AsymmetricCryptoBuffer] The signed data to be sent from a client.
+ \item[\encryptedData{} : AsymmetricCryptoBuffer] The encrypted contact card.
+ \item[\userId{A} : Id] The user id of \User{A}.
+ \item[\userId{B} : Id] The user id of \User{B}.
+ \item[\contactCard{B}: ContactCard] The contact card of \User{B}.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \User{A} requests the contact card of \User{B}. This may happen by \User{A} selecting \User{B} from the contact book of \Client{A} or by \Server{} sending a suggestion to \Client{A} for \User{B} in flow \ref{suggest_new_contact_flow}.
+ \item \Client{A} populates $U$ by picking up the primary identity for \User{B} from the \longProduct{} contact book.
+ \begin{enumerate}
+  \item If there is none, the flow terminates with error. Normally, this case is never reached, because contacts for which no identity is known are neither in \longProduct{} contact book or in \Server{} contact book, but race conditions may arise.
+  \item If there are more than one, a resolution is provided by the native contact book. If there is no native contact book or there is a draw, one is picked arbitrarily.
+ \end{enumerate}
+ \item \Client{A} populates \privateKeys{} from local storage.
+ \item \Client{A} populates \signedData{} from \signingKey{} and $U$ and \userId{B}.
+ \item \Client{A} sends \signedData{} to \Server{}.
+ \item \Server{} populates \publicKeys{} for \Client{A}.
+ \item \Server{} verifies \signedData{}.
+ \item \Server{} retrieves from UserMap all clients for \userId{B}.
+\end{enumerate}
+For the rest of the flow, we assume that there is only one client for \User{B}. If there are more, \Server{} executes \ref{send_contact_card_flow:one} for all clients for \userId{B} and the rest of the flow is executed for each one that responds. If more than one contact cards reach \Client{A}, they are merged in the native and \longProduct{} contact books.
+\begin{enumerate}[resume]
+ \item\label{send_contact_card_flow:one} \Server{} sends to \Client{B} \userId{A}, \clientId{A}, \encryptionKey{} for all clients for \userId{A}.
+ \item \Client{B} requests permission from \User{B} to send the contact card.
+ \begin{enumerate}
+  \item If \User{B} declines, the flow terminates.
+ \end{enumerate}
+ \item \User{B} grants permission for a non-empty subset of identities.
+ \item \Client{B} populates \contactCard{B} from the selected identities.
+ \item \Client{B} populates \encryptedData{} from \encryptionKey{} and \contactCard{B}, for all \encryptionKey{}s that have been received.
+ \item \Client{B} populates \privateKeys{}.
+ \item \Client{B} populates \signedData{} from \signingKey{} and \encryptedData{}, \userId{A}, and \clientId{A}.
+ \item \Client{B} sends to \Server{} \signedData{}.
+ \item \Server{} populates \publicKeys{} for \Client{B}.
+ \item \Server{} verifies \signedData{}.
+ \item For each client of \userId{A} for which \encryptedData{} has been received, let it be \Client{A}'
+ \begin{enumerate}
+  \item \Server{} sends to \Client{A}' \signedData{}, \verificationKey{}.
+  \item \Client{A}' verifies \signedData{} with \verificationKey{}.
+  \item \Client{A}' decrypts \signedData{} to populate \contactCard{B}.
+  \item \Client{A}' merges \contactCard{B} into the contact book entry for \User{B}.
+ \end{enumerate}
+\end{enumerate}
+
+\subsection{Suggest New Contact}
+\label{suggest_new_contact_flow}
+This flow is executed when \server{} believes that \user{A} should know \user{B}. The symmetrical flow is executed with \user{B} and \user{A} exchanging roles.
+
+\paragraph{Participants} \User{A}, \Client{A}, \Server{}
+
+\paragraph{Input}
+\SpecialItem
+\begin{description}
+ \item[U(A) : HashBuffer] The blinded identity of the receiver of the contact suggestion.
+ \item[U(B) : HashBuffer] The blinded identity of the suggested contact.
+\end{description}
+
+\paragraph{Other Variables}
+\SpecialItem
+\begin{description}
+ \item[\userId{A} : Id] The user id of $U(A)$.
+ \item[\userId{B} : Id] The user id of $U(B)$.
+ \item[\clientId{B} : Id] The client id of \userId{B}
+ \item[name : string] The name of \User{A}, retrieved from the contact card.
+\end{description}
+
+\paragraph{Flow}
+
+\begin{enumerate}
+ \item \Server{} checks if $U(B)$ is in UserMap.SentRequests for \userId{A}.
+ \begin{enumerate}
+  \item If it is, the flow terminates.
+ \end{enumerate}
+ \item \Server{} populates \userId{B} from HashIdentityMap for $U(B)$.
+ \item \Server{} populates \userId{A} from HashIdentityMap for $U(A)$.
+ \item For all \Client{A} in UserMap for \userId{A}
+ \begin{enumerate}
+  \item \Server{} sends \userId{B}, $U(B)$, \encryptionKey{} for all clients for \userId{B}.
+  \item \Client{A} requests permission from \User{A} to send a contact request to \User{B}.
+  \item \User{A} grants permission.
+  \item \Client{A} populates $name$ from the contact card.
+  \item \Client{A} encrypts and signs $name$ and sends it to \Server{} with signed $U(B)$.
+  \item \Server{} verifies the signature and checks if that's the first reply from \Client{A} for $U(B)$ in UserMap.SentRequests.
+  \begin{enumerate}
+   \item If it is not, the flow terminates.
+   \item If it is, it enters it in UserMap.SentRequests.
+  \end{enumerate}  
+ \end{enumerate}
+ \item \Server{} forwards the request to all \Client{B}s.
+ \item \Client{B} requests permission from \User{B} to execute the Send Contact Card \ref{send_contact_card_flow} flow.
+ \item \User{B} grants permission.
+ \item \Client{B} executes the Send Contact Card \ref{send_contact_card_flow} flow with \User{A}.
 \end{enumerate}
 
 \bibliography{spec}

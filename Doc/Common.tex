@@ -10,17 +10,18 @@
 \usepackage{enumitem}
 \usepackage{gitinfo2}
 \usepackage{xifthen}
+\usepackage{enumitem}
 
 \newcommand{\parenthesize}[2]{{\em  #1\ifthenelse{\isempty{#2}}{}{(#2)}}}
 \newcommand{\longProduct}{Contacts Discovery}
 \newcommand{\shortProduct}{CD}
 \newcommand{\commercialName}{CD}
-\newcommand{\client}[1][]{\parenthesize{Client}{#1}}
+\newcommand{\client}[1]{\parenthesize{Client}{#1}}
 \newcommand{\server}{{\em Server}}
-\newcommand{\user}[1][]{\parenthesize{User}{#1}}
+\newcommand{\user}[1]{\parenthesize{User}{#1}}
 \newcommand{\Server}{{\em \MakeUppercase{server}}}
-\newcommand{\Client}[1][]{\parenthesize{\MakeUppercase{client}}{#1}}
-\newcommand{\User}[1][]{\parenthesize{\MakeUppercase{user}}{#1}}
+\newcommand{\Client}[1]{\parenthesize{\MakeUppercase{client}}{#1}}
+\newcommand{\User}[1]{\parenthesize{\MakeUppercase{user}}{#1}}
 
 \author{\gitAuthorName{}\\\gitAuthorEmail{}}
 \date{\gitAuthorDate{}\\Version \gitAbbrevHash{} \gitVtag{}}

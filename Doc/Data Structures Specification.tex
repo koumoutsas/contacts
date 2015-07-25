@@ -23,7 +23,7 @@ For the project overview, see~\cite{project_spec}. For the flows and protocols s
 \subsection{Portability}
 The data structures and their fields are specified in a way that is independent from the programming language and the execution platform. For integer types, the width is specified 
 to avoid platform-dependent implementations from diverging. String and composite types (maps, hashtables, etc) are SDK-dependent, but implementation should not rely on any uncommon 
-and SDK-specific behavior (eg, string can correctly be interpreted as an STL or Java string, but any requirement of the type beyond that is not intended).
+and SDK-specific behavior (eg, string can correctly be interpreted as an STL or Java string, but no type requirement beyond that is intended).
 
 \subsection{Attributes}
 Data structures are marked with a set of attributes. A list of markers in all caps appears after the data structure. These attributes are:
@@ -51,8 +51,8 @@ singleton}. Treat this attribute as informative and only as informative. This sp
 \end{description}
 
 \subsection{Comments}
-After the specification of the data structure, a short explanation of its functionality and its usage may follow. This explanation should be treated as informative and not as part 
-of the specification.
+After the specification of the data structure, a short explanation of its functionality and usage may follow. This explanation should be treated as informative and not as part of 
+the specification.
 
 \subsection{Naming}
 A data structure $X$ for entity $Y$ is specified in a section named after $Y$. When referring to $X$ from another section, its name is $Y.X$. Field $Z$ within $X$ is referred to 
@@ -206,6 +206,26 @@ User
 \paragraph*{Comments}
 This is the base for any type of User. It is a simple wrapper around an id, which acts as the key of any subtype.
 
+\subsubsection{ClientId}
+
+\begin{verbbox}
+ClientId
+{
+  user, Id
+  client, Id
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+Convenience data structure that pairs together a user and client id. It is used to identify a client in the entire system.
+
 \subsubsection{TimeoutMap}
 
 \begin{verbbox}
@@ -296,9 +316,9 @@ A HashBuffer is a hash with the algorithm used to produce it. The algorithm acco
  \item[Primary Key] All fields.
 \end{description}
 
-\subsubsection{AsymmetricKeyAlgorithm}
+\subsubsection{EncryptionAlgorithm}
 \begin{verbbox}
-AsymmetricKeyAlgorithm = { ECDSA-prime192v1 }
+EncryptionAlgorithm = { RSA-2048 }
 \end{verbbox}
 \begin{center}
 \theverbbox
@@ -309,15 +329,16 @@ AsymmetricKeyAlgorithm = { ECDSA-prime192v1 }
 \end{inparaitem}
 
 \paragraph*{Comments}
-AsymmetricKeyAlgorithm is an enum of all the acceptable asymmetric key generation algorithms in the system. For the moment only ECDSA-prime192v1 is accepted.
+EncryptionAlgorithm is an enum of all the acceptable encryption key generation algorithms in the system. For the moment only RSA-2048 is accepted.
 
-\subsubsection{AsymmetricCryptoBuffer}
+\subsubsection{EncryptedBuffer}
 
 \begin{verbbox}
-AsymmetricCryptoBuffer
+EncryptedBuffer
 {
   buffer, byte array
-  algorithm, AsymmetricKeyAlgorithm
+  algorithm, EncryptionAlgorithm
+  client, ClientId
 }
 \end{verbbox}
 \begin{center}
@@ -329,26 +350,73 @@ AsymmetricCryptoBuffer
 \end{inparaitem}
 
 \paragraph*{Comments}
-An AsymmetricCryptoBuffer is a ciphertext payload with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
+An EncryptedBuffer is a ciphertext payload with the algorithm used to produce it and the client that generated it. The algorithm accompanies the buffer for forward-compatibility.
 
 \SpecialItem
 \begin{description}
- \item[buffer] A buffer with the ciphertext
+ \item[buffer] A buffer with the ciphertext.
  \item[algorithm] The encryption algorithm. It should be the same as that of the key used to produce it.
+ \item[client] The owner client of the encryption key.
 \end{description}
+
+\begin{description}
+ \item[Primary Key] Buffer and algorithm.
+\end{description}
+
+\subsubsection{SignatureAlgorithm}
+\begin{verbbox}
+SignatureAlgorithm = { ECDSA-prime192v1 }
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+SignatureAlgorithm is an enum of all the acceptable signature key generation algorithms in the system. For the moment only ECDSA-prime192v1 is accepted.
+
+\subsubsection{SignatureBuffer}
+
+\begin{verbbox}
+SignatureBuffer
+{
+  buffer, byte array
+  algorithm, SignatureAlgorithm
+  client, ClientId
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+A SignatureBuffer is a ciphertext payload with the algorithm used to produce it and the client that generated it. The algorithm accompanies the buffer for forward-compatibility.
 
 \SpecialItem
 \begin{description}
- \item[Primary Key] All fields.
+ \item[buffer] A buffer with the ciphertext.
+ \item[algorithm] The signature algorithm. It should be the same as that of the key used to produce it.
+ \item[client] The owner client of the signing key.
 \end{description}
 
-\subsubsection{PublicKey}
+\begin{description}
+ \item[Primary Key] Buffer and algorithm.
+\end{description}
+
+\subsubsection{EncryptionKey}
 
 \begin{verbbox}
 PublicKey
 {
   buffer, byte array with X.509 encoding of the key
-  algorithm, AsymmetricKeyAlgorithm
+  algorithm, EncryptionAlgorithm
 }
 \end{verbbox}
 \begin{center}
@@ -360,15 +428,55 @@ PublicKey
 \end{inparaitem}
 
 \paragraph*{Comments}
-A PublicKey is a buffer with the X.509 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
+An EncryptionKey is a buffer with the X.509 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
+
+\subsubsection{EncryptionKey}
+
+\begin{verbbox}
+PublicKey
+{
+  buffer, byte array with X.509 encoding of the key
+  algorithm, EncryptionAlgorithm
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+An EncryptionKey is a buffer with the X.509 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
+
+\subsubsection{VerificationKey}
+
+\begin{verbbox}
+PublicKey
+{
+  buffer, byte array with X.509 encoding of the key
+  algorithm, SignatureAlgorithm
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+A VerificationKey is a buffer with the X.509 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
 
 \subsubsection{PublicKeys}
 
 \begin{verbbox}
 PublicKeys
 {
-  encryption, PublicKey
-  verification, PublicKey
+  encryption, EncryptionKey
+  verification, VerificationKey
 }
 \end{verbbox}
 \begin{center}
@@ -388,7 +496,7 @@ PublicKeys
 \subsubsection{ContactOperationType}
 
 \begin{verbbox}
-ContactOperationType = { Add, Delete }
+ContactOperationType = { Add, Delete, Update }
 \end{verbbox}
 \begin{center}
 \theverbbox
@@ -399,42 +507,14 @@ ContactOperationType = { Add, Delete }
 \end{inparaitem}
 
 \paragraph*{Comments}
-What kind of operation for a contact is requested by the client.
-
-\subsubsection{HashedContact}
-\label{sec:structure:common:hashed_contact}
-
-\begin{verbbox}
-HashedContact
-{
-  id, Id
-  hash, HashBuffer
-}
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\paragraph*{Comments}
-This structure doesn't leak any client information.
-
-\SpecialItem
-\begin{description}
- \item[id] This id is generated by the client and it is used to match contacts between the blinded representation stored at the server and the full representation stored at the 
-client.
- \item[hash] This is the blinded representation generated at the client. It is a cryptographically secure hash of the target and type of a contact.
-\end{description}
+The kind of contact operation requested by the client.
 
 \subsubsection{ContactOperation}
 
 \begin{verbbox}
 ContactOperation
 {
-  contact, HashedContact
+  contact, HashBuffer
   type, ContactOperationType
 }
 \end{verbbox}
@@ -467,44 +547,6 @@ ContactOperation = set(ContactOperation)
  \item \unsecure
 \end{inparaitem}
 
-\subsubsection{EncryptedContact}
-
-\begin{verbbox}
-EncryptedContact
-{
-  hashedContact, HashedContact
-  encrypted, AsymmetricCryptoBuffer
-}
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\SpecialItem\paragraph*{Comments}
-This structure is used for the protocol between client and server. It is used to transport contact information from one client to another.
-
-\begin{description}
- \item[contact] The blinded contact.
- \item[type] The encrypted contact information
-\end{description}
-
-\subsubsection{EncryptedContactSet}
-
-\begin{verbbox}
-EncryptedContactSet = set(EncryptedContact)
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \unsecure
-\end{inparaitem}
-
 \subsubsection{RandomHashPad}
 
 \begin{verbbox}
@@ -518,19 +560,36 @@ RandomHashPad = 128-bit signed integer
  \item \infrastructure
 \end{inparaitem}
 
-\SpecialItem\paragraph*{Comments}
+\paragraph*{Comments}
 This is a type definition for the randomness added to hashed data sent to \Server{}.
 
 \subsection{Client}
 \label{sec:structure:client}
 
-\subsubsection{PrivateKey}
+\subsubsection{ContactType}
+\begin{verbbox}
+ContactType = { MSISDN, Email, Facebook, Skype, Twitter, Address,
+                Other }
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+ContactType is an enum of all the possible types that the system knows. $Other$ is the default type.
+
+\subsubsection{Identity}
 
 \begin{verbbox}
-PrivateKey
+Identity
 {
-  buffer, byte array with PKCS#8 encoding of the key
-  algorithm, AsymmetricKeyAlgorithm
+  target, string
+  type, ContactType
+  blinded, HashBuffer
 }
 \end{verbbox}
 \begin{center}
@@ -542,7 +601,98 @@ PrivateKey
 \end{inparaitem}
 
 \paragraph*{Comments}
-A PrivateKey is a buffer with the PKCS\#8 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
+This is a central structure that represents a simple contact. The field $blinded$ is empty only for contacts that have not been registered with the service.
+
+\SpecialItem
+\begin{description}
+ \item[target] We assume that the target is normalized and validated by the platform and it is given in its normalized form from the platform SDK. If it turns out that this is not 
+the case for a platform and contact type, the client will apply normalization before importing contacts of this type.
+ \item[type] The type reported by the platform is matched to one of the members of ContactType.
+ \item[blinded] The value of this field is empty for all contacts for which there is no known registered identity.
+\end{description}
+
+\subsubsection{RegistrationLink}
+
+\begin{verbbox}
+RegistrationLink = URL
+(
+  protocol = 'kareebo'
+  host = 'registration'
+  path = an encoding of Id and RandomHashPad
+)
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+A RegistrationLink is a URL whose protocol is handled by the client and whose path encodes the user id of the client that requests registration and its identity. In total the path 
+encodes 192 bits.
+
+\subsubsection{InvitationRequestLink}
+
+\begin{verbbox}
+InvitationRequestLink = URL
+(
+  protocol = 'kareebo'
+  host = 'invitation'
+  path = an encoding of Identity
+)
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+An InvitationRequestLink is a URL whose protocol is handled by the client and whose path encodes an identity, such an MSISDN, an e-mail etc.
+
+\subsubsection{DecryptionKey}
+
+\begin{verbbox}
+DecryptionKey
+{
+  buffer, byte array with PKCS#8 encoding of the key
+  algorithm, EncryptionAlgorithm
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+A DecryptionKey is a buffer with the PKCS\#8 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
+
+\subsubsection{SigningKey}
+
+\begin{verbbox}
+SigningKey
+{
+  buffer, byte array with PKCS#8 encoding of the key
+  algorithm, SignatureAlgorithm
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+A SigningKey is a buffer with the PKCS\#8 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
 
 \subsubsection{PrivateKeys}
 \label{sec:structure:client:private_keys}
@@ -550,8 +700,8 @@ A PrivateKey is a buffer with the PKCS\#8 encoding of the key with the algorithm
 \begin{verbbox}
 PrivateKeys
 {
-  decryption, PrivateKey
-  signing, PrivateKey
+  decryption, DecryptionKey
+  signing, SigningKey
 }
 \end{verbbox}
 \begin{center}
@@ -597,31 +747,13 @@ This data structure holds the information related to the customer using the appl
 clients and the server for encrypting their contact information and verifying the signature of the client. The private keys are kept by the client.
 \end{description}
 
-\subsubsection{ContactType}
-\begin{verbbox}
-ContactType = { MSISDN, Email, Facebook, Skype, Twitter, Address,
-                Other }
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\paragraph*{Comments}
-ContactType is an enum of all the possible types that the system knows. $Other$ is the default type.
-
 \subsubsection{Contact}
 \label{sec:structure:client:contact}
 
 \begin{verbbox}
 Contact
 {
-  id, Id
-  target, string
-  type, ContactType
+  identity, Identity
   attributes, list((string,string))
 }
 \end{verbbox}
@@ -634,22 +766,14 @@ Contact
 \end{inparaitem}
 
 \paragraph*{Comments}
-This is a central structure that represents a simple contact. The only fields that are mandatory are target and type, which are used to calculate the hash of the contact.
+This extends the $Identity$ structure, with a set of attributes that come from the native contact book and are not relevant for the service.
 
 \SpecialItem
 \begin{description}
- \item[id] This is a serial number generated by the client and transfered to the server to act as the primary key of the contact in combination with the user and client id.
- \item[target] We assume that the target is normalized and validated by the platform and it is given in its normalized form from the platform SDK. If it turns out that this is not 
-the case for a platform and contact type, the client will apply normalization before importing contacts of this type.
- \item[type] The type reported by the platform is matched to one of the members of ContactType.
+ \item[identity] The $Identity$ structure of the contact.
  \item[attributes] A list of key-value pairs. These are transported from client to client and are inserted to the receiver's contact book by a contact adaptor that runs in the 
 context of the receiving client. This way if the contacts representation for one platform changes, backwards compatibility is not a problem and the adaptors of other platforms can 
 be updated to cover the changes. The attributes are containing essentially any optional contact information.
-\end{description}
-
-\SpecialItem
-\begin{description}
- \item[Key] target, type
 \end{description}
 
 \subsubsection{PersonalName}
@@ -711,12 +835,100 @@ ContactBook = set(ContactCard)
 
 \begin{inparaitem}[ ]
  \item \persistent
- \item \unsecure
+ \item \secure
  \item \unique
 \end{inparaitem}
 
+\subsubsection{UserContactBook}
+
+\begin{verbbox}
+ContactBook = ContactCard
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \persistent
+ \item \secure
+ \item \unique
+\end{inparaitem}
+
+\subsubsection{PendingIdentity}
+
+\begin{verbbox}
+PendingIdentity
+{
+  identity, Identity
+  blind, RandomHashPad
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
 \paragraph*{Comments}
-This is the internal representation of the contact book of the device. It is indexed by $ContactCard.id$.
+This holds information about a pending identity registration request.
+
+\SpecialItem
+\begin{description}
+ \item[identity] The information about the identity whose registration is pending.
+ \item[blind] The blind used to generate $identity$.
+\end{description}
+
+\SpecialItem
+\begin{description}
+ \item[Primary Key] All fields.
+\end{description}
+
+\subsubsection{PendingIdentitySet}
+
+\begin{verbbox}
+PendingIdentitySet = TimeoutMap<PendingIdentity>
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \unique
+ \item \secure
+ \item \persistent
+\end{inparaitem}
+
+\paragraph*{Comments}
+The map removes pending identity registration information after they timeout without confirmation. The timeout is set to a year, so that the mappings are not removed prematurely. 
+Since the map is not expected to grow large enough to create space problems, the map could be implemented as FIFO queue with a maximum size, as long as the size is large enough 
+entries are not cleared prematurely.
+
+\SpecialItem
+\begin{description}
+ \item[identity] The information about the identity whose registration is pending.
+ \item[blind] The blind used to generate $identity$.
+\end{description}
+
+\subsubsection{Blind}
+
+\begin{verbbox}
+Blind = RandomHashPad
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \unique
+ \item \secure
+ \item \persistent
+\end{inparaitem}
+
+\paragraph*{Comments}
+This value can be set only once during the lifetime of a client. If it is overwritten or lost after it has been set, the client needs to reset its state and start as if installed 
+for the first time.
 
 \subsection{Server}
 \label{sec:structure:server}
@@ -727,6 +939,7 @@ This is the internal representation of the contact book of the device. It is ind
 Client extends Common.Client
 {
   keys, PublicKeys
+  comparisonIdentities, set(EncryptedBuffer)
 }
 \end{verbbox}
 \begin{center}
@@ -743,7 +956,8 @@ The structure extends a client description with a field to indicate whether this
 
 \SpecialItem
 \begin{description}
- \item[keys]  The public keys of the client.
+ \item[keys] The public keys of the client.
+ \item[comparisonIdentities] The set of encrypted identities used for matching identities between different client contact books.
 \end{description}
 
 \subsubsection{User}
@@ -754,7 +968,9 @@ User
 {
   id, Id
   clients, set(Client)
-  identities, map(HashBuffer:Identity)
+  identities, set(HashBuffer)
+  blind, RandomHashPad
+  sentRequests, set(HashBuffer)
 }
 \end{verbbox}
 \begin{center}
@@ -772,7 +988,9 @@ This data structure holds the information related to a user and its registered c
 \begin{description}
  \item[id] This number uniquely identifies the user across the system. It is a primary key in the user's table in the server DB. The server generates this id.
  \item[clients] A set of $Client$.
- \item[identities] A map from hash to Identity.
+ \item[identities] A set of blinded identities.
+ \item[blind] Populated during the first identity registration.
+ \item[sentRequests] The set of contact requests already sent.
 \end{description}
 
 \subsubsection{UserSet}
@@ -792,6 +1010,55 @@ UserSet = set(User)
 
 \paragraph*{Comments}
 A set of $User$ objects, indexed by $User.id$. This is the global user table and entry point for retrieving user related information.
+
+\subsubsection{HashIdentity}
+
+\begin{verbbox}
+HashIdentity
+{
+  id, Id
+  confirmers, set(Id)
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This is the value type of \ref{sec:structure:server:hash_identity_map}. It is the id of the User that owns this identity and the set of Users that have confirmed it.
+
+\SpecialItem
+\begin{description}
+ \item[id] The $User.id$ of the owner of the identity.
+ \item[confirmers] The set of $User$s that have confirmed this identity.
+\end{description}
+
+\SpecialItem
+\begin{description}
+ \item[Foreign Key] All ids are foreign keys in $UserSet$.
+\end{description}
+
+\subsubsection{HashIdentityMap}
+\label{sec:structure:server:hash_identity_map}
+\begin{verbbox}
+HashIdentityMap = map(HashBuffer:HashIdentity)
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \secure
+ \item \persistent
+ \item \unique
+\end{inparaitem}
+
+\paragraph*{Comments}
+A map from blinded identities to $HashIdentity$ objects.
 
 \bibliography{spec,dataStructures}
 \bibliographystyle{plain}

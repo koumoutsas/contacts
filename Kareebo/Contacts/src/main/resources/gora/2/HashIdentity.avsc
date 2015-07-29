@@ -9,27 +9,30 @@
             "type": "bytes"
         },
         {
-            "name": "algorithm",
-            "type": "com.kareebo.contacts.server.gora.HashAlgorithm"
-        },
-        {
-            "name": "identity",
+            "name": "hashIdentity",
             "type":
-            {
-                "name": "IdentityPointer",
-                "type": "record",
-                "fields":
-                [
-                    {
-                        "name": "userId",
-                        "type": "long"
-                    },
-                    {
-                        "name": "contactId",
-                        "type": "long"
-                    }
-                ]
-            }
+            [
+                {
+                    "name": "HashIdentityValue",
+                    "type": "record",
+                    "fields":
+                    [
+                        {
+                            "name": "id",
+                            "type": "long"
+                        },
+                        {
+                            "name": "confirmers",
+                            "type":
+                            {
+                                "type": "array",
+                                "items": "long"
+                            }
+                        }
+                    ]
+                },
+                "HashBuffer"
+            ]
         }
     ]
 }

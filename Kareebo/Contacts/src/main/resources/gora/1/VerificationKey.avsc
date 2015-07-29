@@ -1,6 +1,6 @@
 {
     "namespace": "com.kareebo.contacts.server.gora",
-    "name": "AssymetricCryptoBuffer",
+    "name": "VerificationKey",
     "type": "record",
     "fields":
     [
@@ -13,7 +13,7 @@
             "type":
             {
                 "type": "enum",
-                "name": "AssymetricKeyAlgorithm",
+                "name": "VerificationAlgorithm",
                 "symbols":
                 [
                     "SHA256withECDSAprime239v1",
@@ -24,3 +24,4 @@
         }
     ]
 }
+

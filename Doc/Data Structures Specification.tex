@@ -413,27 +413,7 @@ A SignatureBuffer is a ciphertext payload with the algorithm used to produce it 
 \subsubsection{EncryptionKey}
 
 \begin{verbbox}
-PublicKey
-{
-  buffer, byte array with X.509 encoding of the key
-  algorithm, EncryptionAlgorithm
-}
-\end{verbbox}
-\begin{center}
-\theverbbox
-\end{center}
-
-\begin{inparaitem}[ ]
- \item \infrastructure
-\end{inparaitem}
-
-\paragraph*{Comments}
-An EncryptionKey is a buffer with the X.509 encoding of the key with the algorithm used to produce it. The algorithm accompanies the buffer for forward-compatibility.
-
-\subsubsection{EncryptionKey}
-
-\begin{verbbox}
-PublicKey
+EncryptionKey
 {
   buffer, byte array with X.509 encoding of the key
   algorithm, EncryptionAlgorithm

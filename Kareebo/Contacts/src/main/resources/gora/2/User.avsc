@@ -48,13 +48,21 @@
                                 [
                                     {
                                         "name": "encryption",
-                                        "type": "com.kareebo.contacts.server.gora.AssymetricCryptoBuffer"
+                                        "type": "EncryptionKey"
                                     },
                                     {
                                         "name": "verification",
-                                        "type": "com.kareebo.contacts.server.gora.AssymetricCryptoBuffer"
+                                        "type": "VerificationKey"
                                     }
                                 ]
+                            }
+                        },
+                        {
+                            "name": "comparisonIdentities",
+                            "type":
+                            {
+                                "type": "array",
+                                "items": "EncryptedBuffer"
                             }
                         }
                     ]
@@ -63,57 +71,22 @@
         },
         {
             "name": "identities",
-            "type": 
+            "type":
             {
-                "type": "map",
-                "values":
-                {
-                    "name": "Identity",
-                    "type": "record",
-                    "fields":
-                    [
-                        {
-                            "name": "hash",
-                            "type": "com.kareebo.contacts.server.gora.HashBuffer"
-                        },
-                        {
-                            "name": "referers",
-                            "type":
-                            {
-                                "type": "array",
-                                "items": "long"
-                            }
-                        },
-                        {
-                            "name": "guarantors",
-                            "type":
-                            {
-                                "type": "array",
-                                "items": "long"
-                            }
-                        }
-                    ]
-                }
+                "type": "array",
+                "items": "HashBuffer"
             }
         },
         {
-            "name": "contacts",
-            "type": 
+            "name": "blind",
+            "type": "bytes"
+        },
+        {
+            "name": "sentRequests",
+            "type":
             {
-                "type": "map",
-                "values":
-                {
-                    "name": "Contact",
-                    "namespace": "com.kareebo.contacts.server.gora",
-                    "type": "record",
-                    "fields":
-                    [
-                        {
-                            "name": "hash",
-                            "type": "com.kareebo.contacts.server.gora.HashBuffer"
-                        }
-                    ]
-                }
+                "type": "array",
+                "items": "HashBuffer"
             }
         }
     ]

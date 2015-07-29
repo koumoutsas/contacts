@@ -1,0 +1,11 @@
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "EncryptionAlgorithm",
+    "type": "enum",
+    "symbols":
+    [
+        "RSA2048",
+        "Fake"
+    ]
+}
+

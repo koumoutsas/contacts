@@ -1,86 +1,237 @@
-include "Client.thrift"
-include "Common.thrift"
-
 namespace java com.kareebo.contacts.thrift
 
-struct IdPair
+typedef i64 Id
+typedef binary ByteArray
+
+struct UserAgent
 {
-    1: Common.Id userId,
-    2: Common.Id clientId,
+	1:string platform,
+	2:string version,
 }
 
-struct Signature
+struct Client
 {
-    1: Common.ByteArray signature,
-    2: IdPair ids,
+	1:UserAgent userAgent,
+	2:Id id,
 }
 
-typedef Common.ByteArray EncryptedData
-
-exception InvalidArgument
+struct ClientId
 {
+	1:Id user,
+	2:Id client,
 }
 
-service ModifyKeys
+enum HashAlgorithm
 {
-    void modifyKeys1(1: Common.PublicKeys newPublicKeys, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
+	SHA256=1,
+	Fake=2,
 }
 
-service ModifyUserAgent
+struct HashBuffer
 {
-    void modifyUserAgent1(1: Common.UserAgent userAgent, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
+	1:ByteArray buffer,
+	2:HashAlgorithm algorithm,
 }
 
-enum ContactOperationType
+enum SignatureAlgorithm
 {
-    Add = 1,
-    Delete = 2,
+	SHA256withECDSAprime239v1=1,
+	Fake=2,
 }
 
-struct ContactOperation
+struct SignatureBuffer
 {
-    1: Common.HashedContact contact,
-    2: ContactOperationType type,
+	1:ByteArray buffer,
+	2:SignatureAlgorithm algorithm,
+	3:ClientId client,
 }
 
-typedef set<ContactOperation> ContactOperationSet
-
-service UpdateServerContactBook
+enum EncryptionAlgorithm
 {
-    void updateServerContactBook1(1: ContactOperationSet contactOperationSet, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
+	RSA2048=1,
+	Fake=2,
 }
 
-struct EncryptedContact
+struct EncryptedBuffer
 {
-    1: Common.HashedContact hashedContact,
-    2: Common.CryptoBuffer encrypted,
-}
-
-typedef set<EncryptedContact> EncryptedContactSet
-
-service UpdateLocalContactBook
-{
-    EncryptedContactSet updateLocalContactBook1(1: string fixed, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
+	1:ByteArray buffer,
+	2:EncryptionAlgorithm algorithm,
+	3:ClientId client,
 }
 
 struct EncryptionKey
 {
-    1: Common.Id clientId,
-    2: Common.CryptoBuffer encryption,
+	1:ByteArray buffer,
+	2:EncryptionAlgorithm algorithm,
 }
 
-typedef set<EncryptionKey> EncryptionKeySet
-
-struct UploadedContact
+struct VerificationKey
 {
-    1: IdPair ids,
-    2: Common.CryptoBuffer encrypted,
+	1:ByteArray buffer,
+	2:SignatureAlgorithm algorithm,
 }
 
-typedef set<UploadedContact> UploadedContactSet
-
-service UploadEncryptedContactCard
+struct PublicKeys
 {
-    EncryptionKeySet uploadEncryptedContactCard1(1: Common.Id userId, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
-    void uploadEncryptedContactCard2(1: UploadedContactSet uploadedContactSet, 2: Signature signature) throws (1: InvalidArgument invalidArgument),
+	1:EncryptionKey encryption,
+	2:VerificationKey verification,
+}
+
+enum ContactOperationType
+{
+	Add=1,
+	Delete=2,
+	Update=3,
+	Fake=4,
+}
+
+struct ContactOperation
+{
+	1:HashBuffer contact,
+	2:ContactOperationType type,
+}
+
+typedef set<ContactOperation> ContactOperationSet
+
+typedef binary RandomHashPad
+
+exception FailedOperation
+{
+}
+
+struct RegisterIdentityReply
+{
+	1:Id id,
+	2:RandomHashPad blind,
+}
+
+service RegisterIdentity
+{
+	// Steps 10-14
+	RegisterIdentityReply registerIdentity1(1:HashBuffer uA,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+
+	// Steps 19-22
+	RegisterIdentityReply registerIdentity2(1:Id userIdA) throws (1:FailedOperation failedOperation),
+
+	// Steps 30-34
+	void registerIdentity3(1:HashBuffer uA,2:Id userIdA,3:set<HashBuffer> uSet,4:i64 j,5:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+}
+
+service RegisterUnconfirmedIdentity
+{
+	// Steps 8-12
+	void registerUnconfirmedIdentity1(1:set<HashBuffer> uSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+}
+
+struct EncryptedBufferPair
+{
+	1:EncryptedBuffer i,
+	2:EncryptedBuffer iR,
+}
+
+struct EncryptedBufferSigned
+{
+	1:EncryptedBuffer EncryptedBuffer,
+	2:SignatureBuffer signature,
+}
+
+struct EncryptedBufferSignedWithVerificationKey
+{
+	1:EncryptedBufferSigned encryptedBufferSigned,
+	2:VerificationKey verificationKey,
+}
+
+struct SignedRandomNumber
+{
+	1:i64 i,
+	2:SignatureBuffer signature,
+}
+
+service BroadcastNewContactIdentity
+{
+	// Steps 3-5
+	map<Id,EncryptionKey> broadcastNewContactIdentity1(1:Id userIdB,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+
+	// Steps 11-15
+	set<EncryptedBuffer> broadcastNewContactIdentity2(1:set<EncryptedBufferPair> encryptedBufferPairs,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+
+	// Steps 19-21
+	void broadcastNewContactIdentity3(1:set<EncryptedBufferSigned> encryptedBuffers) throws (1:FailedOperation failedOperation),
+
+	// Step 22
+	EncryptedBufferSignedWithVerificationKey broadcastNewContactIdentity4(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+
+	// Steps 26.c-26.f
+	void BroadcastNewContactIdentity5(1:HashBuffer uC,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+}
+
+service ModifyKeys
+{
+	// Steps 3-8
+	void modifyKeys1(1:PublicKeys newPublicKeys,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+}
+
+service ModifyUserAgent
+{
+	// Steps 3-8
+	void modifyUserAgent1(1:UserAgent userAgent,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+}
+
+service UpdateServerContactBook
+{
+	// Steps 3-7
+	void updateServerContactBook1(1:ContactOperationSet contactOperationSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+}
+
+struct EncryptionKeys
+{
+	1:Id userId,
+	2:map<Id,EncryptionKey> keys,
+}
+
+struct EncryptedBuffersSignedWithVerificationKey
+{
+	1:set<EncryptedBufferSigned> encryptedBuffers,
+	2:VerificationKey verificationKey,
+}
+
+service SendContactCard
+{
+	// Steps 5-7
+	void sendContactCard1(1:HashBuffer u,2:Id userIdB,3:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+
+	// Step 9
+	EncryptionKeys sendContactCard2(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+
+	// Step 16
+	void sendContactCard3(1:set<EncryptedBufferSigned> encryptedBuffers) throws (1:FailedOperation failedOperation),
+
+	// Step 19.a
+	EncryptedBuffersSignedWithVerificationKey sendContactCard4(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+}
+
+struct EncryptionKeysWithHashBuffer
+{
+	1:EncryptionKeys encryptionKeys,
+	2:HashBuffer u,
+}
+
+service SuggestNewContact
+{
+	// Step 4.a
+	EncryptionKeysWithHashBuffer suggestNewContact1(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+
+	// Steps 4.e-4.e
+	void suggestNewContact2(1:set<EncryptedBufferSigned> encryptedBuffers,2:HashBuffer uB,3:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+
+	// Step 5
+	EncryptedBufferSignedWithVerificationKey suggestNewContact3(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+}
+
+service ConfirmIdentity
+{
+}
+
+service RegisterNewClient
+{
 }

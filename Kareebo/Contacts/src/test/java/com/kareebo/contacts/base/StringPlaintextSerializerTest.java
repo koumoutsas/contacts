@@ -14,7 +14,7 @@ public class StringPlaintextSerializerTest
 	@Test
 	public void testSerialize() throws Exception
 	{
-		final String s="sdfsg";
+		final String s="mine";
 		final Vector<byte[]> result=new StringPlaintextSerializer(s).serialize();
 		assertEquals(1,result.size());
 		assertEquals(s,new String(result.elementAt(0)));

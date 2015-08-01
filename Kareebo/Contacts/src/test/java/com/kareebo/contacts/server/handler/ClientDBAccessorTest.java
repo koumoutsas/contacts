@@ -1,8 +1,8 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.server.gora.*;
-import com.kareebo.contacts.thrift.IdPair;
-import com.kareebo.contacts.thrift.InvalidArgument;
+import com.kareebo.contacts.thrift.ClientId;
+import com.kareebo.contacts.thrift.FailedOperation;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -21,10 +22,10 @@ import static org.junit.Assert.*;
 public class ClientDBAccessorTest
 {
 	final long userIdValid=0;
-	private final IdPair idPairNew=new IdPair();
-	private final IdPair idPairPreset=new IdPair();
-	private final IdPair idPairInvalidClient=new IdPair();
-	private final IdPair idPairInvalidUser=new IdPair();
+	private final ClientId clientIdNew=new ClientId();
+	private final ClientId clientIdPreset=new ClientId();
+	private final ClientId clientIdInvalidClient=new ClientId();
+	private final ClientId clientIdInvalidUser=new ClientId();
 	private final Client clientNew=new Client();
 	private final Client clientPreset=new Client();
 	private final byte[] bufferBytes={'a','b'};
@@ -35,34 +36,39 @@ public class ClientDBAccessorTest
 	public void setUp() throws Exception
 	{
 		long clientId=0;
-		idPairNew.setClientId(clientId++);
-		idPairNew.setUserId(userIdValid);
-		idPairPreset.setClientId(clientId++);
-		idPairPreset.setUserId(userIdValid);
-		idPairInvalidClient.setClientId(clientId++);
-		idPairInvalidClient.setUserId(userIdValid);
-		idPairInvalidUser.setClientId(clientId);
-		idPairInvalidUser.setUserId(userIdValid+1);
+		clientIdNew.setClient(clientId++);
+		clientIdNew.setUser(userIdValid);
+		clientIdPreset.setClient(clientId++);
+		clientIdPreset.setUser(userIdValid);
+		clientIdInvalidClient.setClient(clientId++);
+		clientIdInvalidClient.setUser(userIdValid);
+		clientIdInvalidUser.setClient(clientId);
+		clientIdInvalidUser.setUser(userIdValid+1);
 		final UserAgent userAgent=new UserAgent();
 		userAgent.setPlatform("A");
 		userAgent.setVersion("B");
 		final PublicKeys publicKeys=new PublicKeys();
-		final CryptoBuffer cryptoBuffer=new CryptoBuffer();
-		cryptoBuffer.setAlgorithm(Algorithm.SHA256withECDSAprime239v1);
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(bufferBytes);
 		byteBuffer.mark();
-		cryptoBuffer.setBuffer(byteBuffer);
-		publicKeys.setEncryption(cryptoBuffer);
-		publicKeys.setVerification(cryptoBuffer);
+		final EncryptionKey encryptionKey=new EncryptionKey();
+		encryptionKey.setAlgorithm(EncryptionAlgorithm.RSA2048);
+		encryptionKey.setBuffer(byteBuffer);
+		publicKeys.setEncryption(encryptionKey);
+		final VerificationKey verificationKey=new VerificationKey();
+		verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
+		verificationKey.setBuffer(byteBuffer);
+		publicKeys.setVerification(verificationKey);
 		clientPreset.setUserAgent(userAgent);
 		clientPreset.setKeys(publicKeys);
+		clientPreset.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
 		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		final User user=new User();
-		user.setContacts(new HashMap<CharSequence,Contact>());
-		user.setIdentities(new HashMap<CharSequence,Identity>());
+		user.setBlind(byteBuffer);
 		final HashMap<CharSequence,Client> clients=new HashMap<>();
-		clients.put(TypeConverter.convert(idPairPreset.getClientId()),clientPreset);
+		clients.put(TypeConverter.convert(clientIdPreset.getClient()),clientPreset);
 		user.setClients(clients);
+		user.setIdentities(new ArrayList<HashBuffer>());
+		user.setSentRequests(new ArrayList<HashBuffer>());
 		dataStore.put(userIdValid,user);
 		clientDBAccessor=new ClientDBAccessor(dataStore);
 	}
@@ -77,7 +83,7 @@ public class ClientDBAccessorTest
 	@Test
 	public void testGet() throws Exception
 	{
-		final Client client=clientDBAccessor.get(idPairPreset);
+		final Client client=clientDBAccessor.get(clientIdPreset);
 		assertNotNull(client);
 		assertEquals(clientPreset,client);
 		final ByteBuffer byteBuffer=clientPreset.getKeys().getEncryption().getBuffer();
@@ -88,26 +94,26 @@ public class ClientDBAccessorTest
 		assertArrayEquals(bufferBytes,duplicateBytes);
 	}
 
-	@Test(expected=InvalidArgument.class)
+	@Test(expected=FailedOperation.class)
 	public void testGetInvalidUser() throws Exception
 	{
-		clientDBAccessor.get(idPairInvalidUser);
+		clientDBAccessor.get(clientIdInvalidUser);
 	}
 
-	@Test(expected=InvalidArgument.class)
+	@Test(expected=FailedOperation.class)
 	public void testGetInvalidClient() throws Exception
 	{
-		clientDBAccessor.get(idPairInvalidClient);
+		clientDBAccessor.get(clientIdInvalidClient);
 	}
 
 	@Test
 	public void testPut() throws Exception
 	{
-		clientDBAccessor.get(idPairPreset);
+		clientDBAccessor.get(clientIdPreset);
 		clientDBAccessor.put(clientPreset);
-		final User user=dataStore.get(idPairPreset.getUserId());
+		final User user=dataStore.get(clientIdPreset.getUser());
 		assertNotNull(user);
-		assertTrue(user.getClients().containsKey(TypeConverter.convert(idPairPreset.getClientId())));
+		assertTrue(user.getClients().containsKey(TypeConverter.convert(clientIdPreset.getClient())));
 	}
 
 	@Test(expected=IllegalStateException.class)
@@ -115,10 +121,10 @@ public class ClientDBAccessorTest
 	{
 		try
 		{
-			clientDBAccessor.get(idPairInvalidUser);
+			clientDBAccessor.get(clientIdInvalidUser);
 			assertTrue(false);
 		}
-		catch(InvalidArgument e)
+		catch(FailedOperation e)
 		{
 			assertTrue(true);
 		}
@@ -128,15 +134,15 @@ public class ClientDBAccessorTest
 	@Test
 	public void testPut2() throws Exception
 	{
-		clientDBAccessor.put(idPairNew,clientNew);
-		final User user=dataStore.get(idPairNew.getUserId());
+		clientDBAccessor.put(clientIdNew,clientNew);
+		final User user=dataStore.get(clientIdNew.getUser());
 		assertNotNull(user);
-		assertTrue(user.getClients().containsKey(TypeConverter.convert(idPairNew.getClientId())));
+		assertTrue(user.getClients().containsKey(TypeConverter.convert(clientIdNew.getClient())));
 	}
 
-	@Test(expected=InvalidArgument.class)
+	@Test(expected=FailedOperation.class)
 	public void testPut2InvalidUser() throws Exception
 	{
-		clientDBAccessor.put(idPairInvalidUser,clientNew);
+		clientDBAccessor.put(clientIdInvalidUser,clientNew);
 	}
 }

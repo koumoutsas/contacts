@@ -4,8 +4,8 @@ import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
-import com.kareebo.contacts.thrift.InvalidArgument;
-import com.kareebo.contacts.thrift.Signature;
+import com.kareebo.contacts.thrift.FailedOperation;
+import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
@@ -38,37 +38,37 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	 * @param signature The signature
 	 * @param future    The future used to communicate the result
 	 */
-	void verify(final PlaintextSerializer plaintextSerializer,final Signature signature,final Future<Void> future)
+	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future)
 	{
 		final Client client;
 		try
 		{
-			client=get(signature.getIds());
+			client=get(signature.getClient());
 		}
-		catch(InvalidArgument invalidArgument)
+		catch(FailedOperation failedOperation)
 		{
-			future.setFailure(invalidArgument);
+			future.setFailure(failedOperation);
 			return;
 		}
 		try
 		{
-			final ByteBuffer signatureBuffer=signature.bufferForSignature();
+			final ByteBuffer signatureBuffer=signature.bufferForBuffer();
 			signatureBuffer.rewind();
 			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,plaintextSerializer))
 			{
-				future.setFailure(new InvalidArgument());
+				future.setFailure(new FailedOperation());
 				return;
 			}
 			afterVerification(user,client);
 		}
 		catch(NoSuchProviderException|NoSuchAlgorithmException|SignatureException|InvalidKeyException|InvalidKeySpecException e)
 		{
-			future.setFailure(new InvalidArgument());
+			future.setFailure(new FailedOperation());
 			return;
 		}
-		catch(InvalidArgument invalidArgument)
+		catch(FailedOperation failedOperation)
 		{
-			future.setFailure(invalidArgument);
+			future.setFailure(failedOperation);
 			return;
 		}
 		put(client);
@@ -82,5 +82,5 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	 * @param user The user
 	 * @param client The client
 	 */
-	abstract void afterVerification(final User user,final Client client) throws InvalidArgument;
+	abstract void afterVerification(final User user,final Client client) throws FailedOperation;
 }

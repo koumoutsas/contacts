@@ -13,7 +13,7 @@
             "type":
             {
                 "type": "enum",
-                "name": "VerificationAlgorithm",
+                "name": "SignatureAlgorithm",
                 "symbols":
                 [
                     "SHA256withECDSAprime239v1",

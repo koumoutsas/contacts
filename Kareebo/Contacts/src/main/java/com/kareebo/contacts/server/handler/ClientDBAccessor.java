@@ -2,8 +2,8 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
-import com.kareebo.contacts.thrift.IdPair;
-import com.kareebo.contacts.thrift.InvalidArgument;
+import com.kareebo.contacts.thrift.ClientId;
+import com.kareebo.contacts.thrift.FailedOperation;
 import org.apache.gora.store.DataStore;
 
 import java.util.Map;
@@ -25,7 +25,7 @@ class ClientDBAccessor
 	 * Caches of intermediate structures used to get to the client.
 	 */
 	User user;
-	private IdPair idPair;
+	private ClientId clientId;
 	private Map<CharSequence,Client> clients;
 
 	/**
@@ -41,30 +41,30 @@ class ClientDBAccessor
 	/**
 	 * Get a client. Needs to be called before set
 	 *
-	 * @param idPair The user and client ids
+	 * @param clientId The user and client ids
 	 * @return The client
-	 * @throws InvalidArgument If there is no such client
+	 * @throws FailedOperation If there is no such client
 	 */
-	Client get(final IdPair idPair) throws InvalidArgument
+	Client get(final ClientId clientId) throws FailedOperation
 	{
-		getClients(idPair);
-		final Client client=clients.get(TypeConverter.convert(idPair.getClientId()));
+		getClients(clientId);
+		final Client client=clients.get(TypeConverter.convert(clientId.getClient()));
 		if(client==null)
 		{
 			resetState();
-			throw new InvalidArgument();
+			throw new FailedOperation();
 		}
 		return client;
 	}
 
-	private void getClients(final IdPair idPair) throws InvalidArgument
+	private void getClients(final ClientId clientId) throws FailedOperation
 	{
-		this.idPair=idPair;
-		user=dataStore.get(idPair.getUserId(),queryFields);
+		this.clientId=clientId;
+		user=dataStore.get(clientId.getUser(),queryFields);
 		if(user==null)
 		{
 			resetState();
-			throw new InvalidArgument();
+			throw new FailedOperation();
 		}
 		clients=user.getClients();
 	}
@@ -72,7 +72,7 @@ class ClientDBAccessor
 	private void resetState()
 	{
 		user=null;
-		idPair=null;
+		clientId=null;
 		clients=null;
 	}
 
@@ -80,13 +80,13 @@ class ClientDBAccessor
 	 * Set a client for a user, without calling get first. The client can exist already, in
 	 * which case it's an update, or not, in which case it's an insert.
 	 *
-	 * @param idPair The ids
+	 * @param clientId The ids
 	 * @param client The client
-	 * @throws InvalidArgument When the user cannot be found in the DB
+	 * @throws FailedOperation When the user cannot be found in the DB
 	 */
-	void put(final IdPair idPair,final Client client) throws InvalidArgument
+	void put(final ClientId clientId,final Client client) throws FailedOperation
 	{
-		getClients(idPair);
+		getClients(clientId);
 		put(client);
 	}
 
@@ -98,13 +98,13 @@ class ClientDBAccessor
 	 */
 	void put(final Client client)
 	{
-		if(user==null||clients==null||idPair==null)
+		if(user==null||clients==null||clientId==null)
 		{
 			throw new IllegalStateException();
 		}
-		clients.put(TypeConverter.convert(idPair.getClientId()),client);
+		clients.put(TypeConverter.convert(clientId.getClient()),client);
 		user.setClients(clients);
-		dataStore.put(idPair.getUserId(),user);
+		dataStore.put(clientId.getUser(),user);
 	}
 
 	/**

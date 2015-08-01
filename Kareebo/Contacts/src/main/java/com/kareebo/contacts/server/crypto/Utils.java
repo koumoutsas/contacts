@@ -1,8 +1,8 @@
 package com.kareebo.contacts.server.crypto;
 
 import com.kareebo.contacts.base.PlaintextSerializer;
-import com.kareebo.contacts.server.gora.Algorithm;
-import com.kareebo.contacts.server.gora.CryptoBuffer;
+import com.kareebo.contacts.server.gora.SignatureAlgorithm;
+import com.kareebo.contacts.server.gora.VerificationKey;
 
 import java.nio.ByteBuffer;
 import java.security.*;
@@ -33,16 +33,12 @@ public class Utils
 	 * @throws InvalidKeyException
 	 * @throws InvalidKeySpecException
 	 */
-	public static boolean verifySignature(final CryptoBuffer verificationKey,final ByteBuffer signature,final
+	public static boolean verifySignature(final VerificationKey verificationKey,final ByteBuffer signature,final
 	PlaintextSerializer plaintextSerializer)
 		throws
 		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException
 	{
 		final Vector<String> characteristics=decompose(verificationKey.getAlgorithm());
-		if(characteristics.size()!=2)
-		{
-			throw new NoSuchAlgorithmException();
-		}
 		final Signature verify=Signature.getInstance(characteristics.get(1),provider);
 		final ByteBuffer verificationByteBuffer=verificationKey.getBuffer();
 		verificationByteBuffer.rewind();
@@ -60,12 +56,12 @@ public class Utils
 	}
 
 	/**
-	 * Break an {@link Algorithm} to strings that can be passed to the Java crypto API
+	 * Break an {@link SignatureAlgorithm} to strings that can be passed to the Java crypto API
 	 *
-	 * @param algorithm The {@link Algorithm}
+	 * @param algorithm The {@link SignatureAlgorithm}
 	 * @return A list of strings that can be passed to the Java API. Their placement in the list is case-dependent
 	 */
-	private static Vector<String> decompose(final Algorithm algorithm) throws NoSuchAlgorithmException
+	private static Vector<String> decompose(final SignatureAlgorithm algorithm) throws NoSuchAlgorithmException
 	{
 		final Vector<String> ret=new Vector<>(2);
 		switch(algorithm)
@@ -73,9 +69,6 @@ public class Utils
 			case SHA256withECDSAprime239v1:
 				ret.add("ECDSA");
 				ret.add("SHA256withECDSA");
-				break;
-			case SHA256:
-				ret.add("SHA256");
 				break;
 			default:
 				throw new NoSuchAlgorithmException(algorithm.toString());

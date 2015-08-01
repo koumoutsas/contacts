@@ -1,7 +1,7 @@
 package com.kareebo.contacts.server.crypto;
 
-import com.kareebo.contacts.server.gora.Algorithm;
-import com.kareebo.contacts.server.gora.CryptoBuffer;
+import com.kareebo.contacts.server.gora.SignatureAlgorithm;
+import com.kareebo.contacts.server.gora.VerificationKey;
 import com.kareebo.contacts.server.handler.TestPlaintextSerializer;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -24,7 +24,7 @@ public class UtilsTest
 {
 	final static private String ecdsa="ECDSA";
 	final private Vector<byte[]> plaintext=new Vector<>(2);
-	final private CryptoBuffer verificationKey=new CryptoBuffer();
+	final private VerificationKey verificationKey=new VerificationKey();
 	private ByteBuffer signature;
 
 	@Before
@@ -53,7 +53,7 @@ public class UtilsTest
 			                                        .getEncoded());
 		buffer.mark();
 		verificationKey.setBuffer(buffer);
-		verificationKey.setAlgorithm(Algorithm.SHA256withECDSAprime239v1);
+		verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
 	}
 
 	@Test(expected=NoSuchAlgorithmException.class)
@@ -66,8 +66,8 @@ public class UtilsTest
 		plainTextWrong.add(plaintext.get(0));
 		signature.rewind();
 		assertFalse(Utils.verifySignature(verificationKey,signature,new TestPlaintextSerializer(plainTextWrong)));
-		final CryptoBuffer wrongKey=verificationKey;
-		wrongKey.setAlgorithm(Algorithm.SHA256);
+		final VerificationKey wrongKey=verificationKey;
+		wrongKey.setAlgorithm(SignatureAlgorithm.Fake);
 		Utils.verifySignature(wrongKey,signature,plaintextSerializer);
 	}
 }

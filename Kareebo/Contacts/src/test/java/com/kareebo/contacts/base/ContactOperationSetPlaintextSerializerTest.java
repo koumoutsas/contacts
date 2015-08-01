@@ -1,10 +1,9 @@
 package com.kareebo.contacts.base;
 
-import com.kareebo.contacts.common.Algorithm;
-import com.kareebo.contacts.common.CryptoBuffer;
-import com.kareebo.contacts.common.HashedContact;
 import com.kareebo.contacts.thrift.ContactOperation;
 import com.kareebo.contacts.thrift.ContactOperationType;
+import com.kareebo.contacts.thrift.HashAlgorithm;
+import com.kareebo.contacts.thrift.HashBuffer;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -25,16 +24,14 @@ public class ContactOperationSetPlaintextSerializerTest
 	{
 		final ContactOperationType contactOperationTypeAdd=ContactOperationType.Add;
 		final ContactOperationType contactOperationTypeDelete=ContactOperationType.Delete;
-		final long id=536;
-		final Algorithm algorithm=Algorithm.SHA256;
+		final HashAlgorithm algorithm=HashAlgorithm.SHA256;
 		final byte[] bytes="abc".getBytes();
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(bytes);
 		byteBuffer.mark();
-		final CryptoBuffer cryptoBuffer=new CryptoBuffer(byteBuffer,algorithm);
-		final HashedContact hashedContact=new HashedContact(id,cryptoBuffer);
+		final HashBuffer hashBuffer=new HashBuffer(byteBuffer,algorithm);
 		final Set<ContactOperation> contactOperations=new HashSet<>(2);
-		contactOperations.add(new ContactOperation(hashedContact,contactOperationTypeAdd));
-		contactOperations.add(new ContactOperation(hashedContact,
+		contactOperations.add(new ContactOperation(hashBuffer,contactOperationTypeAdd));
+		contactOperations.add(new ContactOperation(hashBuffer,
 			                                          contactOperationTypeDelete));
 		final Vector<byte[]> plaintext=new ContactOperationSetPlaintextSerializer(contactOperations)
 			                               .serialize();

@@ -9,18 +9,6 @@ struct UserAgent
 	2:string version,
 }
 
-struct Client
-{
-	1:UserAgent userAgent,
-	2:Id id,
-}
-
-struct ClientId
-{
-	1:Id user,
-	2:Id client,
-}
-
 enum HashAlgorithm
 {
 	SHA256=1,
@@ -37,6 +25,12 @@ enum SignatureAlgorithm
 {
 	SHA256withECDSAprime239v1=1,
 	Fake=2,
+}
+
+struct ClientId
+{
+	1:Id user,
+	2:Id client,
 }
 
 struct SignatureBuffer
@@ -95,32 +89,10 @@ typedef set<ContactOperation> ContactOperationSet
 
 typedef binary RandomHashPad
 
-exception FailedOperation
-{
-}
-
 struct RegisterIdentityReply
 {
 	1:Id id,
 	2:RandomHashPad blind,
-}
-
-service RegisterIdentity
-{
-	// Steps 10-14
-	RegisterIdentityReply registerIdentity1(1:HashBuffer uA,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
-
-	// Steps 19-22
-	RegisterIdentityReply registerIdentity2(1:Id userIdA) throws (1:FailedOperation failedOperation),
-
-	// Steps 30-34
-	void registerIdentity3(1:HashBuffer uA,2:Id userIdA,3:set<HashBuffer> uSet,4:i64 j,5:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
-}
-
-service RegisterUnconfirmedIdentity
-{
-	// Steps 8-12
-	void registerUnconfirmedIdentity1(1:set<HashBuffer> uSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
 struct EncryptedBufferPair
@@ -145,6 +117,46 @@ struct SignedRandomNumber
 {
 	1:i64 i,
 	2:SignatureBuffer signature,
+}
+
+struct EncryptionKeys
+{
+	1:Id userId,
+	2:map<Id,EncryptionKey> keys,
+}
+
+struct EncryptedBuffersSignedWithVerificationKey
+{
+	1:set<EncryptedBufferSigned> encryptedBuffers,
+	2:VerificationKey verificationKey,
+}
+
+struct EncryptionKeysWithHashBuffer
+{
+	1:EncryptionKeys encryptionKeys,
+	2:HashBuffer u,
+}
+
+exception FailedOperation
+{
+}
+
+service RegisterIdentity
+{
+	// Steps 10-14
+	RegisterIdentityReply registerIdentity1(1:HashBuffer uA,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+
+	// Steps 19-22
+	RegisterIdentityReply registerIdentity2(1:Id userIdA) throws (1:FailedOperation failedOperation),
+
+	// Steps 30-34
+	void registerIdentity3(1:HashBuffer uA,2:Id userIdA,3:set<HashBuffer> uSet,4:i64 j,5:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+}
+
+service RegisterUnconfirmedIdentity
+{
+	// Steps 8-12
+	void registerUnconfirmedIdentity1(1:set<HashBuffer> uSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
 service BroadcastNewContactIdentity
@@ -183,18 +195,6 @@ service UpdateServerContactBook
 	void updateServerContactBook1(1:ContactOperationSet contactOperationSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
-struct EncryptionKeys
-{
-	1:Id userId,
-	2:map<Id,EncryptionKey> keys,
-}
-
-struct EncryptedBuffersSignedWithVerificationKey
-{
-	1:set<EncryptedBufferSigned> encryptedBuffers,
-	2:VerificationKey verificationKey,
-}
-
 service SendContactCard
 {
 	// Steps 5-7
@@ -208,12 +208,6 @@ service SendContactCard
 
 	// Step 19.a
 	EncryptedBuffersSignedWithVerificationKey sendContactCard4(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
-}
-
-struct EncryptionKeysWithHashBuffer
-{
-	1:EncryptionKeys encryptionKeys,
-	2:HashBuffer u,
 }
 
 service SuggestNewContact

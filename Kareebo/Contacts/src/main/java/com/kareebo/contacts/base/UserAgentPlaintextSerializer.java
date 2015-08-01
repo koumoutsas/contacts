@@ -1,6 +1,6 @@
 package com.kareebo.contacts.base;
 
-import com.kareebo.contacts.common.UserAgent;
+import com.kareebo.contacts.thrift.UserAgent;
 
 import java.util.Vector;
 

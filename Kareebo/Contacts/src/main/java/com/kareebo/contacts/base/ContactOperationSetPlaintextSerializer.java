@@ -14,6 +14,7 @@ public class ContactOperationSetPlaintextSerializer implements PlaintextSerializ
 
 	/**
 	 * Constructor
+	 *
 	 * @param contactOperationSet The contact operation set
 	 */
 	public ContactOperationSetPlaintextSerializer(final Set<ContactOperation> contactOperationSet)
@@ -25,7 +26,7 @@ public class ContactOperationSetPlaintextSerializer implements PlaintextSerializ
 	public Vector<byte[]> serialize()
 	{
 		final Vector<byte[]> ret=new Vector<>(contactOperationSet.size()*ContactOperationPlaintextSerializer.LENGTH);
-		for(ContactOperation contactOperation:contactOperationSet)
+		for(ContactOperation contactOperation : contactOperationSet)
 		{
 			ret.addAll(new ContactOperationPlaintextSerializer(contactOperation).serialize());
 		}

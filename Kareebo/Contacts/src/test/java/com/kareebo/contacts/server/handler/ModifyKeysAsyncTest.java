@@ -2,9 +2,10 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.base.PublicKeysPlaintextSerializer;
-import com.kareebo.contacts.common.Algorithm;
 import com.kareebo.contacts.server.gora.User;
-import com.kareebo.contacts.thrift.InvalidArgument;
+import com.kareebo.contacts.thrift.EncryptionAlgorithm;
+import com.kareebo.contacts.thrift.FailedOperation;
+import com.kareebo.contacts.thrift.PublicKeys;
 import org.apache.gora.store.DataStore;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +20,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class ModifyKeysAsyncTest extends SignatureVerifierTestBase
 {
-	private final com.kareebo.contacts.common.PublicKeys newPublicKeys=new com.kareebo.contacts.common.PublicKeys();
+	private final PublicKeys newPublicKeys=new PublicKeys();
 
 	@Override
 	PlaintextSerializer constructPlaintext()
@@ -31,8 +32,8 @@ public class ModifyKeysAsyncTest extends SignatureVerifierTestBase
 	@Override
 	public void setUp() throws Exception
 	{
-		newPublicKeys.setEncryption(setUpCryptoBuffer("abc".getBytes()));
-		newPublicKeys.setVerification(setUpCryptoBuffer("efg".getBytes()));
+		newPublicKeys.setEncryption(setUpEncryptionKey("abc".getBytes()));
+		newPublicKeys.setVerification(setUpVerificationKey("efg".getBytes()));
 		super.setUp();
 	}
 
@@ -55,14 +56,13 @@ public class ModifyKeysAsyncTest extends SignatureVerifierTestBase
 	public void testInvalidAlgorithm() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		final com.kareebo.contacts.common.PublicKeys fakePublicKeys=new com.kareebo.contacts.common
-			                                                                .PublicKeys();
+		final PublicKeys fakePublicKeys=new PublicKeys();
 		fakePublicKeys.setEncryption(newPublicKeys.getEncryption());
 		fakePublicKeys.setVerification(newPublicKeys.getVerification());
-		fakePublicKeys.getEncryption().setAlgorithm(Algorithm.Fake);
+		fakePublicKeys.getEncryption().setAlgorithm(EncryptionAlgorithm.Fake);
 		((ModifyKeys)signatureVerifier).modifyKeys1(fakePublicKeys,null,result);
 		assertTrue(result.failed());
 		//noinspection ThrowableResultOfMethodCallIgnored
-		assertEquals(InvalidArgument.class,result.cause().getClass());
+		assertEquals(FailedOperation.class,result.cause().getClass());
 	}
 }

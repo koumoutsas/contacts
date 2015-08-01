@@ -3,8 +3,14 @@ package com.kareebo.contacts.server.handler;
 import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
-import com.kareebo.contacts.server.gora.Identity;
-import com.kareebo.contacts.thrift.IdPair;
+import com.kareebo.contacts.server.gora.EncryptedBuffer;
+import com.kareebo.contacts.server.gora.PublicKeys;
+import com.kareebo.contacts.server.gora.UserAgent;
+import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.EncryptionAlgorithm;
+import com.kareebo.contacts.thrift.EncryptionKey;
+import com.kareebo.contacts.thrift.SignatureAlgorithm;
+import com.kareebo.contacts.thrift.VerificationKey;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -16,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertNotNull;
@@ -26,13 +33,47 @@ import static org.junit.Assert.assertNotNull;
 abstract class SignatureVerifierTestBase
 {
 	final static String ecdsa="ECDSA";
-	final IdPair idPairValid=new IdPair();
-	final com.kareebo.contacts.thrift.Signature signature=new com.kareebo.contacts.thrift.Signature();
+	final ClientId clientIdValid=new ClientId();
+	final SignatureBuffer signature=new SignatureBuffer();
 	PlaintextSerializer plaintext;
-	final com.kareebo.contacts.thrift.Signature wrongSignature=new com.kareebo.contacts.thrift.Signature();
-	CryptoBuffer verificationKey;
+	final SignatureBuffer wrongSignature=new SignatureBuffer();
+	com.kareebo.contacts.server.gora.VerificationKey verificationKey;
 	SignatureVerifier signatureVerifier;
 	Client clientValid;
+
+	public void setUp() throws Exception
+	{
+		setUpCrypto();
+		final long userId=0;
+		clientIdValid.setClient(0);
+		clientIdValid.setUser(userId);
+		final UserAgent userAgent=new UserAgent();
+		userAgent.setPlatform("A");
+		userAgent.setVersion("B");
+		final PublicKeys publicKeys=new PublicKeys();
+		final byte[] buffer={'a','b'};
+		publicKeys.setEncryption(TypeConverter.convert(setUpEncryptionKey(buffer)));
+		publicKeys.setVerification(verificationKey);
+		final Client client=new Client();
+		client.setUserAgent(userAgent);
+		client.setKeys(publicKeys);
+		client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+		final User user=new User();
+		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
+		byteBuffer.mark();
+		user.setBlind(byteBuffer);
+		final HashMap<CharSequence,Client> clients=new HashMap<>();
+		clients.put(TypeConverter.convert(clientIdValid.getClient()),client);
+		user.setClients(clients);
+		user.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+		user.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
+		dataStore.put(userId,user);
+		signatureVerifier=construct(dataStore);
+		assertNotNull(signatureVerifier);
+		signatureVerifier.put(clientIdValid,client);
+		clientValid=signatureVerifier.get(clientIdValid);
+	}
 
 	private void setUpCrypto() throws NoSuchProviderException, NoSuchAlgorithmException,
 		                                  InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, InvalidKeySpecException
@@ -49,55 +90,34 @@ abstract class SignatureVerifierTestBase
 		{
 			ecdsaSign.update((byte[])a);
 		}
-		signature.setIds(idPairValid);
-		signature.setSignature(ecdsaSign.sign());
+		signature.setClient(clientIdValid);
+		signature.setBuffer(ecdsaSign.sign());
 		ecdsaSign.update("fgh".getBytes());
-		wrongSignature.setIds(idPairValid);
-		wrongSignature.setSignature(ecdsaSign.sign());
-		verificationKey=TypeConverter.convert(setUpCryptoBuffer(new X509EncodedKeySpec(
-			                                                                              keyPair.getPublic().getEncoded
-				                                                                                                  ())
-			                                                        .getEncoded()));
+		wrongSignature.setClient(clientIdValid);
+		wrongSignature.setBuffer(ecdsaSign.sign());
+		verificationKey=TypeConverter.convert(setUpVerificationKey(new X509EncodedKeySpec(keyPair.getPublic().getEncoded()).getEncoded()));
 	}
 
-	public void setUp() throws Exception
+	EncryptionKey setUpEncryptionKey(final byte[] buffer)
 	{
-		setUpCrypto();
-		final long userId=0;
-		idPairValid.setClientId(0);
-		idPairValid.setUserId(userId);
-		final Client client=new Client();
-		final UserAgent userAgent=new UserAgent();
-		userAgent.setPlatform("A");
-		userAgent.setVersion("B");
-		final PublicKeys publicKeys=new PublicKeys();
-		final byte[] buffer={'a','b'};
-		publicKeys.setEncryption(TypeConverter.convert(setUpCryptoBuffer(buffer)));
-		publicKeys.setVerification(verificationKey);
-		client.setUserAgent(userAgent);
-		client.setKeys(publicKeys);
-		final User user=new User();
-		user.setContacts(new HashMap<CharSequence,Contact>());
-		user.setIdentities(new HashMap<CharSequence,Identity>());
-		user.setClients(new HashMap<CharSequence,Client>());
-		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
-		dataStore.put(userId,user);
-		signatureVerifier=construct(dataStore);
-		assertNotNull(signatureVerifier);
-		signatureVerifier.put(idPairValid,client);
-		clientValid=signatureVerifier.get(idPairValid);
+		final EncryptionKey encryptionKey=new EncryptionKey();
+		encryptionKey.setAlgorithm(EncryptionAlgorithm.RSA2048);
+		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
+		byteBuffer.mark();
+		encryptionKey.setBuffer(byteBuffer);
+		return encryptionKey;
 	}
 
 	abstract PlaintextSerializer constructPlaintext();
 
-	com.kareebo.contacts.common.CryptoBuffer setUpCryptoBuffer(final byte[] buffer)
+	VerificationKey setUpVerificationKey(final byte[] buffer)
 	{
-		final com.kareebo.contacts.common.CryptoBuffer cryptoBuffer=new com.kareebo.contacts.common.CryptoBuffer();
-		cryptoBuffer.setAlgorithm(com.kareebo.contacts.common.Algorithm.SHA256withECDSAprime239v1);
+		final VerificationKey verificationKey=new VerificationKey();
+		verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
 		byteBuffer.mark();
-		cryptoBuffer.setBuffer(byteBuffer);
-		return cryptoBuffer;
+		verificationKey.setBuffer(byteBuffer);
+		return verificationKey;
 	}
 
 	abstract SignatureVerifier construct(final DataStore<Long,User> dataStore);

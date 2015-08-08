@@ -40,6 +40,8 @@ abstract class SignatureVerifierTestBase
 	com.kareebo.contacts.server.gora.VerificationKey verificationKey;
 	SignatureVerifier signatureVerifier;
 	Client clientValid;
+	private DataStore<Long,User> dataStore;
+	UserAgent userAgent;
 
 	public void setUp() throws Exception
 	{
@@ -47,7 +49,7 @@ abstract class SignatureVerifierTestBase
 		final long userId=0;
 		clientIdValid.setClient(0);
 		clientIdValid.setUser(userId);
-		final UserAgent userAgent=new UserAgent();
+		userAgent=new UserAgent();
 		userAgent.setPlatform("A");
 		userAgent.setVersion("B");
 		final PublicKeys publicKeys=new PublicKeys();
@@ -67,7 +69,7 @@ abstract class SignatureVerifierTestBase
 		user.setClients(clients);
 		user.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
 		user.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
+		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(userId,user);
 		signatureVerifier=construct(dataStore);
 		assertNotNull(signatureVerifier);

@@ -77,7 +77,6 @@ public class ClientDBAccessorTest
 	public void tearDown() throws Exception
 	{
 		clientDBAccessor.close();
-		assertNull(dataStore.get(userIdValid));
 	}
 
 	@Test

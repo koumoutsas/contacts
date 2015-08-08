@@ -4,16 +4,19 @@ import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.User;
+import com.kareebo.contacts.server.gora.UserAgent;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.Vector;
 
 import static org.junit.Assert.*;
@@ -24,6 +27,12 @@ import static org.junit.Assert.*;
 public class SignatureVerifierTest extends SignatureVerifierTestBase
 {
 	private final ClientId clientIdInvalid=new ClientId();
+
+	private MemStore<Long,User> datastore;
+
+	final static private UserAgent emptyUserAgent=new UserAgent();
+
+	private static final String[] queryFields={"clients"};
 
 	@Override
 	PlaintextSerializer constructPlaintext()
@@ -41,12 +50,25 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		super.setUp();
 		clientIdInvalid.setClient(clientIdValid.getClient()+1);
 		clientIdInvalid.setUser(clientIdValid.getUser());
+		emptyUserAgent.setPlatform("");
+		emptyUserAgent.setVersion("");
 	}
 
 	@Override
 	SignatureVerifier construct(final DataStore<Long,User> dataStore)
 	{
+		this.datastore=(MemStore)dataStore;
 		return new SignatureVerifierMock(dataStore);
+	}
+
+	@After
+	public void tearDown() throws Exception
+	{
+		final User retrievedUser=datastore.get(clientIdValid.getUser(),queryFields);
+		assertNotNull(retrievedUser);
+		final Map<CharSequence,Client> clients=retrievedUser.getClients();
+		assertEquals(1,clients.size());
+		assertEquals(clientValid,clients.values().iterator().next());
 	}
 
 	@Test
@@ -55,7 +77,17 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		final Future<Void> result=new DefaultFutureResult<>();
 		signatureVerifier.verify(plaintext,signature,result);
 		assertTrue(result.succeeded());
-		assertNull(clientValid.getUserAgent());
+		assertEquals(clientValid.getUserAgent(),emptyUserAgent);
+		assertTrue(datastore.hasBeenClosed());
+	}
+
+	private void testFailed(final Future<Void> result) throws Exception
+	{
+		assertTrue(result.failed());
+		//noinspection ThrowableResultOfMethodCallIgnored
+		assertEquals(FailedOperation.class,result.cause().getClass());
+		assertEquals(signatureVerifier.get(signature.getClient()).getUserAgent(),userAgent);
+		assertFalse(datastore.hasBeenClosed());
 	}
 
 	@Test
@@ -73,10 +105,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 			throw e;
 		}
 		signature.setClient(clientIdValid);
-		assertTrue(result.failed());
-		//noinspection ThrowableResultOfMethodCallIgnored
-		assertEquals(FailedOperation.class,result.cause().getClass());
-		assertNotNull(signatureVerifier.get(signature.getClient()).getUserAgent());
+		testFailed(result);
 	}
 
 	@Test
@@ -94,10 +123,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		falseSignature.setClient(clientIdValid);
 		falseSignature.setBuffer(falseSignatureBuffer);
 		signatureVerifier.verify(plaintext,falseSignature,result);
-		assertTrue(result.failed());
-		//noinspection ThrowableResultOfMethodCallIgnored
-		assertEquals(FailedOperation.class,result.cause().getClass());
-		assertNotNull(signatureVerifier.get(signature.getClient()).getUserAgent());
+		testFailed(result);
 	}
 
 	@Test
@@ -118,10 +144,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 			throw e;
 		}
 		client.getKeys().getVerification().setAlgorithm(algorithm);
-		assertTrue(result.failed());
-		//noinspection ThrowableResultOfMethodCallIgnored
-		assertEquals(FailedOperation.class,result.cause().getClass());
-		assertNotNull(signatureVerifier.get(signature.getClient()).getUserAgent());
+		testFailed(result);
 	}
 
 	@Test
@@ -129,10 +152,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
 		signatureVerifier.verify(plaintext,wrongSignature,result);
-		assertTrue(result.failed());
-		//noinspection ThrowableResultOfMethodCallIgnored
-		assertEquals(FailedOperation.class,result.cause().getClass());
-		assertNotNull(signatureVerifier.get(signature.getClient()).getUserAgent());
+		testFailed(result);
 	}
 
 	@Test
@@ -141,10 +161,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		final Future<Void> result=new DefaultFutureResult<>();
 		((SignatureVerifierMock)signatureVerifier).shouldThrow=true;
 		signatureVerifier.verify(plaintext,signature,result);
-		assertTrue(result.failed());
-		//noinspection ThrowableResultOfMethodCallIgnored
-		assertEquals(FailedOperation.class,result.cause().getClass());
-		assertNotNull(signatureVerifier.get(signature.getClient()).getUserAgent());
+		testFailed(result);
 	}
 
 	private class SignatureVerifierMock extends SignatureVerifier
@@ -168,7 +185,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 			{
 				throw new FailedOperation();
 			}
-			client.setUserAgent(null);
+			client.setUserAgent(emptyUserAgent);
 		}
 	}
 }

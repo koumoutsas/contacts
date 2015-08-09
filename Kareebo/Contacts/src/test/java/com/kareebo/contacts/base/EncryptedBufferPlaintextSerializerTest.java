@@ -24,7 +24,7 @@ public class EncryptedBufferPlaintextSerializerTest
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(bytes);
 		byteBuffer.mark();
 		final Vector<byte[]> plaintext=new EncryptedBufferPlaintextSerializer(new EncryptedBuffer(byteBuffer,
-			                                                                                     algorithm,new ClientId(0,0))).serialize();
+			                                                                                         algorithm,new ClientId(0,0))).serialize();
 		assertEquals(EnumPlaintextSerializer.LENGTH+1,plaintext.size());
 		assertArrayEquals(new EnumPlaintextSerializer<>(algorithm).serialize().elementAt(0),plaintext
 			                                                                                    .elementAt(0));

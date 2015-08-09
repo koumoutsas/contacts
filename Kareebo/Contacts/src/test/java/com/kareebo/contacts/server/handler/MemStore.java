@@ -5,7 +5,7 @@ import org.apache.gora.persistency.impl.PersistentBase;
 /**
  * Extension of {@link org.apache.gora.memory.store.MemStore} that doesn't clear its contents at close
  */
-public class MemStore<K, T extends PersistentBase> extends org.apache.gora.memory.store.MemStore<K, T>
+public class MemStore<K,T extends PersistentBase> extends org.apache.gora.memory.store.MemStore<K,T>
 {
 	private boolean isClosed=false;
 

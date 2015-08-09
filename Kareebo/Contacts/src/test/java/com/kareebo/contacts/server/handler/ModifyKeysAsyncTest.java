@@ -22,12 +22,6 @@ public class ModifyKeysAsyncTest extends SignatureVerifierTestBase
 {
 	private final PublicKeys newPublicKeys=new PublicKeys();
 
-	@Override
-	PlaintextSerializer constructPlaintext()
-	{
-		return new PublicKeysPlaintextSerializer(newPublicKeys);
-	}
-
 	@Before
 	@Override
 	public void setUp() throws Exception
@@ -41,6 +35,12 @@ public class ModifyKeysAsyncTest extends SignatureVerifierTestBase
 	SignatureVerifier construct(final DataStore<Long,User> dataStore)
 	{
 		return new ModifyKeys(dataStore);
+	}
+
+	@Override
+	PlaintextSerializer constructPlaintext()
+	{
+		return new PublicKeysPlaintextSerializer(newPublicKeys);
 	}
 
 	@Test

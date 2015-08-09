@@ -35,8 +35,8 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	 * Verify the signature
 	 *
 	 * @param plaintextSerializer The plaintext serializer
-	 * @param signature The signature
-	 * @param future    The future used to communicate the result
+	 * @param signature           The signature
+	 * @param future              The future used to communicate the result
 	 */
 	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future)
 	{
@@ -79,7 +79,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	/**
 	 * Abstract method for modifying the state of the user after a successful verification
 	 *
-	 * @param user The user
+	 * @param user   The user
 	 * @param client The client
 	 */
 	abstract void afterVerification(final User user,final Client client) throws FailedOperation;

@@ -1,7 +1,7 @@
 package com.kareebo.contacts.base;
 
-import com.kareebo.contacts.thrift.EncryptionAlgorithm;
 import com.kareebo.contacts.thrift.EncryptedBuffer;
+import com.kareebo.contacts.thrift.EncryptionAlgorithm;
 
 /**
  * {@link PlaintextSerializer} for {@link EncryptedBuffer}

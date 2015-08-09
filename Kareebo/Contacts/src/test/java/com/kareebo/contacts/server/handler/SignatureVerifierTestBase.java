@@ -35,13 +35,13 @@ abstract class SignatureVerifierTestBase
 	final static String ecdsa="ECDSA";
 	final ClientId clientIdValid=new ClientId();
 	final SignatureBuffer signature=new SignatureBuffer();
-	PlaintextSerializer plaintext;
 	final SignatureBuffer wrongSignature=new SignatureBuffer();
+	PlaintextSerializer plaintext;
 	com.kareebo.contacts.server.gora.VerificationKey verificationKey;
 	SignatureVerifier signatureVerifier;
 	Client clientValid;
-	private DataStore<Long,User> dataStore;
 	UserAgent userAgent;
+	private DataStore<Long,User> dataStore;
 
 	public void setUp() throws Exception
 	{
@@ -110,6 +110,8 @@ abstract class SignatureVerifierTestBase
 		return encryptionKey;
 	}
 
+	abstract SignatureVerifier construct(final DataStore<Long,User> dataStore);
+
 	abstract PlaintextSerializer constructPlaintext();
 
 	VerificationKey setUpVerificationKey(final byte[] buffer)
@@ -121,6 +123,4 @@ abstract class SignatureVerifierTestBase
 		verificationKey.setBuffer(byteBuffer);
 		return verificationKey;
 	}
-
-	abstract SignatureVerifier construct(final DataStore<Long,User> dataStore);
 }

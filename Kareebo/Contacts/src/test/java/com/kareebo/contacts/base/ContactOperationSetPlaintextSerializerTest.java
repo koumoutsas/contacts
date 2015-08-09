@@ -37,7 +37,7 @@ public class ContactOperationSetPlaintextSerializerTest
 			                               .serialize();
 		assertEquals(2*ContactOperationPlaintextSerializer.LENGTH,plaintext.size());
 		final Vector<byte[]> expected=new Vector<>();
-		for(ContactOperation contactOperation : contactOperations)
+		for(final ContactOperation contactOperation : contactOperations)
 		{
 			expected.addAll(new ContactOperationPlaintextSerializer(contactOperation).serialize());
 		}

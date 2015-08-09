@@ -25,7 +25,7 @@ public class VerificationKeyPlaintextSerializerTest
 		final Vector<byte[]> plaintext=new VerificationKeyPlaintextSerializer(new VerificationKey(byteBuffer,algorithm)).serialize();
 		assertEquals(EnumPlaintextSerializer.LENGTH+1,plaintext.size());
 		assertArrayEquals(new EnumPlaintextSerializer<>(algorithm).serialize().elementAt(0),plaintext
-			                                                                                           .elementAt(0));
+			                                                                                    .elementAt(0));
 		assertArrayEquals(bytes,plaintext.elementAt(1));
 	}
 }

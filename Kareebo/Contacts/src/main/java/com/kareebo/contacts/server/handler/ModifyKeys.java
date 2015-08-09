@@ -1,10 +1,10 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.PublicKeysPlaintextSerializer;
-import com.kareebo.contacts.thrift.PublicKeys;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
+import com.kareebo.contacts.thrift.PublicKeys;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
@@ -39,7 +39,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	 * The client sends the new keys signed with the old keys
 	 */
 	public void modifyKeys1(final PublicKeys newPublicKeys,final SignatureBuffer signature,final Future<Void>
-		                                                                                               future)
+		                                                                                       future)
 	{
 		try
 		{

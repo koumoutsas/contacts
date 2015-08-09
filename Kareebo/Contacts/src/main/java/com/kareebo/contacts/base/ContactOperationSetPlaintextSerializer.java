@@ -26,7 +26,7 @@ public class ContactOperationSetPlaintextSerializer implements PlaintextSerializ
 	public Vector<byte[]> serialize()
 	{
 		final Vector<byte[]> ret=new Vector<>(contactOperationSet.size()*ContactOperationPlaintextSerializer.LENGTH);
-		for(ContactOperation contactOperation : contactOperationSet)
+		for(final ContactOperation contactOperation : contactOperationSet)
 		{
 			ret.addAll(new ContactOperationPlaintextSerializer(contactOperation).serialize());
 		}

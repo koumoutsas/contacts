@@ -18,13 +18,13 @@ class ClientDBAccessor
 	 */
 	private static final String[] queryFields={"clients"};
 	/**
-	 * The datastore is initialized in the constructor and is never null
-	 */
-	private DataStore<Long,User> dataStore;
-	/**
 	 * Caches of intermediate structures used to get to the client.
 	 */
 	User user;
+	/**
+	 * The datastore is initialized in the constructor and is never null
+	 */
+	private DataStore<Long,User> dataStore;
 	private ClientId clientId;
 	private Map<CharSequence,Client> clients;
 
@@ -81,7 +81,7 @@ class ClientDBAccessor
 	 * which case it's an update, or not, in which case it's an insert.
 	 *
 	 * @param clientId The ids
-	 * @param client The client
+	 * @param client   The client
 	 * @throws FailedOperation When the user cannot be found in the DB
 	 */
 	void put(final ClientId clientId,final Client client) throws FailedOperation

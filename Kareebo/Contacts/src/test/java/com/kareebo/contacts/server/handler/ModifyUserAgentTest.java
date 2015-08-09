@@ -20,12 +20,6 @@ public class ModifyUserAgentTest extends SignatureVerifierTestBase
 {
 	private final UserAgent newUserAgent=new UserAgent();
 
-	@Override
-	PlaintextSerializer constructPlaintext()
-	{
-		return new UserAgentPlaintextSerializer(newUserAgent);
-	}
-
 	@Before
 	@Override
 	public void setUp() throws Exception
@@ -39,6 +33,12 @@ public class ModifyUserAgentTest extends SignatureVerifierTestBase
 	SignatureVerifier construct(final DataStore<Long,User> dataStore)
 	{
 		return new ModifyUserAgent(dataStore);
+	}
+
+	@Override
+	PlaintextSerializer constructPlaintext()
+	{
+		return new UserAgentPlaintextSerializer(newUserAgent);
 	}
 
 	@Test

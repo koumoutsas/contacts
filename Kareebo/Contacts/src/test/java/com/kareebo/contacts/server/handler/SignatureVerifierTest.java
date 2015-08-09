@@ -26,22 +26,10 @@ import static org.junit.Assert.*;
  */
 public class SignatureVerifierTest extends SignatureVerifierTestBase
 {
-	private final ClientId clientIdInvalid=new ClientId();
-
-	private MemStore<Long,User> datastore;
-
 	final static private UserAgent emptyUserAgent=new UserAgent();
-
 	private static final String[] queryFields={"clients"};
-
-	@Override
-	PlaintextSerializer constructPlaintext()
-	{
-		final Vector<byte[]> ret=new Vector<>(2);
-		ret.add("abc".getBytes());
-		ret.add("cde".getBytes());
-		return new TestPlaintextSerializer(ret);
-	}
+	private final ClientId clientIdInvalid=new ClientId();
+	private MemStore<Long,User> datastore;
 
 	@Before
 	@Override
@@ -59,6 +47,15 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	{
 		this.datastore=(MemStore)dataStore;
 		return new SignatureVerifierMock(dataStore);
+	}
+
+	@Override
+	PlaintextSerializer constructPlaintext()
+	{
+		final Vector<byte[]> ret=new Vector<>(2);
+		ret.add("abc".getBytes());
+		ret.add("cde".getBytes());
+		return new TestPlaintextSerializer(ret);
 	}
 
 	@After
@@ -81,15 +78,6 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		assertTrue(datastore.hasBeenClosed());
 	}
 
-	private void testFailed(final Future<Void> result) throws Exception
-	{
-		assertTrue(result.failed());
-		//noinspection ThrowableResultOfMethodCallIgnored
-		assertEquals(FailedOperation.class,result.cause().getClass());
-		assertEquals(signatureVerifier.get(signature.getClient()).getUserAgent(),userAgent);
-		assertFalse(datastore.hasBeenClosed());
-	}
-
 	@Test
 	public void testInvalidUser() throws Exception
 	{
@@ -106,6 +94,15 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		}
 		signature.setClient(clientIdValid);
 		testFailed(result);
+	}
+
+	private void testFailed(final Future<Void> result) throws Exception
+	{
+		assertTrue(result.failed());
+		//noinspection ThrowableResultOfMethodCallIgnored
+		assertEquals(FailedOperation.class,result.cause().getClass());
+		assertEquals(signatureVerifier.get(signature.getClient()).getUserAgent(),userAgent);
+		assertFalse(datastore.hasBeenClosed());
 	}
 
 	@Test

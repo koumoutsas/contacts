@@ -23,9 +23,9 @@ public class Utils
 	/**
 	 * Verify a signature
 	 *
-	 * @param verificationKey The verification key
-	 * @param signature       The signature
-	 * @param plaintextSerializer       The plaintext serializer
+	 * @param verificationKey     The verification key
+	 * @param signature           The signature
+	 * @param plaintextSerializer The plaintext serializer
 	 * @return Whether the signature is correct
 	 * @throws NoSuchProviderException
 	 * @throws NoSuchAlgorithmException

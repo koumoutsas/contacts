@@ -27,28 +27,13 @@ public class TypeConverterTest
 		final byte[] buffer1={'a','b'};
 		final com.kareebo.contacts.thrift.EncryptionKey encryptionKey=create(
 			                                                                    com.kareebo.contacts.thrift.EncryptionAlgorithm.RSA2048,
-		buffer1);
+			                                                                    buffer1);
 		final byte[] buffer2={'c','d'};
 		final com.kareebo.contacts.thrift.VerificationKey verificationKey=create(com.kareebo.contacts.thrift.SignatureAlgorithm
-			                                                           .SHA256withECDSAprime239v1,buffer2);
+			                                                                         .SHA256withECDSAprime239v1,buffer2);
 		final com.kareebo.contacts.thrift.PublicKeys publicKeys=new com.kareebo.contacts.thrift.PublicKeys(encryptionKey,
 			                                                                                                  verificationKey);
 		final PublicKeys converted=TypeConverter.convert(publicKeys);
-		assertEquals(TypeConverter.convert(encryptionKey),converted.getEncryption());
-		assertEquals(TypeConverter.convert(verificationKey),converted.getVerification());
-	}
-
-	@Test
-	public void testConvertPublicKeysToThrift() throws Exception
-	{
-		final byte[] buffer1={'a','b'};
-		final EncryptionKey encryptionKey=create(EncryptionAlgorithm.RSA2048,buffer1);
-		final byte[] buffer2={'c','d'};
-		final VerificationKey verificationKey=create(SignatureAlgorithm.SHA256withECDSAprime239v1,buffer2);
-		final PublicKeys publicKeys=new PublicKeys();
-		publicKeys.setEncryption(encryptionKey);
-		publicKeys.setVerification(verificationKey);
-		final com.kareebo.contacts.thrift.PublicKeys converted=TypeConverter.convert(publicKeys);
 		assertEquals(TypeConverter.convert(encryptionKey),converted.getEncryption());
 		assertEquals(TypeConverter.convert(verificationKey),converted.getVerification());
 	}
@@ -65,23 +50,28 @@ public class TypeConverterTest
 
 	private com.kareebo.contacts.thrift.VerificationKey create(final com.kareebo.contacts.thrift
 		                                                                 .SignatureAlgorithm
-		                                                         algorithm,final byte[] buffer)
+		                                                           algorithm,final byte[] buffer)
 	{
 		final com.kareebo.contacts.thrift.VerificationKey verificationKey=new com.kareebo.contacts.thrift
-			                                                                  .VerificationKey();
+			                                                                      .VerificationKey();
 		verificationKey.setAlgorithm(algorithm);
 		verificationKey.setBuffer(buffer);
 		return verificationKey;
 	}
 
-	private com.kareebo.contacts.thrift.HashBuffer create(final com.kareebo.contacts.thrift.HashAlgorithm
-		                                                         algorithm,final byte[] buffer)
+	@Test
+	public void testConvertPublicKeysToThrift() throws Exception
 	{
-		final com.kareebo.contacts.thrift.HashBuffer hashBuffer=new com.kareebo.contacts.thrift
-			                                                                  .HashBuffer();
-		hashBuffer.setAlgorithm(algorithm);
-		hashBuffer.setBuffer(buffer);
-		return hashBuffer;
+		final byte[] buffer1={'a','b'};
+		final EncryptionKey encryptionKey=create(EncryptionAlgorithm.RSA2048,buffer1);
+		final byte[] buffer2={'c','d'};
+		final VerificationKey verificationKey=create(SignatureAlgorithm.SHA256withECDSAprime239v1,buffer2);
+		final PublicKeys publicKeys=new PublicKeys();
+		publicKeys.setEncryption(encryptionKey);
+		publicKeys.setVerification(verificationKey);
+		final com.kareebo.contacts.thrift.PublicKeys converted=TypeConverter.convert(publicKeys);
+		assertEquals(TypeConverter.convert(encryptionKey),converted.getEncryption());
+		assertEquals(TypeConverter.convert(verificationKey),converted.getVerification());
 	}
 
 	private EncryptionKey create(final EncryptionAlgorithm algorithm,final byte[] buffer)
@@ -102,16 +92,6 @@ public class TypeConverterTest
 		byteBuffer.mark();
 		verificationKey.setBuffer(byteBuffer);
 		return verificationKey;
-	}
-
-	private HashBuffer create(final HashAlgorithm algorithm,final byte[] buffer)
-	{
-		final HashBuffer hashBuffer=new HashBuffer();
-		hashBuffer.setAlgorithm(algorithm);
-		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
-		byteBuffer.mark();
-		hashBuffer.setBuffer(byteBuffer);
-		return hashBuffer;
 	}
 
 	@Test
@@ -146,6 +126,37 @@ public class TypeConverterTest
 		assertEquals(ByteBuffer.wrap(buffer),converted.getBuffer());
 	}
 
+	private com.kareebo.contacts.thrift.HashBuffer create(final com.kareebo.contacts.thrift.HashAlgorithm
+		                                                      algorithm,final byte[] buffer)
+	{
+		final com.kareebo.contacts.thrift.HashBuffer hashBuffer=new com.kareebo.contacts.thrift
+			                                                            .HashBuffer();
+		hashBuffer.setAlgorithm(algorithm);
+		hashBuffer.setBuffer(buffer);
+		return hashBuffer;
+	}
+
+	@Test
+	public void testConvertEncryptedBuffer() throws Exception
+	{
+		final com.kareebo.contacts.thrift.EncryptionAlgorithm algorithm=com.kareebo.contacts.thrift
+			                                                                .EncryptionAlgorithm.RSA2048;
+		final byte[] buffer={'a','b'};
+		final EncryptedBuffer converted=TypeConverter.convert(createEncryptedBufer(algorithm,buffer));
+		assertEquals(TypeConverter.convert(algorithm),converted.getAlgorithm());
+		assertEquals(ByteBuffer.wrap(buffer),converted.getBuffer());
+	}
+
+	private com.kareebo.contacts.thrift.EncryptedBuffer createEncryptedBufer(final com.kareebo.contacts.thrift.EncryptionAlgorithm
+		                                                                         algorithm,final byte[] buffer)
+	{
+		final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer=new com.kareebo.contacts.thrift
+			                                                                      .EncryptedBuffer();
+		encryptedBuffer.setAlgorithm(algorithm);
+		encryptedBuffer.setBuffer(buffer);
+		return encryptedBuffer;
+	}
+
 	@Test
 	public void testConvertEncryptionKeyToThrift() throws Exception
 	{
@@ -176,12 +187,43 @@ public class TypeConverterTest
 		assertEquals(ByteBuffer.wrap(buffer),converted.bufferForBuffer());
 	}
 
+	private HashBuffer create(final HashAlgorithm algorithm,final byte[] buffer)
+	{
+		final HashBuffer hashBuffer=new HashBuffer();
+		hashBuffer.setAlgorithm(algorithm);
+		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
+		byteBuffer.mark();
+		hashBuffer.setBuffer(byteBuffer);
+		return hashBuffer;
+	}
+
+	@Test
+	public void testConvertEncryptedBufferToThrift() throws Exception
+	{
+		final EncryptionAlgorithm algorithm=EncryptionAlgorithm.RSA2048;
+		final byte[] buffer={'a','b'};
+		final com.kareebo.contacts.thrift.EncryptedBuffer converted=TypeConverter.convert(createEncryptedBufer(algorithm,
+			                                                                                                      buffer));
+		assertEquals(TypeConverter.convert(algorithm),converted.getAlgorithm());
+		assertEquals(ByteBuffer.wrap(buffer),converted.bufferForBuffer());
+	}
+
+	private EncryptedBuffer createEncryptedBufer(final EncryptionAlgorithm algorithm,final byte[] buffer)
+	{
+		final EncryptedBuffer encryptedBuffer=new EncryptedBuffer();
+		encryptedBuffer.setAlgorithm(algorithm);
+		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
+		byteBuffer.mark();
+		encryptedBuffer.setBuffer(byteBuffer);
+		return encryptedBuffer;
+	}
+
 	@Test(expected=NoSuchAlgorithmException.class)
 	public void testConvertEncryptionAlgorithm() throws Exception
 	{
 		assertEquals(EncryptionAlgorithm.RSA2048,TypeConverter.convert(com.kareebo.contacts.thrift
 			                                                               .EncryptionAlgorithm
-			                                                          .RSA2048));
+			                                                               .RSA2048));
 		TypeConverter.convert(com.kareebo.contacts.thrift.EncryptionAlgorithm.Fake);
 	}
 
@@ -189,7 +231,7 @@ public class TypeConverterTest
 	public void testConvertSignatureAlgorithm() throws Exception
 	{
 		assertEquals(SignatureAlgorithm.SHA256withECDSAprime239v1,TypeConverter.convert(com.kareebo.contacts.thrift
-			                                                             .SignatureAlgorithm.SHA256withECDSAprime239v1));
+			                                                                                .SignatureAlgorithm.SHA256withECDSAprime239v1));
 		TypeConverter.convert(com.kareebo.contacts.thrift.SignatureAlgorithm.Fake);
 	}
 
@@ -205,7 +247,7 @@ public class TypeConverterTest
 	{
 		assertEquals(com.kareebo.contacts.thrift.EncryptionAlgorithm.RSA2048,TypeConverter.convert
 			                                                                                   (EncryptionAlgorithm
-			                                                                                      .RSA2048));
+				                                                                                    .RSA2048));
 		TypeConverter.convert(EncryptionAlgorithm.Fake);
 	}
 
@@ -213,7 +255,7 @@ public class TypeConverterTest
 	public void testConvertSignatureAlgorithmToThrift() throws Exception
 	{
 		assertEquals(com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1,TypeConverter.convert
-			                                                                                   (SignatureAlgorithm.SHA256withECDSAprime239v1));
+			                                                                                                    (SignatureAlgorithm.SHA256withECDSAprime239v1));
 		TypeConverter.convert(SignatureAlgorithm.Fake);
 	}
 

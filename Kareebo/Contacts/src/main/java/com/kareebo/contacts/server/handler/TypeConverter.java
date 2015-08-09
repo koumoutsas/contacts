@@ -19,27 +19,6 @@ class TypeConverter
 		return ret;
 	}
 
-	static com.kareebo.contacts.thrift.PublicKeys convert(final PublicKeys publicKeys) throws
-		NoSuchAlgorithmException
-	{
-		return new com.kareebo.contacts.thrift.PublicKeys(convert(publicKeys.getEncryption()),convert(publicKeys
-			                                                                                              .getVerification
-				                                                                                               ()));
-	}
-
-	static com.kareebo.contacts.thrift.EncryptionKey convert(final EncryptionKey encryptionKey) throws NoSuchAlgorithmException
-	{
-		return new com.kareebo.contacts.thrift.EncryptionKey(encryptionKey.getBuffer(),convert(encryptionKey
-			                                                                                       .getAlgorithm()));
-	}
-
-	static com.kareebo.contacts.thrift.VerificationKey convert(final VerificationKey verificationKey) throws
-		NoSuchAlgorithmException
-	{
-		return new com.kareebo.contacts.thrift.VerificationKey(verificationKey.getBuffer(),convert(verificationKey
-			                                                                                           .getAlgorithm()));
-	}
-
 	static EncryptionKey convert(final com.kareebo.contacts.thrift.EncryptionKey encryptionKey) throws NoSuchAlgorithmException
 	{
 		final EncryptionKey ret=new EncryptionKey();
@@ -59,24 +38,6 @@ class TypeConverter
 		buffer.mark();
 		ret.setBuffer(buffer);
 		return ret;
-	}
-
-	static HashBuffer convert(final com.kareebo.contacts.thrift.HashBuffer hashBuffer) throws
-		NoSuchAlgorithmException
-	{
-		final HashBuffer ret=new HashBuffer();
-		ret.setAlgorithm(convert(hashBuffer.getAlgorithm()));
-		final ByteBuffer buffer=hashBuffer.bufferForBuffer();
-		buffer.mark();
-		ret.setBuffer(buffer);
-		return ret;
-	}
-
-	static com.kareebo.contacts.thrift.HashBuffer convert(final HashBuffer cryptoBuffer) throws
-		NoSuchAlgorithmException
-	{
-		return new com.kareebo.contacts.thrift.HashBuffer(cryptoBuffer.getBuffer(),convert(cryptoBuffer
-			                                                                                     .getAlgorithm()));
 	}
 
 	static EncryptionAlgorithm convert(final com.kareebo.contacts.thrift.EncryptionAlgorithm algorithm) throws
@@ -103,16 +64,25 @@ class TypeConverter
 		}
 	}
 
-	static HashAlgorithm convert(final com.kareebo.contacts.thrift.HashAlgorithm algorithm) throws
+	static com.kareebo.contacts.thrift.PublicKeys convert(final PublicKeys publicKeys) throws
 		NoSuchAlgorithmException
 	{
-		switch(algorithm)
-		{
-			case SHA256:
-				return HashAlgorithm.SHA256;
-			default:
-				throw new NoSuchAlgorithmException(algorithm.toString());
-		}
+		return new com.kareebo.contacts.thrift.PublicKeys(convert(publicKeys.getEncryption()),convert(publicKeys
+			                                                                                              .getVerification
+				                                                                                               ()));
+	}
+
+	static com.kareebo.contacts.thrift.EncryptionKey convert(final EncryptionKey encryptionKey) throws NoSuchAlgorithmException
+	{
+		return new com.kareebo.contacts.thrift.EncryptionKey(encryptionKey.getBuffer(),convert(encryptionKey
+			                                                                                       .getAlgorithm()));
+	}
+
+	static com.kareebo.contacts.thrift.VerificationKey convert(final VerificationKey verificationKey) throws
+		NoSuchAlgorithmException
+	{
+		return new com.kareebo.contacts.thrift.VerificationKey(verificationKey.getBuffer(),convert(verificationKey
+			                                                                                           .getAlgorithm()));
 	}
 
 	static com.kareebo.contacts.thrift.EncryptionAlgorithm convert(final EncryptionAlgorithm algorithm) throws
@@ -137,6 +107,58 @@ class TypeConverter
 			default:
 				throw new NoSuchAlgorithmException(algorithm.toString());
 		}
+	}
+
+	static HashBuffer convert(final com.kareebo.contacts.thrift.HashBuffer hashBuffer) throws
+		NoSuchAlgorithmException
+	{
+		final HashBuffer ret=new HashBuffer();
+		ret.setAlgorithm(convert(hashBuffer.getAlgorithm()));
+		final ByteBuffer buffer=hashBuffer.bufferForBuffer();
+		buffer.mark();
+		ret.setBuffer(buffer);
+		return ret;
+	}
+
+	static HashAlgorithm convert(final com.kareebo.contacts.thrift.HashAlgorithm algorithm) throws
+		NoSuchAlgorithmException
+	{
+		switch(algorithm)
+		{
+			case SHA256:
+				return HashAlgorithm.SHA256;
+			default:
+				throw new NoSuchAlgorithmException(algorithm.toString());
+		}
+	}
+
+	static EncryptedBuffer convert(final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer) throws
+		NoSuchAlgorithmException
+	{
+		final EncryptedBuffer ret=new EncryptedBuffer();
+		ret.setAlgorithm(convert(encryptedBuffer.getAlgorithm()));
+		final ByteBuffer buffer=encryptedBuffer.bufferForBuffer();
+		buffer.mark();
+		ret.setBuffer(buffer);
+		return ret;
+	}
+
+	static com.kareebo.contacts.thrift.EncryptedBuffer convert(final EncryptedBuffer encryptedBuffer) throws
+		NoSuchAlgorithmException
+	{
+		final com.kareebo.contacts.thrift.EncryptedBuffer ret=new com.kareebo.contacts.thrift.EncryptedBuffer();
+		ret.setAlgorithm(convert(encryptedBuffer.getAlgorithm()));
+		final ByteBuffer buffer=encryptedBuffer.getBuffer();
+		buffer.mark();
+		ret.setBuffer(buffer);
+		return ret;
+	}
+
+	static com.kareebo.contacts.thrift.HashBuffer convert(final HashBuffer cryptoBuffer) throws
+		NoSuchAlgorithmException
+	{
+		return new com.kareebo.contacts.thrift.HashBuffer(cryptoBuffer.getBuffer(),convert(cryptoBuffer
+			                                                                                   .getAlgorithm()));
 	}
 
 	static com.kareebo.contacts.thrift.HashAlgorithm convert(final HashAlgorithm algorithm) throws

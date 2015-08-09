@@ -1,9 +1,6 @@
 package com.kareebo.contacts.base;
 
-import com.kareebo.contacts.thrift.ContactOperation;
-import com.kareebo.contacts.thrift.ContactOperationType;
-import com.kareebo.contacts.thrift.HashAlgorithm;
-import com.kareebo.contacts.thrift.HashBuffer;
+import com.kareebo.contacts.thrift.*;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -22,14 +19,17 @@ public class ContactOperationPlaintextSerializerTest
 	{
 		final ContactOperationType contactOperationType=ContactOperationType.Add;
 		final HashAlgorithm algorithm=HashAlgorithm.SHA256;
-		final byte[] bytes="abc".getBytes();
-		final ByteBuffer byteBuffer=ByteBuffer.wrap(bytes);
+		final ByteBuffer byteBuffer=ByteBuffer.wrap("abc".getBytes());
 		byteBuffer.mark();
 		final HashBuffer hashBuffer=new HashBuffer(byteBuffer,algorithm);
-		final Vector<byte[]> plaintext=new ContactOperationPlaintextSerializer(new ContactOperation(hashBuffer,contactOperationType)).serialize();
+		final EncryptedBuffer encryptedBuffer=new EncryptedBuffer(byteBuffer,EncryptionAlgorithm.RSA2048,new
+			                                                                                                 ClientId(0,0));
+		final Vector<byte[]> plaintext=new ContactOperationPlaintextSerializer(new ContactOperation
+			                                                                       (hashBuffer,contactOperationType,encryptedBuffer)).serialize();
 		assertEquals(ContactOperationPlaintextSerializer.LENGTH,plaintext.size());
 		final Vector<byte[]> expected=new HashBufferPlaintextSerializer(hashBuffer).serialize();
 		expected.addAll(new EnumPlaintextSerializer<>(contactOperationType).serialize());
+		expected.addAll(new EncryptedBufferPlaintextSerializer(encryptedBuffer).serialize());
 		assertEquals(expected.size(),plaintext.size());
 		for(int i=0;i<expected.size();++i)
 		{

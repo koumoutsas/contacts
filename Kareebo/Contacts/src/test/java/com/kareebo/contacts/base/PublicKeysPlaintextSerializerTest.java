@@ -17,8 +17,7 @@ public class PublicKeysPlaintextSerializerTest
 	@Test
 	public void testSerialize() throws Exception
 	{
-		final byte[] bytes="abc".getBytes();
-		final ByteBuffer byteBuffer=ByteBuffer.wrap(bytes);
+		final ByteBuffer byteBuffer=ByteBuffer.wrap("abc".getBytes());
 		byteBuffer.mark();
 		final EncryptionKey encryptionKey=new EncryptionKey(byteBuffer,EncryptionAlgorithm.RSA2048);
 		final VerificationKey verificationKey=new VerificationKey(byteBuffer,SignatureAlgorithm

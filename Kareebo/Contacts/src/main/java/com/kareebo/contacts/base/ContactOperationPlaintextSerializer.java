@@ -13,7 +13,7 @@ public class ContactOperationPlaintextSerializer implements PlaintextSerializer
 	 * The length of the returned vector
 	 */
 	public static final int LENGTH=HashBufferPlaintextSerializer.LENGTH+EnumPlaintextSerializer
-		                                                                    .LENGTH;
+		                                                                    .LENGTH+EncryptedBufferPlaintextSerializer.LENGTH;
 	final private ContactOperation contactOperation;
 
 	ContactOperationPlaintextSerializer(final ContactOperation contactOperation)
@@ -27,6 +27,7 @@ public class ContactOperationPlaintextSerializer implements PlaintextSerializer
 		final Vector<byte[]> ret=new Vector<>(LENGTH);
 		ret.addAll(new HashBufferPlaintextSerializer(contactOperation.getContact()).serialize());
 		ret.addAll(new EnumPlaintextSerializer<>(contactOperation.getType()).serialize());
+		ret.addAll(new EncryptedBufferPlaintextSerializer(contactOperation.getComparisonIdentity()).serialize());
 		return ret;
 	}
 }

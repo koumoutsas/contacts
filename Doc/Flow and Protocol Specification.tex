@@ -404,7 +404,10 @@ This flow is triggered when the user agent has changed, due to client or OS upda
 signs the new user agent, instead of \newPublicKeys{}. The implementation must be common, parameterized for the input data.
 
 \subsection{Update Server Contact Book}
-This flow updates the contact book that is stored server-side.
+\label{update_server_bontact_book_flow}
+This flow updates the contact book that is stored server-side. For new contacts, it adds their comparison identity and adds an edge to the graph, for deleted contacts, it removes their comparison identity and deletes an edge from the graph, and or updated contacts, it adds and edge to the graph.
+
+The difference between an add and an update operation is that an add operation may be executed before the client know the blinded identity of the added contact, while an update opertion adds the blinded identity for a contact that has been added without one.
 
 \paragraph{Participants} \Client{A}, \Server{}
 
@@ -452,12 +455,12 @@ that $c.hash$ cannot be empty for these contacts, since the update operation is 
   \item If the operation is {\em Add}
   \begin{enumerate}
    \item \Server{} adds $a.comparisonIdentity$ to UserSet.ComparisonIdentities for \userId{A} and \clientId{A}. If the entry exists, the flow terminates with error.
-   \item \Server{} updates the graph and generates the appropriate notifications to \Client{A}.
+   \item\label{update_server_bontact_book_flow:one} \Server{} updates the graph and generates the appropriate notifications to \Client{A}.
   \end{enumerate}
   \item If the operation is {\em Delete}
   \begin{enumerate}
    \item \Server{} deletes $a.comparisonIdentity$ from UserSet.ComparisonIdentities for \userId{A} and \clientId{A}. If the entry doesn't exist, the flow terminates with error.
-   \item \Server{} updates the graph.
+   \item \Server{} executes \ref{update_server_bontact_book_flow:one}.
   \end{enumerate}
   \item If the operation is {\em Update}
   \begin{enumerate}

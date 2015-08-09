@@ -83,6 +83,7 @@ struct ContactOperation
 {
 	1:HashBuffer contact,
 	2:ContactOperationType type,
+	3:EncryptedBuffer comparisonIdentity,
 }
 
 typedef set<ContactOperation> ContactOperationSet

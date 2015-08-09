@@ -1,9 +1,6 @@
 package com.kareebo.contacts.base;
 
-import com.kareebo.contacts.thrift.ContactOperation;
-import com.kareebo.contacts.thrift.ContactOperationType;
-import com.kareebo.contacts.thrift.HashAlgorithm;
-import com.kareebo.contacts.thrift.HashBuffer;
+import com.kareebo.contacts.thrift.*;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -22,20 +19,24 @@ public class ContactOperationSetPlaintextSerializerTest
 	@Test
 	public void testSerialize() throws Exception
 	{
-		final ContactOperationType contactOperationTypeAdd=ContactOperationType.Add;
-		final ContactOperationType contactOperationTypeDelete=ContactOperationType.Delete;
 		final HashAlgorithm algorithm=HashAlgorithm.SHA256;
-		final byte[] bytes="abc".getBytes();
-		final ByteBuffer byteBuffer=ByteBuffer.wrap(bytes);
+		final ByteBuffer byteBuffer=ByteBuffer.wrap("abc".getBytes());
 		byteBuffer.mark();
 		final HashBuffer hashBuffer=new HashBuffer(byteBuffer,algorithm);
 		final Set<ContactOperation> contactOperations=new HashSet<>(2);
-		contactOperations.add(new ContactOperation(hashBuffer,contactOperationTypeAdd));
+		final EncryptedBuffer encryptedBuffer=new EncryptedBuffer(byteBuffer,EncryptionAlgorithm.RSA2048,new ClientId(0,0));
+		final ByteBuffer emptyByteBuffer=ByteBuffer.wrap("".getBytes());
+		emptyByteBuffer.mark();
+		contactOperations.add(new ContactOperation(new HashBuffer(emptyByteBuffer,HashAlgorithm.Fake),ContactOperationType
+			                                                                                              .Add,encryptedBuffer));
 		contactOperations.add(new ContactOperation(hashBuffer,
-			                                          contactOperationTypeDelete));
+			                                          ContactOperationType.Delete,encryptedBuffer));
+		contactOperations.add(new ContactOperation(hashBuffer,
+			                                          ContactOperationType.Update,new EncryptedBuffer
+				                                                                      (emptyByteBuffer,EncryptionAlgorithm.Fake,new ClientId(-1,-1))));
 		final Vector<byte[]> plaintext=new ContactOperationSetPlaintextSerializer(contactOperations)
 			                               .serialize();
-		assertEquals(2*ContactOperationPlaintextSerializer.LENGTH,plaintext.size());
+		assertEquals(contactOperations.size()*ContactOperationPlaintextSerializer.LENGTH,plaintext.size());
 		final Vector<byte[]> expected=new Vector<>();
 		for(final ContactOperation contactOperation : contactOperations)
 		{

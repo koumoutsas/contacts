@@ -41,40 +41,38 @@ abstract class SignatureVerifierTestBase
 	SignatureVerifier signatureVerifier;
 	Client clientValid;
 	UserAgent userAgent;
+	long userId;
 	private DataStore<Long,User> dataStore;
 
 	public void setUp() throws Exception
 	{
-		setUpCrypto();
-		final long userId=0;
-		clientIdValid.setClient(0);
-		clientIdValid.setUser(userId);
-		userAgent=new UserAgent();
-		userAgent.setPlatform("A");
-		userAgent.setVersion("B");
-		final PublicKeys publicKeys=new PublicKeys();
-		final byte[] buffer={'a','b'};
-		publicKeys.setEncryption(TypeConverter.convert(setUpEncryptionKey(buffer)));
-		publicKeys.setVerification(verificationKey);
-		final Client client=new Client();
-		client.setUserAgent(userAgent);
-		client.setKeys(publicKeys);
-		client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		final User user=new User();
+		final byte[] buffer={'a','b'};
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
 		byteBuffer.mark();
 		user.setBlind(byteBuffer);
 		final HashMap<CharSequence,Client> clients=new HashMap<>();
-		clients.put(TypeConverter.convert(clientIdValid.getClient()),client);
 		user.setClients(clients);
 		user.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
 		user.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(userId,user);
+		setUpCrypto();
+		clientIdValid.setClient(0);
+		clientIdValid.setUser(user.getId());
+		userAgent=new UserAgent();
+		userAgent.setPlatform("A");
+		userAgent.setVersion("B");
+		final PublicKeys publicKeys=new PublicKeys();
+		publicKeys.setEncryption(TypeConverter.convert(setUpEncryptionKey(buffer)));
+		publicKeys.setVerification(verificationKey);
+		clientValid=new Client();
+		clientValid.setUserAgent(userAgent);
+		clientValid.setKeys(publicKeys);
+		clientValid.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
 		signatureVerifier=construct(dataStore);
+		signatureVerifier.put(clientIdValid,clientValid);
 		assertNotNull(signatureVerifier);
-		signatureVerifier.put(clientIdValid,client);
-		clientValid=signatureVerifier.get(clientIdValid);
 	}
 
 	private void setUpCrypto() throws NoSuchProviderException, NoSuchAlgorithmException,
@@ -86,7 +84,7 @@ abstract class SignatureVerifierTestBase
 		final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
 		g.initialize(ecSpec,new SecureRandom());
 		final KeyPair keyPair=g.generateKeyPair();
-		Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
+		final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
 		for(final Object a : plaintext.serialize())
 		{
@@ -122,5 +120,23 @@ abstract class SignatureVerifierTestBase
 		byteBuffer.mark();
 		verificationKey.setBuffer(byteBuffer);
 		return verificationKey;
+	}
+
+	long addUsers(final int n)
+	{
+		final long ret=userId+1;
+		for(int i=0;i<n;++i)
+		{
+			final User user=new User();
+			final ByteBuffer byteBuffer=ByteBuffer.wrap("".getBytes());
+			byteBuffer.mark();
+			user.setBlind(byteBuffer);
+			user.setClients(new HashMap<CharSequence,Client>());
+			user.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+			user.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+			dataStore.put(++userId,user);
+			dataStore.close();
+		}
+		return ret;
 	}
 }

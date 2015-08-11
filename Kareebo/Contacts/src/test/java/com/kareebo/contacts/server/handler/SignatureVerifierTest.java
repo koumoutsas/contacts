@@ -45,7 +45,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	@Override
 	SignatureVerifier construct(final DataStore<Long,User> dataStore)
 	{
-		this.datastore=(MemStore)dataStore;
+		this.datastore=(MemStore<Long,User>)dataStore;
 		return new SignatureVerifierMock(dataStore);
 	}
 

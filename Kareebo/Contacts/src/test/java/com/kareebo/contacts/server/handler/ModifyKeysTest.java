@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Unit tests for {@link ModifyKeys}
  */
-public class ModifyKeysAsyncTest extends SignatureVerifierTestBase
+public class ModifyKeysTest extends SignatureVerifierTestBase
 {
 	private final PublicKeys newPublicKeys=new PublicKeys();
 

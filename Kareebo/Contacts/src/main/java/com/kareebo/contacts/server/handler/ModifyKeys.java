@@ -7,6 +7,8 @@ import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.PublicKeys;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class ModifyKeys extends SignatureVerifier implements com.kareebo.contacts.thrift.ModifyKeys.AsyncIface
 {
+	private static final Logger logger=LoggerFactory.getLogger(ModifyKeys.class.getName());
 	private com.kareebo.contacts.server.gora.PublicKeys newPublicKeys;
 
 	/**
@@ -47,6 +50,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 		}
 		catch(NoSuchAlgorithmException e)
 		{
+			logger.error("Invalid algorithm",e);
 			future.setFailure(new FailedOperation());
 			return;
 		}

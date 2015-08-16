@@ -5,6 +5,8 @@ import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.FailedOperation;
 import org.apache.gora.store.DataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -13,6 +15,7 @@ import java.util.Map;
  */
 class ClientDBAccessor
 {
+	private static final Logger logger=LoggerFactory.getLogger(ClientDBAccessor.class.getName());
 	/**
 	 * Restricts the query fields to the clients only
 	 */
@@ -52,6 +55,7 @@ class ClientDBAccessor
 		if(client==null)
 		{
 			resetState();
+			logger.error("No client for "+clientId.toString());
 			throw new FailedOperation();
 		}
 		return client;
@@ -64,6 +68,7 @@ class ClientDBAccessor
 		if(user==null)
 		{
 			resetState();
+			logger.error("No user for "+clientId.getUser());
 			throw new FailedOperation();
 		}
 		clients=user.getClients();

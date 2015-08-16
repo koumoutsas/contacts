@@ -7,6 +7,8 @@ import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 
 import java.nio.ByteBuffer;
@@ -21,6 +23,8 @@ import java.security.spec.InvalidKeySpecException;
  */
 abstract class SignatureVerifier extends ClientDBAccessor
 {
+	private static final Logger logger=LoggerFactory.getLogger(SignatureVerifier.class.getName());
+
 	/**
 	 * Constructor from a datastore
 	 *
@@ -56,6 +60,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 			signatureBuffer.rewind();
 			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,plaintextSerializer))
 			{
+				logger.error("Verification failure for "+client.toString());
 				future.setFailure(new FailedOperation());
 				return;
 			}
@@ -63,6 +68,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 		}
 		catch(NoSuchProviderException|NoSuchAlgorithmException|SignatureException|InvalidKeyException|InvalidKeySpecException e)
 		{
+			logger.error("Verification failure with exception",e);
 			future.setFailure(new FailedOperation());
 			return;
 		}

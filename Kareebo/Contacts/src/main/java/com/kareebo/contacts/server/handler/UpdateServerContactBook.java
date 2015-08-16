@@ -7,8 +7,11 @@ import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.ContactOperation;
 import com.kareebo.contacts.thrift.FailedOperation;
+import com.kareebo.contacts.thrift.HashBuffer;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 
 import java.nio.ByteBuffer;
@@ -23,6 +26,7 @@ import java.util.Set;
 public class UpdateServerContactBook extends SignatureVerifier implements com.kareebo.contacts.thrift
 	                                                                          .UpdateServerContactBook.AsyncIface
 {
+	private static final Logger logger=LoggerFactory.getLogger(UpdateServerContactBook.class.getName());
 	final private HashIdentityRetriever hashIdentityRetriever;
 	final private GraphAccessor graphAccessor;
 	private Set<ContactOperation> contactOperationSet;
@@ -74,6 +78,7 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 					updateOperations.add(contactOperation);
 					break;
 				default:
+					logger.error("Unknown operation "+contactOperation.getType()+" for "+client.toString());
 					throw new FailedOperation();
 			}
 		}
@@ -98,14 +103,10 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 				{
 					if(!comparisonIdentities.add(TypeConverter.convert(c.getComparisonIdentity())))
 					{
+						logger.error("Unable to add comparison identity for "+c.toString());
 						throw new FailedOperation();
 					}
-					final Long resolved=hashIdentityRetriever.find(c.getContact().bufferForBuffer());
-					if(resolved==null)
-					{
-						throw new FailedOperation();
-					}
-					addedContacts.add(resolved);
+					resolveAndAdd(c.getContact(),addedContacts);
 				}
 			}
 			if(!deleteOperations.isEmpty())
@@ -116,26 +117,17 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 						                                                        ());
 					if(!comparisonIdentities.remove(converted))
 					{
+						logger.error("Unable to remove comparison identity for "+c.toString());
 						throw new FailedOperation();
 					}
-					final Long resolved=hashIdentityRetriever.find(c.getContact().bufferForBuffer());
-					if(resolved==null)
-					{
-						throw new FailedOperation();
-					}
-					deletedContacts.add(hashIdentityRetriever.find(c.getContact().bufferForBuffer()));
+					resolveAndAdd(c.getContact(),deletedContacts);
 				}
 			}
 			if(!updateOperations.isEmpty())
 			{
 				for(final ContactOperation c : updateOperations)
 				{
-					final Long resolved=hashIdentityRetriever.find(c.getContact().bufferForBuffer());
-					if(resolved==null)
-					{
-						throw new FailedOperation();
-					}
-					addedContacts.add(resolved);
+					resolveAndAdd(c.getContact(),addedContacts);
 				}
 			}
 			graphAccessor.addEdges(user.getId(),addedContacts);
@@ -144,8 +136,20 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 		}
 		catch(NoSuchAlgorithmException|IllegalStateException e)
 		{
+			logger.error("Verification failure with exception",e);
 			throw new FailedOperation();
 		}
 		client.setComparisonIdentities(new ArrayList<>(comparisonIdentities));
+	}
+
+	private void resolveAndAdd(final HashBuffer contact,final Set<Long> set) throws FailedOperation
+	{
+		final Long resolved=hashIdentityRetriever.find(contact.bufferForBuffer());
+		if(resolved==null)
+		{
+			logger.error("Unknown contact "+contact.toString());
+			throw new FailedOperation();
+		}
+		set.add(resolved);
 	}
 }

@@ -27,11 +27,15 @@ public class UtilsTest
 	final private VerificationKey verificationKey=new VerificationKey();
 	private ByteBuffer signature;
 
+	static
+	{
+		// For 100% coverage
+		new Utils();
+	}
+
 	@Before
 	public void setUp() throws Exception
 	{
-		// Only for 100% coverage
-		new Utils();
 		Security.addProvider(new BouncyCastleProvider());
 		final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
 		final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());

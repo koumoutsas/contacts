@@ -1,7 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.server.gora.*;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -14,10 +13,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class TypeConverterTest
 {
-	@Before
-	public void setUp() throws Exception
+	static
 	{
-		// Only for getting to 100% coverage
+		// For 100% coverage
 		new TypeConverter();
 	}
 
@@ -142,12 +140,12 @@ public class TypeConverterTest
 		final com.kareebo.contacts.thrift.EncryptionAlgorithm algorithm=com.kareebo.contacts.thrift
 			                                                                .EncryptionAlgorithm.RSA2048;
 		final byte[] buffer={'a','b'};
-		final EncryptedBuffer converted=TypeConverter.convert(createEncryptedBufer(algorithm,buffer));
+		final EncryptedBuffer converted=TypeConverter.convert(createEncryptedBuffer(algorithm,buffer));
 		assertEquals(TypeConverter.convert(algorithm),converted.getAlgorithm());
 		assertEquals(ByteBuffer.wrap(buffer),converted.getBuffer());
 	}
 
-	private com.kareebo.contacts.thrift.EncryptedBuffer createEncryptedBufer(final com.kareebo.contacts.thrift.EncryptionAlgorithm
+	private com.kareebo.contacts.thrift.EncryptedBuffer createEncryptedBuffer(final com.kareebo.contacts.thrift.EncryptionAlgorithm
 		                                                                         algorithm,final byte[] buffer)
 	{
 		final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer=new com.kareebo.contacts.thrift
@@ -202,13 +200,13 @@ public class TypeConverterTest
 	{
 		final EncryptionAlgorithm algorithm=EncryptionAlgorithm.RSA2048;
 		final byte[] buffer={'a','b'};
-		final com.kareebo.contacts.thrift.EncryptedBuffer converted=TypeConverter.convert(createEncryptedBufer(algorithm,
+		final com.kareebo.contacts.thrift.EncryptedBuffer converted=TypeConverter.convert(createEncryptedBuffer(algorithm,
 			                                                                                                      buffer));
 		assertEquals(TypeConverter.convert(algorithm),converted.getAlgorithm());
 		assertEquals(ByteBuffer.wrap(buffer),converted.bufferForBuffer());
 	}
 
-	private EncryptedBuffer createEncryptedBufer(final EncryptionAlgorithm algorithm,final byte[] buffer)
+	private EncryptedBuffer createEncryptedBuffer(final EncryptionAlgorithm algorithm,final byte[] buffer)
 	{
 		final EncryptedBuffer encryptedBuffer=new EncryptedBuffer();
 		encryptedBuffer.setAlgorithm(algorithm);

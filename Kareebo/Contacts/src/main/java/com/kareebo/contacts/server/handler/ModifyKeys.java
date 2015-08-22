@@ -26,7 +26,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	 *
 	 * @param dataStore The datastore
 	 */
-	ModifyKeys(final DataStore<Long,User> dataStore)
+	public ModifyKeys(final DataStore<Long,User> dataStore)
 	{
 		super(dataStore);
 	}

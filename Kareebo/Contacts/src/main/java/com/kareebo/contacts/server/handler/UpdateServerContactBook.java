@@ -37,8 +37,8 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 	 * @param userDataStore     The datastore of the users
 	 * @param identityDatastore The datastore of hashed identities
 	 */
-	UpdateServerContactBook(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity>
-		                                                                 identityDatastore,final GraphAccessor graphAccessor)
+	public UpdateServerContactBook(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity>
+		                                                                        identityDatastore,final GraphAccessor graphAccessor)
 	{
 		super(userDataStore);
 		hashIdentityRetriever=new HashIdentityRetriever(identityDatastore);

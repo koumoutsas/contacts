@@ -44,7 +44,9 @@ public class UpdateServerContactBookTest
 				operations.add(ContactOperationType.Delete);
 				operations.add(ContactOperationType.Update);
 				operations.add(ContactOperationType.Update);
-			}			@Override
+			}
+
+			@Override
 			void runImpl(final Future<Void> result)
 			{
 				for(long i=userId-3;i<userId-1;++i)
@@ -58,8 +60,6 @@ public class UpdateServerContactBookTest
 				}
 				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
 			}
-
-
 		}
 		new Test().run();
 	}
@@ -441,6 +441,11 @@ public class UpdateServerContactBookTest
 			final Future<Void> result=new DefaultFutureResult<>();
 			runImpl(result);
 			assertEquals(expectedResult,result.succeeded());
+			if(!expectedResult)
+			{
+				//noinspection ThrowableResultOfMethodCallIgnored
+				assertEquals(FailedOperation.class,result.cause().getClass());
+			}
 			assertEquals(expectedResult,graph.isClosed);
 			assertTrue(testGraph(expectedEdges));
 			assertEquals(expectedComparisonIdentities.size(),clientValid.getComparisonIdentities().size());

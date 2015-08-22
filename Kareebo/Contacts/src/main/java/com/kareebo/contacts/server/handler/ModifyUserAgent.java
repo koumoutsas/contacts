@@ -23,7 +23,7 @@ public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.co
 	 *
 	 * @param dataStore The datastore
 	 */
-	ModifyUserAgent(final DataStore<Long,User> dataStore)
+	public ModifyUserAgent(final DataStore<Long,User> dataStore)
 	{
 		super(dataStore);
 	}

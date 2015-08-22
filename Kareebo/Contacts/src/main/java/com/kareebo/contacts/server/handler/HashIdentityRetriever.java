@@ -13,9 +13,9 @@ import java.util.HashSet;
  */
 class HashIdentityRetriever
 {
-	final DataStore<ByteBuffer,HashIdentity> dataStore;
+	final private DataStore<ByteBuffer,HashIdentity> dataStore;
 
-	public HashIdentityRetriever(final DataStore<ByteBuffer,HashIdentity> dataStore)
+	HashIdentityRetriever(final DataStore<ByteBuffer,HashIdentity> dataStore)
 	{
 		this.dataStore=dataStore;
 	}

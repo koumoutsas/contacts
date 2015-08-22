@@ -47,19 +47,19 @@ abstract class SignatureVerifierTestBase
 	public void setUp() throws Exception
 	{
 		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
-		final User user=new User();
+		final User userValid=new User();
 		final byte[] buffer={'a','b'};
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
 		byteBuffer.mark();
-		user.setBlind(byteBuffer);
+		userValid.setBlind(byteBuffer);
 		final HashMap<CharSequence,Client> clients=new HashMap<>();
-		user.setClients(clients);
-		user.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-		user.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-		dataStore.put(userId,user);
+		userValid.setClients(clients);
+		userValid.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+		userValid.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+		dataStore.put(userId,userValid);
 		setUpCrypto();
 		clientIdValid.setClient(0);
-		clientIdValid.setUser(user.getId());
+		clientIdValid.setUser(userValid.getId());
 		userAgent=new UserAgent();
 		userAgent.setPlatform("A");
 		userAgent.setVersion("B");
@@ -138,5 +138,10 @@ abstract class SignatureVerifierTestBase
 			dataStore.close();
 		}
 		return ret;
+	}
+
+	User getUserValid()
+	{
+		return dataStore.get(clientIdValid.getUser());
 	}
 }

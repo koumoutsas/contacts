@@ -145,8 +145,6 @@ public class RegisterUnconfirmedIdentityTest
 		{
 		}
 
-		abstract void setUpFailure();
-
 		void run()
 		{
 			setUpFailure();
@@ -159,5 +157,7 @@ public class RegisterUnconfirmedIdentityTest
 			assertFalse(((MemStore)identityDataStore).hasBeenClosed());
 			assertEquals(original,Utils.convertToSet(getUserValid().getIdentities()));
 		}
+
+		abstract void setUpFailure();
 	}
 }

@@ -146,7 +146,7 @@ public class TypeConverterTest
 	}
 
 	private com.kareebo.contacts.thrift.EncryptedBuffer createEncryptedBuffer(final com.kareebo.contacts.thrift.EncryptionAlgorithm
-		                                                                         algorithm,final byte[] buffer)
+		                                                                          algorithm,final byte[] buffer)
 	{
 		final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer=new com.kareebo.contacts.thrift
 			                                                                      .EncryptedBuffer();
@@ -201,7 +201,7 @@ public class TypeConverterTest
 		final EncryptionAlgorithm algorithm=EncryptionAlgorithm.RSA2048;
 		final byte[] buffer={'a','b'};
 		final com.kareebo.contacts.thrift.EncryptedBuffer converted=TypeConverter.convert(createEncryptedBuffer(algorithm,
-			                                                                                                      buffer));
+			                                                                                                       buffer));
 		assertEquals(TypeConverter.convert(algorithm),converted.getAlgorithm());
 		assertEquals(ByteBuffer.wrap(buffer),converted.bufferForBuffer());
 	}

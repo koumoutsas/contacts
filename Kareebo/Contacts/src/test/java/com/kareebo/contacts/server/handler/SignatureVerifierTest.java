@@ -72,7 +72,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	public void testVerify() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		signatureVerifier.verify(plaintext,signature,result);
+		((SignatureVerifierMock)signatureVerifier).verify(plaintext,signature,result);
 		assertTrue(result.succeeded());
 		assertEquals(clientValid.getUserAgent(),emptyUserAgent);
 		assertTrue(datastore.hasBeenClosed());
@@ -85,7 +85,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		signature.setClient(clientIdInvalid);
 		try
 		{
-			signatureVerifier.verify(plaintext,signature,result);
+			((SignatureVerifierMock)signatureVerifier).verify(plaintext,signature,result);
 		}
 		catch(Exception e)
 		{
@@ -119,7 +119,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		final SignatureBuffer falseSignature=new SignatureBuffer();
 		falseSignature.setClient(clientIdValid);
 		falseSignature.setBuffer(falseSignatureBuffer);
-		signatureVerifier.verify(plaintext,falseSignature,result);
+		((SignatureVerifierMock)signatureVerifier).verify(plaintext,falseSignature,result);
 		testFailed(result);
 	}
 
@@ -133,7 +133,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		try
 		{
 			signatureVerifier.put(client);
-			signatureVerifier.verify(plaintext,signature,result);
+			((SignatureVerifierMock)signatureVerifier).verify(plaintext,signature,result);
 		}
 		catch(Exception e)
 		{
@@ -148,7 +148,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	public void testInvalidSignature() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		signatureVerifier.verify(plaintext,wrongSignature,result);
+		((SignatureVerifierMock)signatureVerifier).verify(plaintext,wrongSignature,result);
 		testFailed(result);
 	}
 
@@ -156,8 +156,9 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	public void testAfterVerificationThrows() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		((SignatureVerifierMock)signatureVerifier).shouldThrow=true;
-		signatureVerifier.verify(plaintext,signature,result);
+		final SignatureVerifierMock signatureVerifierMock=(SignatureVerifierMock)signatureVerifier;
+		signatureVerifierMock.shouldThrow=true;
+		signatureVerifierMock.verify(plaintext,signature,result);
 		testFailed(result);
 	}
 
@@ -175,14 +176,20 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 			super(dataStore);
 		}
 
-		@Override
-		void afterVerification(final User user,final Client client) throws FailedOperation
+		void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future)
 		{
-			if(shouldThrow)
+			verify(plaintextSerializer,signature,future,new After()
 			{
-				throw new FailedOperation();
-			}
-			client.setUserAgent(emptyUserAgent);
+				@Override
+				public void run(final User user,final Client client) throws FailedOperation
+				{
+					if(shouldThrow)
+					{
+						throw new FailedOperation();
+					}
+					client.setUserAgent(emptyUserAgent);
+				}
+			});
 		}
 	}
 }

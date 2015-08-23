@@ -41,8 +41,9 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	 * @param plaintextSerializer The plaintext serializer
 	 * @param signature           The signature
 	 * @param future              The future used to communicate the result
+	 * @param after               The after hook
 	 */
-	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future)
+	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future,final After after)
 	{
 		final Client client;
 		try
@@ -64,7 +65,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 				future.setFailure(new FailedOperation());
 				return;
 			}
-			afterVerification(user,client);
+			after.run(user,client);
 		}
 		catch(NoSuchProviderException|NoSuchAlgorithmException|SignatureException|InvalidKeyException|InvalidKeySpecException e)
 		{
@@ -83,10 +84,14 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	}
 
 	/**
-	 * Abstract method for modifying the state of the user after a successful verification
-	 *
-	 * @param user   The user
-	 * @param client The client
+	 * Closure for the operations to be executed after a successful verification
 	 */
-	abstract void afterVerification(final User user,final Client client) throws FailedOperation;
+	interface After
+	{
+		/**
+		 * @param user   The user
+		 * @param client The client
+		 */
+		void run(final User user,final Client client) throws FailedOperation;
+	}
 }

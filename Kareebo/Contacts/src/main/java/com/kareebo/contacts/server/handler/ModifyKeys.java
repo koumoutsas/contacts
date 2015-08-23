@@ -19,7 +19,6 @@ import java.security.NoSuchAlgorithmException;
 public class ModifyKeys extends SignatureVerifier implements com.kareebo.contacts.thrift.ModifyKeys.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(ModifyKeys.class.getName());
-	private com.kareebo.contacts.server.gora.PublicKeys newPublicKeys;
 
 	/**
 	 * Constructor from a datastore
@@ -32,28 +31,27 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	}
 
 	@Override
-	void afterVerification(final User user,final Client client)
-	{
-		client.setKeys(newPublicKeys);
-	}
-
-	@Override
 	/**
 	 * The client sends the new keys signed with the old keys
 	 */
 	public void modifyKeys1(final PublicKeys newPublicKeys,final SignatureBuffer signature,final Future<Void>
 		                                                                                       future)
 	{
-		try
+		verify(new PublicKeysPlaintextSerializer(newPublicKeys),signature,future,new After()
 		{
-			this.newPublicKeys=TypeConverter.convert(newPublicKeys);
-		}
-		catch(NoSuchAlgorithmException e)
-		{
-			logger.error("Invalid algorithm",e);
-			future.setFailure(new FailedOperation());
-			return;
-		}
-		verify(new PublicKeysPlaintextSerializer(newPublicKeys),signature,future);
+			@Override
+			public void run(final User user,final Client client) throws FailedOperation
+			{
+				try
+				{
+					client.setKeys(TypeConverter.convert(newPublicKeys));
+				}
+				catch(NoSuchAlgorithmException e)
+				{
+					logger.error("Invalid algorithm",e);
+					throw new FailedOperation();
+				}
+			}
+		});
 	}
 }

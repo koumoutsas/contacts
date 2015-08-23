@@ -3,6 +3,7 @@ package com.kareebo.contacts.server.handler;
 import com.kareebo.contacts.base.UserAgentPlaintextSerializer;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
+import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import com.kareebo.contacts.thrift.UserAgent;
 import org.apache.gora.store.DataStore;
@@ -14,11 +15,6 @@ import org.vertx.java.core.Future;
 public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.contacts.thrift.ModifyUserAgent.AsyncIface
 {
 	/**
-	 * Stores the user agent for modifying the client state on success
-	 */
-	private UserAgent userAgent;
-
-	/**
 	 * Constructor from a datastore
 	 *
 	 * @param dataStore The datastore
@@ -29,15 +25,15 @@ public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.co
 	}
 
 	@Override
-	void afterVerification(final User user,final Client client)
-	{
-		client.setUserAgent(TypeConverter.convert(userAgent));
-	}
-
-	@Override
 	public void modifyUserAgent1(final UserAgent userAgent,final SignatureBuffer signature,final Future<Void> future)
 	{
-		this.userAgent=userAgent;
-		verify(new UserAgentPlaintextSerializer(userAgent),signature,future);
+		verify(new UserAgentPlaintextSerializer(userAgent),signature,future,new After()
+		{
+			@Override
+			public void run(final User user,final Client client) throws FailedOperation
+			{
+				client.setUserAgent(TypeConverter.convert(userAgent));
+			}
+		});
 	}
 }

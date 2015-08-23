@@ -28,10 +28,6 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifier implements co
 	private static final Logger logger=LoggerFactory.getLogger(RegisterUnconfirmedIdentity.class.getName());
 	final private HashIdentityRetriever hashIdentityRetriever;
 	/**
-	 * Stores the {@link HashBuffer} set
-	 */
-	private Set<HashBuffer> uSet;
-	/**
 	 * The datastore of hashed identities
 	 */
 	private DataStore<ByteBuffer,HashIdentity>
@@ -54,54 +50,54 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifier implements co
 	@Override
 	public void registerUnconfirmedIdentity1(final Set<HashBuffer> uSet,final SignatureBuffer signature,final Future<Void> future)
 	{
-		this.uSet=uSet;
-		verify(new SetHashBufferPlaintextSerializer(uSet),signature,future);
+		verify(new SetHashBufferPlaintextSerializer(uSet),signature,future,new After()
+		{
+			@Override
+			public void run(final User user,final Client client) throws FailedOperation
+			{
+				final Set<com.kareebo.contacts.server.gora.HashBuffer> identitySet=Utils.convertToSet(user.getIdentities());
+				for(final HashBuffer h : uSet)
+				{
+					try
+					{
+						final com.kareebo.contacts.server.gora.HashBuffer dbH=TypeConverter.convert(h);
+						if(!identitySet.add(dbH))
+						{
+							logger.error("Unable to add hashed identity for "+h.toString());
+							throw new FailedOperation();
+						}
+						final ByteBuffer b=dbH.getBuffer();
+						if(hashIdentityRetriever.find(b)!=null)
+						{
+							logger.error("Hashed identity for "+h.toString()+" already exists in identity datastore");
+							throw new FailedOperation();
+						}
+						final HashIdentity hashIdentity=new HashIdentity();
+						hashIdentity.setHash(b);
+						final HashIdentityValue hashIdentityValue=new HashIdentityValue();
+						hashIdentityValue.setConfirmers(new ArrayList<Long>());
+						hashIdentityValue.setId(user.getId());
+						hashIdentity.setHashIdentity(hashIdentityValue);
+						identityDatastore.put(b,hashIdentity);
+					}
+					catch(NoSuchAlgorithmException e)
+					{
+						logger.error("Verification failure with exception",e);
+						throw new FailedOperation();
+					}
+				}
+				user.setIdentities(new ArrayList<>(identitySet));
+			}
+		});
 	}
 
 	@Override
-	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future)
+	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future,final After after)
 	{
-		super.verify(plaintextSerializer,signature,future);
+		super.verify(plaintextSerializer,signature,future,after);
 		if(future.succeeded())
 		{
 			identityDatastore.close();
 		}
-	}
-
-	@Override
-	void afterVerification(final User user,final Client client) throws FailedOperation
-	{
-		final Set<com.kareebo.contacts.server.gora.HashBuffer> identitySet=Utils.convertToSet(user.getIdentities());
-		for(final HashBuffer h : uSet)
-		{
-			try
-			{
-				final com.kareebo.contacts.server.gora.HashBuffer dbH=TypeConverter.convert(h);
-				if(!identitySet.add(dbH))
-				{
-					logger.error("Unable to add hashed identity for "+h.toString());
-					throw new FailedOperation();
-				}
-				final ByteBuffer b=dbH.getBuffer();
-				if(hashIdentityRetriever.find(b)!=null)
-				{
-					logger.error("Hashed identity for "+h.toString()+" already exists in identity datastore");
-					throw new FailedOperation();
-				}
-				final HashIdentity hashIdentity=new HashIdentity();
-				hashIdentity.setHash(b);
-				final HashIdentityValue hashIdentityValue=new HashIdentityValue();
-				hashIdentityValue.setConfirmers(new ArrayList<Long>());
-				hashIdentityValue.setId(user.getId());
-				hashIdentity.setHashIdentity(hashIdentityValue);
-				identityDatastore.put(b,hashIdentity);
-			}
-			catch(NoSuchAlgorithmException e)
-			{
-				logger.error("Verification failure with exception",e);
-				throw new FailedOperation();
-			}
-		}
-		user.setIdentities(new ArrayList<>(identitySet));
 	}
 }

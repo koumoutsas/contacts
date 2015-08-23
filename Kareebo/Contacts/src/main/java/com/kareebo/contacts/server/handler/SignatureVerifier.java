@@ -43,7 +43,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	 * @param future              The future used to communicate the result
 	 * @param after               The after hook
 	 */
-	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future,final After after)
+	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<?> future,final After after)
 	{
 		final Client client;
 		try

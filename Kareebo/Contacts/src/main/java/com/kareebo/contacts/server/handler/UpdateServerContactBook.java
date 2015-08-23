@@ -23,11 +23,10 @@ import java.util.Set;
 /**
  * Service implementation for updating the server-side contact book
  */
-public class UpdateServerContactBook extends SignatureVerifier implements com.kareebo.contacts.thrift
-	                                                                          .UpdateServerContactBook.AsyncIface
+public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore implements com.kareebo.contacts.thrift
+	                                                                                           .UpdateServerContactBook.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(UpdateServerContactBook.class.getName());
-	final private HashIdentityRetriever hashIdentityRetriever;
 	final private GraphAccessor graphAccessor;
 
 	/**
@@ -39,8 +38,7 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 	public UpdateServerContactBook(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity>
 		                                                                        identityDatastore,final GraphAccessor graphAccessor)
 	{
-		super(userDataStore);
-		hashIdentityRetriever=new HashIdentityRetriever(identityDatastore);
+		super(userDataStore,identityDatastore);
 		this.graphAccessor=graphAccessor;
 	}
 
@@ -141,7 +139,7 @@ public class UpdateServerContactBook extends SignatureVerifier implements com.ka
 
 			private void resolveAndAdd(final HashBuffer contact,final Set<Long> set) throws FailedOperation
 			{
-				final Long resolved=hashIdentityRetriever.find(contact.bufferForBuffer());
+				final Long resolved=find(contact.bufferForBuffer());
 				if(resolved==null)
 				{
 					logger.error("Unknown contact "+contact.toString());

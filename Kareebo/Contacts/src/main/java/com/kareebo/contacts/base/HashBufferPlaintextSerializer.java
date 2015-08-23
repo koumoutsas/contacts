@@ -8,7 +8,7 @@ import com.kareebo.contacts.thrift.HashBuffer;
  */
 public class HashBufferPlaintextSerializer extends CryptoPlaintextSerializer<HashAlgorithm>
 {
-	HashBufferPlaintextSerializer(final HashBuffer hashBuffer)
+	public HashBufferPlaintextSerializer(final HashBuffer hashBuffer)
 	{
 		super(hashBuffer.getAlgorithm(),hashBuffer.getBuffer());
 	}

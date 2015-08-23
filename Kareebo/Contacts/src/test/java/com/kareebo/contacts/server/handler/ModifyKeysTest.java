@@ -55,7 +55,9 @@ public class ModifyKeysTest
 				assertTrue(result.failed());
 				//noinspection ThrowableResultOfMethodCallIgnored
 				assertEquals(FailedOperation.class,result.cause().getClass());
-			}			@Override
+			}
+
+			@Override
 			PublicKeys createKeys()
 			{
 				final EncryptionKey encryptionKey=setUpEncryptionKey("abc".getBytes());
@@ -63,8 +65,6 @@ public class ModifyKeysTest
 				return new PublicKeys(encryptionKey,setUpVerificationKey("efg".getBytes
 					                                                               ()));
 			}
-
-
 		}.run();
 	}
 

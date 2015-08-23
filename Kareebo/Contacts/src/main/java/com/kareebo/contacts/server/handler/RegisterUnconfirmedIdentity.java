@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.base.SetHashBufferPlaintextSerializer;
 import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.Client;
@@ -23,15 +22,9 @@ import java.util.Set;
 /**
  * Service implementation for registering an unconfirmed identity
  */
-public class RegisterUnconfirmedIdentity extends SignatureVerifier implements com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.AsyncIface
+public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentityStore implements com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(RegisterUnconfirmedIdentity.class.getName());
-	final private HashIdentityRetriever hashIdentityRetriever;
-	/**
-	 * The datastore of hashed identities
-	 */
-	private DataStore<ByteBuffer,HashIdentity>
-		identityDatastore;
 
 	/**
 	 * Constructor from a datastore
@@ -42,9 +35,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifier implements co
 	public RegisterUnconfirmedIdentity(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity>
 		                                                                        identityDatastore)
 	{
-		super(dataStore);
-		this.identityDatastore=identityDatastore;
-		hashIdentityRetriever=new HashIdentityRetriever(identityDatastore);
+		super(dataStore,identityDatastore);
 	}
 
 	@Override
@@ -67,7 +58,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifier implements co
 							throw new FailedOperation();
 						}
 						final ByteBuffer b=dbH.getBuffer();
-						if(hashIdentityRetriever.find(b)!=null)
+						if(find(b)!=null)
 						{
 							logger.error("Hashed identity for "+h.toString()+" already exists in identity datastore");
 							throw new FailedOperation();
@@ -78,7 +69,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifier implements co
 						hashIdentityValue.setConfirmers(new ArrayList<Long>());
 						hashIdentityValue.setId(user.getId());
 						hashIdentity.setHashIdentity(hashIdentityValue);
-						identityDatastore.put(b,hashIdentity);
+						put(b,hashIdentity);
 					}
 					catch(NoSuchAlgorithmException e)
 					{
@@ -89,15 +80,5 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifier implements co
 				user.setIdentities(new ArrayList<>(identitySet));
 			}
 		});
-	}
-
-	@Override
-	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future,final After after)
-	{
-		super.verify(plaintextSerializer,signature,future,after);
-		if(future.succeeded())
-		{
-			identityDatastore.close();
-		}
 	}
 }

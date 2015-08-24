@@ -21,13 +21,30 @@ class HashIdentityRetriever
 	}
 
 	/**
-	 * Find the identity mapping to a key, resolving all intermediate aliases
+	 * Find the user id mapping to a key, resolving all intermediate aliases
+	 *
+	 * @param key The key to look for
+	 * @return The resolved user id, null if there is no mapped value
+	 * @throws IllegalStateException When a corrupted datastore is detected
+	 */
+	Long find(final ByteBuffer key)
+	{
+		final HashIdentityValue value=get(key);
+		if(value==null)
+		{
+			return null;
+		}
+		return value.getId();
+	}
+
+	/**
+	 * Get the identity mapping to a key, resolving all intermediate aliases
 	 *
 	 * @param key The key to look for
 	 * @return The resolved value, null if there is no mapped value
 	 * @throws IllegalStateException When a corrupted datastore is detected
 	 */
-	Long find(final ByteBuffer key)
+	HashIdentityValue get(final ByteBuffer key)
 	{
 		final HashSet<ByteBuffer> seenKeys=new HashSet<>();
 		for(ByteBuffer nextKey=key;;)
@@ -45,7 +62,7 @@ class HashIdentityRetriever
 			if(value instanceof HashIdentityValue)
 			{
 				promoteAliases(seenKeys,nextKey);
-				return ((HashIdentityValue)value).getId();
+				return (HashIdentityValue)value;
 			}
 			if(value instanceof ByteBuffer)
 			{

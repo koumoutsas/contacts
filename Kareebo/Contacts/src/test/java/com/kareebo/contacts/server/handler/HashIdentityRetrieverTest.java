@@ -125,4 +125,29 @@ public class HashIdentityRetrieverTest
 		thrown.expectMessage("Cycle detected for key "+aString);
 		retriever.find(aKey);
 	}
+
+	@Test
+	public void testGet() throws Exception
+	{
+		final HashIdentity identity=new HashIdentity();
+		final ByteBuffer key=ByteBuffer.wrap("abc".getBytes());
+		key.mark();
+		identity.setHash(key);
+		final HashIdentityValue value=new HashIdentityValue();
+		value.setId((long)0);
+		value.setConfirmers(new ArrayList<Long>());
+		identity.setHashIdentity(value);
+		dataStore.put(key,identity);
+		final ByteBuffer alias=createAlias("def",key);
+		final ByteBuffer doubleAlias=createAlias("ghi",alias);
+		final ByteBuffer tripleAlias=createAlias("jkl",doubleAlias);
+		assertNull(retriever.get(ByteBuffer.wrap("".getBytes())));
+		assertEquals(value,retriever.get(key));
+		assertEquals(value,retriever.get(alias));
+		assertEquals(value,retriever.get(doubleAlias));
+		assertEquals(value,retriever.get(tripleAlias));
+		final Object retrieved=dataStore.get(tripleAlias).getHashIdentity();
+		assertEquals(key,retrieved);
+		assertTrue(((MemStore)dataStore).hasBeenClosed());
+	}
 }

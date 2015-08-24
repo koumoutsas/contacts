@@ -1,13 +1,16 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.server.gora.Client;
-import com.kareebo.contacts.server.gora.User;
+import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.FailedOperation;
 import org.apache.gora.store.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -64,13 +67,7 @@ class ClientDBAccessor
 	private void getClients(final ClientId clientId) throws FailedOperation
 	{
 		this.clientId=clientId;
-		user=dataStore.get(clientId.getUser(),queryFields);
-		if(user==null)
-		{
-			resetState();
-			logger.error("No user for "+clientId.getUser());
-			throw new FailedOperation();
-		}
+		get(clientId.getUser());
 		clients=user.getClients();
 	}
 
@@ -79,6 +76,25 @@ class ClientDBAccessor
 		user=null;
 		clientId=null;
 		clients=null;
+	}
+
+	/**
+	 * Get a user by id
+	 *
+	 * @param id The user id
+	 * @return The user
+	 * @throws FailedOperation If there is no user for the id
+	 */
+	User get(final Long id) throws FailedOperation
+	{
+		user=dataStore.get(id,queryFields);
+		if(user==null)
+		{
+			logger.error("No user for "+id);
+			resetState();
+			throw new FailedOperation();
+		}
+		return user;
 	}
 
 	/**
@@ -97,19 +113,30 @@ class ClientDBAccessor
 
 	/**
 	 * Set a client for a user that has been retrieved before with get. The client can exist already, in
-	 * which case it's an update, or not, in which case it's an insert.
+	 * which case it's an update, or not, in which case it's an insert
 	 *
 	 * @param client The client
+	 * @throws FailedOperation When the state is not correct
 	 */
-	void put(final Client client)
+	void put(final Client client) throws FailedOperation
 	{
 		if(user==null||clients==null||clientId==null)
 		{
-			throw new IllegalStateException();
+			throw new FailedOperation();
 		}
 		clients.put(TypeConverter.convert(clientId.getClient()),client);
 		user.setClients(clients);
-		dataStore.put(clientId.getUser(),user);
+		put(user);
+	}
+
+	/**
+	 * Store a user in the datastore
+	 *
+	 * @param user The user
+	 */
+	void put(final User user)
+	{
+		dataStore.put(user.getId(),user);
 	}
 
 	/**
@@ -118,5 +145,83 @@ class ClientDBAccessor
 	void close()
 	{
 		dataStore.close();
+	}
+
+	/**
+	 * Create and commit a new user
+	 *
+	 * @return The user that was created
+	 */
+	User createNewUser() throws FailedOperation
+	{
+		final Long id=new SecureRandom().nextLong();
+		boolean exists=false;
+		try
+		{
+			get(id);
+			exists=true;
+		}
+		catch(FailedOperation ignored)
+		{
+		}
+		if(exists)
+		{
+			logger.error("Random id "+id+" already exists");
+			throw new FailedOperation();
+		}
+		final User user=new User();
+		final ByteBuffer blind=ByteBuffer.wrap("".getBytes());
+		blind.mark();
+		user.setBlind(blind);
+		user.setClients(new HashMap<CharSequence,Client>());
+		user.setId(id);
+		user.setIdentities(new ArrayList<HashBuffer>());
+		user.setSentRequests(new ArrayList<HashBuffer>());
+		dataStore.put(id,user);
+		return user;
+	}
+
+	/**
+	 * Create and commit a new client for a user that was retrieved
+	 *
+	 * @return The id of the new client that was created
+	 * @throws FailedOperation When the state is not correct or an id couldn't be generated
+	 */
+	Long createNewClient() throws FailedOperation
+	{
+		if(user==null)
+		{
+			throw new FailedOperation();
+		}
+		clients=user.getClients();
+		final Long id=new SecureRandom().nextLong();
+		final CharSequence key=TypeConverter.convert(id);
+		if(clients.containsKey(key))
+		{
+			logger.error("Random id "+id+" already exists");
+			throw new FailedOperation();
+		}
+		final Client client=new Client();
+		client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+		final PublicKeys publicKeys=new PublicKeys();
+		final EncryptionKey encryptionKey=new EncryptionKey();
+		encryptionKey.setAlgorithm(EncryptionAlgorithm.Fake);
+		final ByteBuffer b=ByteBuffer.wrap("".getBytes());
+		b.mark();
+		encryptionKey.setBuffer(b);
+		publicKeys.setEncryption(encryptionKey);
+		final VerificationKey verificationKey=new VerificationKey();
+		verificationKey.setAlgorithm(SignatureAlgorithm.Fake);
+		verificationKey.setBuffer(b);
+		publicKeys.setVerification(verificationKey);
+		client.setKeys(publicKeys);
+		final UserAgent userAgent=new UserAgent();
+		userAgent.setPlatform("");
+		userAgent.setVersion("");
+		client.setUserAgent(userAgent);
+		clients.put(key,client);
+		user.setClients(clients);
+		dataStore.put(user.getId(),user);
+		return id;
 	}
 }

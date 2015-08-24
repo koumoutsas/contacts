@@ -78,7 +78,6 @@ abstract class SignatureVerifier extends ClientDBAccessor
 			future.setFailure(failedOperation);
 			return;
 		}
-		put(client);
 		close();
 		future.setResult(null);
 	}

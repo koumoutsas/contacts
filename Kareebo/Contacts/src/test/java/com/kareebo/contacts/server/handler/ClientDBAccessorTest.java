@@ -6,7 +6,6 @@ import com.kareebo.contacts.thrift.FailedOperation;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,6 +21,7 @@ import static org.junit.Assert.*;
 public class ClientDBAccessorTest
 {
 	final long userIdValid=0;
+	final User userValid=new User();
 	private final ClientId clientIdNew=new ClientId();
 	private final ClientId clientIdPreset=new ClientId();
 	private final ClientId clientIdInvalidClient=new ClientId();
@@ -62,21 +62,14 @@ public class ClientDBAccessorTest
 		clientPreset.setKeys(publicKeys);
 		clientPreset.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
 		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
-		final User user=new User();
-		user.setBlind(byteBuffer);
+		userValid.setBlind(byteBuffer);
 		final HashMap<CharSequence,Client> clients=new HashMap<>();
 		clients.put(TypeConverter.convert(clientIdPreset.getClient()),clientPreset);
-		user.setClients(clients);
-		user.setIdentities(new ArrayList<HashBuffer>());
-		user.setSentRequests(new ArrayList<HashBuffer>());
-		dataStore.put(userIdValid,user);
+		userValid.setClients(clients);
+		userValid.setIdentities(new ArrayList<HashBuffer>());
+		userValid.setSentRequests(new ArrayList<HashBuffer>());
+		dataStore.put(userIdValid,userValid);
 		clientDBAccessor=new ClientDBAccessor(dataStore);
-	}
-
-	@After
-	public void tearDown() throws Exception
-	{
-		clientDBAccessor.close();
 	}
 
 	@Test
@@ -115,7 +108,7 @@ public class ClientDBAccessorTest
 		assertTrue(user.getClients().containsKey(TypeConverter.convert(clientIdPreset.getClient())));
 	}
 
-	@Test(expected=IllegalStateException.class)
+	@Test(expected=FailedOperation.class)
 	public void testPutInvalidState() throws Exception
 	{
 		try
@@ -139,9 +132,82 @@ public class ClientDBAccessorTest
 		assertTrue(user.getClients().containsKey(TypeConverter.convert(clientIdNew.getClient())));
 	}
 
+	@Test
+	public void testPutUser() throws Exception
+	{
+		clientDBAccessor.put(userValid);
+		final User user=dataStore.get(userValid.getId());
+		assertEquals(userValid,user);
+	}
+
 	@Test(expected=FailedOperation.class)
 	public void testPut2InvalidUser() throws Exception
 	{
 		clientDBAccessor.put(clientIdInvalidUser,clientNew);
+	}
+
+	@Test
+	public void testGetUser() throws Exception
+	{
+		final User user=clientDBAccessor.get(clientIdPreset.getUser());
+		assertNotNull(user);
+		assertEquals(userValid,user);
+	}
+
+	@Test(expected=FailedOperation.class)
+	public void testGetUserInvalid() throws Exception
+	{
+		clientDBAccessor.get(clientIdInvalidUser.getUser());
+	}
+
+	@Test
+	public void testCreateNewUser() throws Exception
+	{
+		final User user=clientDBAccessor.createNewUser();
+		assertEquals(user,dataStore.get(user.getId()));
+	}
+
+	@Test(expected=FailedOperation.class)
+	public void testCreateNewUserFailed() throws Exception
+	{
+		((MemStore)dataStore).useId=userIdValid;
+		clientDBAccessor.createNewUser();
+	}
+
+	@Test
+	public void testCreateNewClient() throws Exception
+	{
+		final User user=clientDBAccessor.get(userIdValid);
+		assertTrue(user.getClients().containsKey(TypeConverter.convert(clientDBAccessor.createNewClient())));
+	}
+
+	@Test(expected=FailedOperation.class)
+	public void testCreateNewClientFailed1() throws Exception
+	{
+		clientDBAccessor.createNewClient();
+	}
+
+	@Test(expected=FailedOperation.class)
+	public void testCreateNewClientFailed2() throws Exception
+	{
+		final User user=clientDBAccessor.get(userIdValid);
+		class MyMap extends HashMap<CharSequence,Client>
+		{
+			@Override
+			public boolean containsKey(Object O)
+			{
+				return true;
+			}
+		}
+		user.setClients(new MyMap());
+		clientDBAccessor.createNewClient();
+	}
+
+	@Test
+	public void testClose() throws Exception
+	{
+		assertFalse(((MemStore)dataStore).hasBeenClosed());
+		clientDBAccessor.close();
+		assertTrue(((MemStore)dataStore).hasBeenClosed());
 	}
 }

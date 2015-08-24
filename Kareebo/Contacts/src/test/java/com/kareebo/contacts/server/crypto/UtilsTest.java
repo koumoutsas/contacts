@@ -23,15 +23,16 @@ import static org.junit.Assert.assertTrue;
 public class UtilsTest
 {
 	final static private String ecdsa="ECDSA";
-	final private Vector<byte[]> plaintext=new Vector<>(2);
-	final private VerificationKey verificationKey=new VerificationKey();
-	private ByteBuffer signature;
 
 	static
 	{
 		// For 100% coverage
 		new Utils();
 	}
+
+	final private Vector<byte[]> plaintext=new Vector<>(2);
+	final private VerificationKey verificationKey=new VerificationKey();
+	private ByteBuffer signature;
 
 	@Before
 	public void setUp() throws Exception

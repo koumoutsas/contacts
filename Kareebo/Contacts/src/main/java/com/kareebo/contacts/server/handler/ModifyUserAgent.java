@@ -33,6 +33,7 @@ public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.co
 			public void run(final User user,final Client client) throws FailedOperation
 			{
 				client.setUserAgent(TypeConverter.convert(userAgent));
+				put(client);
 			}
 		});
 	}

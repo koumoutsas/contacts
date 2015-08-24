@@ -36,13 +36,14 @@ abstract class SignatureVerifierTestBase
 	final ClientId clientIdValid=new ClientId();
 	final SignatureBuffer signature=new SignatureBuffer();
 	final SignatureBuffer wrongSignature=new SignatureBuffer();
+	final PublicKeys publicKeys=new PublicKeys();
 	PlaintextSerializer plaintext;
 	com.kareebo.contacts.server.gora.VerificationKey verificationKey;
 	SignatureVerifier signatureVerifier;
 	Client clientValid;
 	UserAgent userAgent;
 	long userId;
-	private DataStore<Long,User> dataStore;
+	DataStore<Long,User> dataStore;
 
 	public void setUp() throws Exception
 	{
@@ -63,7 +64,6 @@ abstract class SignatureVerifierTestBase
 		userAgent=new UserAgent();
 		userAgent.setPlatform("A");
 		userAgent.setVersion("B");
-		final PublicKeys publicKeys=new PublicKeys();
 		publicKeys.setEncryption(TypeConverter.convert(setUpEncryptionKey(buffer)));
 		publicKeys.setVerification(verificationKey);
 		clientValid=new Client();
@@ -98,7 +98,7 @@ abstract class SignatureVerifierTestBase
 		verificationKey=TypeConverter.convert(setUpVerificationKey(new X509EncodedKeySpec(keyPair.getPublic().getEncoded()).getEncoded()));
 	}
 
-	EncryptionKey setUpEncryptionKey(final byte[] buffer)
+	static EncryptionKey setUpEncryptionKey(final byte[] buffer)
 	{
 		final EncryptionKey encryptionKey=new EncryptionKey();
 		encryptionKey.setAlgorithm(EncryptionAlgorithm.RSA2048);
@@ -112,7 +112,7 @@ abstract class SignatureVerifierTestBase
 
 	abstract PlaintextSerializer constructPlaintext();
 
-	VerificationKey setUpVerificationKey(final byte[] buffer)
+	static VerificationKey setUpVerificationKey(final byte[] buffer)
 	{
 		final VerificationKey verificationKey=new VerificationKey();
 		verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);

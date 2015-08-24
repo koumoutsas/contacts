@@ -63,12 +63,9 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 							logger.error("Hashed identity for "+h.toString()+" already exists in identity datastore");
 							throw new FailedOperation();
 						}
-						final HashIdentity hashIdentity=new HashIdentity();
-						hashIdentity.setHash(b);
-						final HashIdentityValue hashIdentityValue=new HashIdentityValue();
-						hashIdentityValue.setConfirmers(new ArrayList<Long>());
-						hashIdentityValue.setId(user.getId());
-						hashIdentity.setHashIdentity(hashIdentityValue);
+						final HashIdentityValue hashIdentity=new HashIdentityValue();
+						hashIdentity.setConfirmers(new ArrayList<Long>());
+						hashIdentity.setId(user.getId());
 						put(b,hashIdentity);
 					}
 					catch(NoSuchAlgorithmException e)
@@ -78,6 +75,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 					}
 				}
 				user.setIdentities(new ArrayList<>(identitySet));
+				put(user);
 			}
 		});
 	}

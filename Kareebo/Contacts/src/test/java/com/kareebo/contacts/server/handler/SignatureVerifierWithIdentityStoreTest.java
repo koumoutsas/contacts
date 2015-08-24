@@ -95,6 +95,18 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 	@Test
 	public void testPut() throws Exception
 	{
+		final ByteBuffer key=ByteBuffer.wrap("abc".getBytes());
+		key.mark();
+		final HashIdentityValue identity=new HashIdentityValue();
+		identity.setId((long)0);
+		identity.setConfirmers(new ArrayList<Long>());
+		((SignatureVerifierWithIdentityStore)signatureVerifier).put(key,identity);
+		assertEquals(identity,identityDatastore.get(key).getHashIdentity());
+	}
+
+	@Test
+	public void testGet() throws Exception
+	{
 		final HashIdentity identity=new HashIdentity();
 		final ByteBuffer key=ByteBuffer.wrap("abc".getBytes());
 		key.mark();
@@ -103,8 +115,23 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 		value.setId((long)0);
 		value.setConfirmers(new ArrayList<Long>());
 		identity.setHashIdentity(value);
-		((SignatureVerifierWithIdentityStore)signatureVerifier).put(key,identity);
-		assertEquals(identity,identityDatastore.get(key));
+		identityDatastore.put(key,identity);
+		assertEquals(value,((SignatureVerifierWithIdentityStore)signatureVerifier).get(key));
+	}
+
+	@Test
+	public void testAliasTo() throws Exception
+	{
+		final ByteBuffer key=ByteBuffer.wrap("abc".getBytes());
+		key.mark();
+		final ByteBuffer alias=ByteBuffer.wrap("def".getBytes());
+		alias.mark();
+		((SignatureVerifierWithIdentityStore)signatureVerifier).aliasTo(key,alias);
+		final HashIdentity retrieved=identityDatastore.get(key);
+		assertNotNull(retrieved);
+		assertEquals(key,retrieved.getHash());
+		assertTrue(retrieved.getHashIdentity() instanceof ByteBuffer);
+		assertEquals(alias,retrieved.getHashIdentity());
 	}
 
 	private class SignatureVerifierMock extends SignatureVerifierWithIdentityStore

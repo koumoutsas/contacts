@@ -45,6 +45,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 				try
 				{
 					client.setKeys(TypeConverter.convert(newPublicKeys));
+					put(client);
 				}
 				catch(NoSuchAlgorithmException e)
 				{

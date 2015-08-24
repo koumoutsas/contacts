@@ -7,11 +7,18 @@ import org.apache.gora.persistency.impl.PersistentBase;
  */
 public class MemStore<K,T extends PersistentBase> extends org.apache.gora.memory.store.MemStore<K,T>
 {
+	public K useId;
 	private boolean isClosed=false;
 
 	public boolean hasBeenClosed()
 	{
 		return isClosed;
+	}
+
+	@Override
+	public T get(K var1,String[] var2)
+	{
+		return super.get(useId==null?var1:useId,var2);
 	}
 
 	@Override

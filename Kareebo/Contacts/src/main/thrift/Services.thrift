@@ -142,6 +142,15 @@ exception FailedOperation
 {
 }
 
+struct RegisterIdentityInput
+{
+	1:PublicKeys publicKeys,
+	2:HashBuffer uA,
+	3:Id userIdA,
+	4:set<HashBuffer> uSet,
+	5:HashBuffer uJ,
+	6:UserAgent userAgent,
+}
 service RegisterIdentity
 {
 	// Steps 10-14
@@ -150,8 +159,8 @@ service RegisterIdentity
 	// Steps 19-22
 	RegisterIdentityReply registerIdentity2(1:Id userIdA) throws (1:FailedOperation failedOperation),
 
-	// Steps 30-34
-	void registerIdentity3(1:HashBuffer uA,2:Id userIdA,3:set<HashBuffer> uSet,4:i64 j,5:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	// Steps 30-35
+	void registerIdentity3(1:RegisterIdentityInput registerIdentityInput,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
 service RegisterUnconfirmedIdentity

@@ -93,7 +93,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		assertTrue(result.failed());
 		//noinspection ThrowableResultOfMethodCallIgnored
 		assertEquals(FailedOperation.class,result.cause().getClass());
-		assertEquals(signatureVerifier.get(signature.getClient()).getUserAgent(),userAgent);
+		assertEquals(signatureVerifier.clientDBAccessor.get(signature.getClient()).getUserAgent(),userAgent);
 		assertFalse(datastore.hasBeenClosed());
 	}
 
@@ -119,10 +119,10 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	public void testInvalidAlgorithm() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		final Client client=signatureVerifier.get(clientIdValid);
+		final Client client=signatureVerifier.clientDBAccessor.get(clientIdValid);
 		final SignatureAlgorithm algorithm=client.getKeys().getVerification().getAlgorithm();
 		client.getKeys().getVerification().setAlgorithm(SignatureAlgorithm.Fake);
-		signatureVerifier.put(client);
+		signatureVerifier.clientDBAccessor.put(client);
 		((SignatureVerifierMock)signatureVerifier).verify(plaintext,signature,result);
 		client.getKeys().getVerification().setAlgorithm(algorithm);
 		testFailed(result);

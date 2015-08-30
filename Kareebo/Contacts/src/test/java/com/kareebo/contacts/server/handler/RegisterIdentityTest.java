@@ -132,7 +132,7 @@ public class RegisterIdentityTest
 		assertTrue(result.succeeded());
 		final RegisterIdentityReply reply=result.result();
 		assertEquals(b,reply.bufferForBlind());
-		assertTrue(handler.get(newUserId).getClients().containsKey(TypeConverter.convert(reply.getId())));
+		assertTrue(handler.clientDBAccessor.get(newUserId).getClients().containsKey(TypeConverter.convert(reply.getId())));
 	}
 
 	@Test
@@ -594,6 +594,7 @@ public class RegisterIdentityTest
 			final Future<Void> result=new DefaultFutureResult<>();
 			registerIdentity.registerIdentity3(registerIdentityInput,signature,result);
 			assertTrue(result.failed());
+			//noinspection ThrowableResultOfMethodCallIgnored
 			assertEquals(FailedOperation.class,result.cause().getClass());
 		}
 	}
@@ -636,7 +637,7 @@ public class RegisterIdentityTest
 			assertNotNull(userId);
 			final RegisterIdentityReply reply=result.result();
 			assertEquals(userId.longValue(),reply.getId());
-			final User user=signatureVerifier.get(userId);
+			final User user=signatureVerifier.clientDBAccessor.get(userId);
 			final ByteBuffer expectedBlind=user.getBlind();
 			expectedBlind.rewind();
 			expectedBlind.mark();

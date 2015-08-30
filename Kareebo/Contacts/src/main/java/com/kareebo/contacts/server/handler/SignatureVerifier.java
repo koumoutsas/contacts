@@ -21,9 +21,10 @@ import java.security.spec.InvalidKeySpecException;
 /**
  * Base class for all services that verify a signature and modify the client state upon successful verification
  */
-abstract class SignatureVerifier extends ClientDBAccessor
+abstract class SignatureVerifier
 {
 	private static final Logger logger=LoggerFactory.getLogger(SignatureVerifier.class.getName());
+	final ClientDBAccessor clientDBAccessor;
 
 	/**
 	 * Constructor from a datastore
@@ -32,7 +33,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 	 */
 	SignatureVerifier(final DataStore<Long,User> dataStore)
 	{
-		super(dataStore);
+		clientDBAccessor=new ClientDBAccessor(dataStore);
 	}
 
 	/**
@@ -48,7 +49,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 		final Client client;
 		try
 		{
-			client=get(signature.getClient());
+			client=clientDBAccessor.get(signature.getClient());
 		}
 		catch(FailedOperation failedOperation)
 		{
@@ -65,7 +66,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 				future.setFailure(new FailedOperation());
 				return;
 			}
-			after.run(user,client);
+			after.run(clientDBAccessor.user,client);
 		}
 		catch(NoSuchProviderException|NoSuchAlgorithmException|SignatureException|InvalidKeyException|InvalidKeySpecException e)
 		{
@@ -78,7 +79,7 @@ abstract class SignatureVerifier extends ClientDBAccessor
 			future.setFailure(failedOperation);
 			return;
 		}
-		close();
+		clientDBAccessor.close();
 		future.setResult(null);
 	}
 

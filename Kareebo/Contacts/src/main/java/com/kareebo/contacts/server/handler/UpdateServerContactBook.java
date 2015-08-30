@@ -135,7 +135,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 					throw new FailedOperation();
 				}
 				client.setComparisonIdentities(new ArrayList<>(comparisonIdentities));
-				put(client);
+				clientDBAccessor.put(client);
 			}
 
 			private void resolveAndAdd(final HashBuffer contact,final Set<Long> set) throws FailedOperation

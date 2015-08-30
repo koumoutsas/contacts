@@ -71,7 +71,7 @@ abstract class SignatureVerifierTestBase
 		clientValid.setKeys(publicKeys);
 		clientValid.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
 		signatureVerifier=construct(dataStore);
-		signatureVerifier.put(clientIdValid,clientValid);
+		signatureVerifier.clientDBAccessor.put(clientIdValid,clientValid);
 		assertNotNull(signatureVerifier);
 	}
 

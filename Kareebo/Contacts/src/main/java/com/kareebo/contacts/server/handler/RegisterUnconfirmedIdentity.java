@@ -75,7 +75,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 					}
 				}
 				user.setIdentities(new ArrayList<>(identitySet));
-				put(user);
+				clientDBAccessor.put(user);
 			}
 		});
 	}

@@ -33,11 +33,12 @@ public class RegisterIdentityInputPlaintextSerializerTest
 		final Vector<byte[]> plaintext=new RegisterIdentityInputPlaintextSerializer(new RegisterIdentityInput(publicKeys,uA,userIdA,uSet,
 			                                                                                                     uB,userAgent)).serialize();
 		assertEquals(PublicKeysPlaintextSerializer.LENGTH+(uSet.size()+2)*HashBufferPlaintextSerializer
-			                                                                  .LENGTH+1+UserAgentPlaintextSerializer.LENGTH,plaintext.size());
+			                                                                  .LENGTH+LongPlaintextSerializer
+				                                                                          .LENGTH+UserAgentPlaintextSerializer.LENGTH,plaintext.size());
 		final Vector<byte[]> expected=new Vector<>(plaintext.size());
 		expected.addAll(new PublicKeysPlaintextSerializer(publicKeys).serialize());
 		expected.addAll(new HashBufferPlaintextSerializer(uA).serialize());
-		expected.addAll(new StringPlaintextSerializer(String.valueOf(userIdA)).serialize());
+		expected.addAll(new LongPlaintextSerializer(userIdA).serialize());
 		expected.addAll(new SetHashBufferPlaintextSerializer(uSet).serialize());
 		expected.addAll(new HashBufferPlaintextSerializer(uB).serialize());
 		expected.addAll(new UserAgentPlaintextSerializer(userAgent).serialize());

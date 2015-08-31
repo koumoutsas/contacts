@@ -178,6 +178,11 @@ class TypeConverter
 		return String.valueOf(id);
 	}
 
+	static Long convert(final CharSequence id)
+	{
+		return Long.parseLong(id.toString());
+	}
+
 	static UserAgent convert(final com.kareebo.contacts.thrift.UserAgent userAgent)
 	{
 		final UserAgent ret=new UserAgent();

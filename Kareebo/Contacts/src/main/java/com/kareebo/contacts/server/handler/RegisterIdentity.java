@@ -24,7 +24,6 @@ import java.util.List;
 public class RegisterIdentity extends SignatureVerifierWithIdentityStore implements com.kareebo.contacts.thrift.RegisterIdentity.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(RegisterIdentity.class.getName());
-	private RegisterIdentityReply reply;
 
 	/**
 	 * Constructor from a datastore
@@ -40,6 +39,7 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 	@Override
 	public void registerIdentity1(final HashBuffer uA,final SignatureBuffer signature,final Future<RegisterIdentityReply> future)
 	{
+		final RegisterIdentityReply reply=new RegisterIdentityReply();
 		verify(new HashBufferPlaintextSerializer(uA),signature,future,new After()
 		{
 			@Override
@@ -69,7 +69,8 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 				identity.setConfirmers(confirmers);
 				put(key,identity);
 				clientDBAccessor.put(newUser);
-				reply=new RegisterIdentityReply(id,blind);
+				reply.setId(id);
+				reply.setBlind(blind);
 			}
 		});
 		if(future.succeeded())

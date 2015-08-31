@@ -21,11 +21,12 @@ public class RegisterIdentityInputPlaintextSerializer implements PlaintextSerial
 	{
 		final Vector<byte[]> ret=new Vector<>(PublicKeysPlaintextSerializer.LENGTH+(registerIdentityInput.getUSet().size()+2)
 			                                                                           *HashBufferPlaintextSerializer
-				                                                                            .LENGTH+1+UserAgentPlaintextSerializer
+				                                                                            .LENGTH+LongPlaintextSerializer
+					                                                                                    .LENGTH+UserAgentPlaintextSerializer
 					                                                                                      .LENGTH);
 		ret.addAll(new PublicKeysPlaintextSerializer(registerIdentityInput.getPublicKeys()).serialize());
 		ret.addAll(new HashBufferPlaintextSerializer(registerIdentityInput.getUA()).serialize());
-		ret.addAll(new StringPlaintextSerializer(String.valueOf(registerIdentityInput.getUserIdA())).serialize());
+		ret.addAll(new LongPlaintextSerializer(registerIdentityInput.getUserIdA()).serialize());
 		ret.addAll(new SetHashBufferPlaintextSerializer(registerIdentityInput.getUSet()).serialize());
 		ret.addAll(new HashBufferPlaintextSerializer(registerIdentityInput.getUJ()).serialize());
 		ret.addAll(new UserAgentPlaintextSerializer(registerIdentityInput.getUserAgent()).serialize());

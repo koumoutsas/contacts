@@ -7,6 +7,10 @@ import java.util.Vector;
  */
 public class StringPlaintextSerializer implements PlaintextSerializer
 {
+	/**
+	 * The length of the returned vector
+	 */
+	public static final int LENGTH=1;
 	final private String s;
 
 	public StringPlaintextSerializer(final String s)
@@ -17,7 +21,7 @@ public class StringPlaintextSerializer implements PlaintextSerializer
 	@Override
 	public Vector<byte[]> serialize()
 	{
-		final Vector<byte[]> ret=new Vector<>(1);
+		final Vector<byte[]> ret=new Vector<>(LENGTH);
 		ret.add(s.getBytes());
 		return ret;
 	}

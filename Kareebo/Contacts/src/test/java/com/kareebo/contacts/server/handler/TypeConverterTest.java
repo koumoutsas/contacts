@@ -273,6 +273,14 @@ public class TypeConverterTest
 	}
 
 	@Test
+	public void testConvertCharSequenceToLong() throws Exception
+	{
+		final String expected="12234";
+		final String calculated=String.valueOf((TypeConverter.convert(expected)));
+		assertEquals(expected,calculated);
+	}
+
+	@Test
 	public void testConvertUserAgent() throws Exception
 	{
 		final com.kareebo.contacts.thrift.UserAgent userAgent=new com.kareebo.contacts.thrift.UserAgent("A","B");

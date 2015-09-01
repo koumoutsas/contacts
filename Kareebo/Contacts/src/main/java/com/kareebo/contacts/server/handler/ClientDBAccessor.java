@@ -58,7 +58,7 @@ class ClientDBAccessor
 		if(client==null)
 		{
 			resetState();
-			logger.error("No client for "+clientId.toString());
+			logger.error("No client for "+clientId);
 			throw new FailedOperation();
 		}
 		return client;

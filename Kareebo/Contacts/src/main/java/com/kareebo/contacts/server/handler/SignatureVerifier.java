@@ -61,7 +61,7 @@ abstract class SignatureVerifier
 			signatureBuffer.rewind();
 			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,plaintextSerializer))
 			{
-				logger.error("Verification failure for "+client.toString());
+				logger.error("Verification failure for "+client);
 				reply.setFailure(new FailedOperation());
 				return;
 			}

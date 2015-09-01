@@ -51,7 +51,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifier implements co
 					}
 					catch(NoSuchAlgorithmException e)
 					{
-						logger.error("Invalid algorithm retrieved from the datastore: "+e.toString());
+						logger.error("Invalid algorithm retrieved from the datastore",e);
 						throw new FailedOperation();
 					}
 				}

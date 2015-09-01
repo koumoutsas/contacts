@@ -73,7 +73,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 							updateOperations.add(contactOperation);
 							break;
 						default:
-							logger.error("Unknown operation "+contactOperation.getType()+" for "+client.toString());
+							logger.error("Unknown operation "+contactOperation.getType()+" for "+client);
 							throw new FailedOperation();
 					}
 				}
@@ -98,7 +98,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 						{
 							if(!comparisonIdentities.add(TypeConverter.convert(c.getComparisonIdentity())))
 							{
-								logger.error("Unable to add comparison identity for "+c.toString());
+								logger.error("Unable to add comparison identity for "+c);
 								throw new FailedOperation();
 							}
 							resolveAndAdd(c.getContact(),addedContacts);
@@ -112,7 +112,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 								                                                        ());
 							if(!comparisonIdentities.remove(converted))
 							{
-								logger.error("Unable to remove comparison identity for "+c.toString());
+								logger.error("Unable to remove comparison identity for "+c);
 								throw new FailedOperation();
 							}
 							resolveAndAdd(c.getContact(),deletedContacts);
@@ -143,7 +143,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 				final Long resolved=find(contact.bufferForBuffer());
 				if(resolved==null)
 				{
-					logger.error("Unknown contact "+contact.toString());
+					logger.error("Unknown contact "+contact);
 					throw new FailedOperation();
 				}
 				set.add(resolved);

@@ -120,7 +120,7 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 		}
 		catch(NoSuchAlgorithmException e)
 		{
-			logger.error("Error converting algorithm: "+e.toString());
+			logger.error("Error converting algorithm",e);
 			future.setFailure(new FailedOperation());
 			return;
 		}
@@ -151,7 +151,7 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 					}
 					catch(NoSuchAlgorithmException e)
 					{
-						logger.error("Error converting algorithm: "+e.toString());
+						logger.error("Error converting algorithm",e);
 						throw new FailedOperation();
 					}
 				}

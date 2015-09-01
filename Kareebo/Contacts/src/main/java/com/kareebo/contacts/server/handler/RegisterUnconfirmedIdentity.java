@@ -54,13 +54,13 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 						final com.kareebo.contacts.server.gora.HashBuffer dbH=TypeConverter.convert(h);
 						if(!identitySet.add(dbH))
 						{
-							logger.error("Unable to add hashed identity for "+h.toString());
+							logger.error("Unable to add hashed identity for "+h);
 							throw new FailedOperation();
 						}
 						final ByteBuffer b=dbH.getBuffer();
 						if(find(b)!=null)
 						{
-							logger.error("Hashed identity for "+h.toString()+" already exists in identity datastore");
+							logger.error("Hashed identity for "+h+" already exists in identity datastore");
 							throw new FailedOperation();
 						}
 						final HashIdentityValue hashIdentity=new HashIdentityValue();

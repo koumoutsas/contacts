@@ -513,7 +513,7 @@ public class RegisterIdentityTest
 				signature.setClient(clientId);
 				signature.setBuffer(ecdsaSign.sign());
 			}
-			catch(NoSuchAlgorithmException|InvalidAlgorithmParameterException|NoSuchProviderException e)
+			catch(NoSuchAlgorithmException|InvalidAlgorithmParameterException|NoSuchProviderException|FailedOperation e)
 			{
 				e.printStackTrace();
 				fail();

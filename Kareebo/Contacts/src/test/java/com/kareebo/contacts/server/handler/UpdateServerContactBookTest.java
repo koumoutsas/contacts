@@ -1,6 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.ContactOperationSetPlaintextSerializer;
+import com.kareebo.contacts.base.CollectionPlaintextSerializer;
 import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
@@ -356,7 +356,7 @@ public class UpdateServerContactBookTest
 				}
 			}
 			adjustContactOperations();
-			return new ContactOperationSetPlaintextSerializer(contactOperations);
+			return new CollectionPlaintextSerializer<>(contactOperations);
 		}
 
 		abstract void setupOperations();

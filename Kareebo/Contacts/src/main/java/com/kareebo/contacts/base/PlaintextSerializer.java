@@ -1,5 +1,7 @@
 package com.kareebo.contacts.base;
 
+import com.kareebo.contacts.thrift.FailedOperation;
+
 import java.util.Vector;
 
 /**
@@ -7,5 +9,5 @@ import java.util.Vector;
  */
 public interface PlaintextSerializer
 {
-	Vector<byte[]> serialize();
+	Vector<byte[]> serialize() throws FailedOperation;
 }

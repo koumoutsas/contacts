@@ -39,7 +39,7 @@ public class RegisterIdentityInputPlaintextSerializerTest
 		expected.addAll(new PublicKeysPlaintextSerializer(publicKeys).serialize());
 		expected.addAll(new HashBufferPlaintextSerializer(uA).serialize());
 		expected.addAll(new LongPlaintextSerializer(userIdA).serialize());
-		expected.addAll(new SetHashBufferPlaintextSerializer(uSet).serialize());
+		expected.addAll(new CollectionPlaintextSerializer<>(uSet).serialize());
 		expected.addAll(new HashBufferPlaintextSerializer(uB).serialize());
 		expected.addAll(new UserAgentPlaintextSerializer(userAgent).serialize());
 		for(int i=0;i<expected.size();++i)

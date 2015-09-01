@@ -1,5 +1,6 @@
 package com.kareebo.contacts.base;
 
+import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.RegisterIdentityInput;
 
 import java.util.Vector;
@@ -17,7 +18,7 @@ public class RegisterIdentityInputPlaintextSerializer implements PlaintextSerial
 	}
 
 	@Override
-	public Vector<byte[]> serialize()
+	public Vector<byte[]> serialize() throws FailedOperation
 	{
 		final Vector<byte[]> ret=new Vector<>(PublicKeysPlaintextSerializer.LENGTH+(registerIdentityInput.getUSet().size()+2)
 			                                                                           *HashBufferPlaintextSerializer
@@ -27,7 +28,7 @@ public class RegisterIdentityInputPlaintextSerializer implements PlaintextSerial
 		ret.addAll(new PublicKeysPlaintextSerializer(registerIdentityInput.getPublicKeys()).serialize());
 		ret.addAll(new HashBufferPlaintextSerializer(registerIdentityInput.getUA()).serialize());
 		ret.addAll(new LongPlaintextSerializer(registerIdentityInput.getUserIdA()).serialize());
-		ret.addAll(new SetHashBufferPlaintextSerializer(registerIdentityInput.getUSet()).serialize());
+		ret.addAll(new CollectionPlaintextSerializer<>(registerIdentityInput.getUSet()).serialize());
 		ret.addAll(new HashBufferPlaintextSerializer(registerIdentityInput.getUJ()).serialize());
 		ret.addAll(new UserAgentPlaintextSerializer(registerIdentityInput.getUserAgent()).serialize());
 		return ret;

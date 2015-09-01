@@ -124,7 +124,7 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 			future.setFailure(new FailedOperation());
 			return;
 		}
-		verify(new RegisterIdentityInputPlaintextSerializer(registerIdentityInput),signature,new Reply(future),new After()
+		verify(new RegisterIdentityInputPlaintextSerializer(registerIdentityInput),signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

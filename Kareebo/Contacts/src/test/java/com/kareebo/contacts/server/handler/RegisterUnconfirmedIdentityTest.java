@@ -1,7 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.CollectionPlaintextSerializer;
 import com.kareebo.contacts.base.PlaintextSerializer;
-import com.kareebo.contacts.base.SetHashBufferPlaintextSerializer;
 import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
@@ -135,7 +135,7 @@ public class RegisterUnconfirmedIdentityTest
 		@Override
 		PlaintextSerializer constructPlaintext()
 		{
-			return new SetHashBufferPlaintextSerializer(hashBufferSet);
+			return new CollectionPlaintextSerializer<>(hashBufferSet);
 		}
 	}
 

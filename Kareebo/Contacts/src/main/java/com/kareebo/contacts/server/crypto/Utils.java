@@ -3,6 +3,7 @@ package com.kareebo.contacts.server.crypto;
 import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.VerificationKey;
+import com.kareebo.contacts.thrift.FailedOperation;
 
 import java.nio.ByteBuffer;
 import java.security.*;
@@ -36,7 +37,7 @@ public class Utils
 	public static boolean verifySignature(final VerificationKey verificationKey,final ByteBuffer signature,final
 	PlaintextSerializer plaintextSerializer)
 		throws
-		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException
+		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException, FailedOperation
 	{
 		final Vector<String> characteristics=decompose(verificationKey.getAlgorithm());
 		final Signature verify=Signature.getInstance(characteristics.get(1),provider);

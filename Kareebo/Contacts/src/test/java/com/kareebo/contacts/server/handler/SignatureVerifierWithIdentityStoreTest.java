@@ -149,7 +149,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 
 		void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future)
 		{
-			verify(plaintextSerializer,signature,new Reply(future),new After()
+			verify(plaintextSerializer,signature,new Reply<>(future),new After()
 			{
 				@Override
 				public void run(final User user,final Client client) throws FailedOperation

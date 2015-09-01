@@ -7,15 +7,15 @@ import org.vertx.java.core.Future;
  */
 class Reply<T>
 {
-	private final Future future;
+	private final Future<T> future;
 	private final T reply;
 
-	Reply(final Future future)
+	Reply(final Future<T> future)
 	{
 		this(future,null);
 	}
 
-	Reply(final Future future,final T reply)
+	Reply(final Future<T> future,final T reply)
 	{
 		this.future=future;
 		this.reply=reply;
@@ -38,7 +38,7 @@ class Reply<T>
 
 	T result()
 	{
-		return (T)future.result();
+		return future.result();
 	}
 
 	Throwable cause()

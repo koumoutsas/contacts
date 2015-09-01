@@ -76,7 +76,7 @@ abstract class SignatureVerifierTestBase
 	}
 
 	private void setUpCrypto() throws NoSuchProviderException, NoSuchAlgorithmException,
-		                                  InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, InvalidKeySpecException
+		                                  InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, InvalidKeySpecException, FailedOperation
 	{
 		plaintext=constructPlaintext();
 		Security.addProvider(new BouncyCastleProvider());

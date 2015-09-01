@@ -37,7 +37,7 @@ public class ReplyTest
 	@Test
 	public void testSetNullReply() throws Exception
 	{
-		final Future<String> future=new DefaultFutureResult<>();
+		final Future<Void> future=new DefaultFutureResult<>();
 		final Reply<Void> reply=new Reply<>(future);
 		reply.setReply();
 		assertTrue(reply.succeeded());

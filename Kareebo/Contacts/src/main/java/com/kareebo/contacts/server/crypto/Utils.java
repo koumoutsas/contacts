@@ -86,4 +86,37 @@ public class Utils
 	{
 		return provider;
 	}
+
+	/**
+	 * XOR two byte arrays
+	 *
+	 * @param a The first array
+	 * @param b The second array
+	 * @return The XOR of the two inputs. If one is shorter, it's padded with 0s
+	 */
+	public static byte[] xor(final byte[] a,final byte[] b)
+	{
+		byte[] longer, shorter;
+		if(a.length>b.length)
+		{
+			longer=a;
+			shorter=b;
+		}
+		else
+		{
+			longer=b;
+			shorter=a;
+		}
+		final byte[] ret=new byte[longer.length];
+		int i;
+		for(i=0;i<shorter.length;++i)
+		{
+			ret[i]=(byte)(longer[i]^shorter[i]);
+		}
+		for(;i<longer.length;++i)
+		{
+			ret[i]=longer[i];
+		}
+		return ret;
+	}
 }

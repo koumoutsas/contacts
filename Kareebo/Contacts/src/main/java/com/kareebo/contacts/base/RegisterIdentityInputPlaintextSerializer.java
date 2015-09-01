@@ -24,7 +24,7 @@ public class RegisterIdentityInputPlaintextSerializer implements PlaintextSerial
 			                                                                           *HashBufferPlaintextSerializer
 				                                                                            .LENGTH+LongPlaintextSerializer
 					                                                                                    .LENGTH+UserAgentPlaintextSerializer
-					                                                                                      .LENGTH);
+						                                                                                            .LENGTH);
 		ret.addAll(new PublicKeysPlaintextSerializer(registerIdentityInput.getPublicKeys()).serialize());
 		ret.addAll(new HashBufferPlaintextSerializer(registerIdentityInput.getUA()).serialize());
 		ret.addAll(new LongPlaintextSerializer(registerIdentityInput.getUserIdA()).serialize());

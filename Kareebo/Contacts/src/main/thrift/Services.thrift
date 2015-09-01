@@ -172,10 +172,11 @@ service RegisterUnconfirmedIdentity
 service BroadcastNewContactIdentity
 {
 	// Steps 3-5
-	map<Id,EncryptionKey> broadcastNewContactIdentity1(1:Id userIdB,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	map<ClientId,EncryptionKey> broadcastNewContactIdentity1(1:Id userIdB,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Steps 11-15
-	set<EncryptedBuffer> broadcastNewContactIdentity2(1:set<EncryptedBufferPair> encryptedBufferPairs,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	map<ClientId,EncryptionKey> broadcastNewContactIdentity2(1:set<EncryptedBufferPair> encryptedBufferPairs,2:SignatureBuffer signature) throws
+	(1:FailedOperation failedOperation),
 
 	// Steps 19-21
 	void broadcastNewContactIdentity3(1:set<EncryptedBufferSigned> encryptedBuffers) throws (1:FailedOperation failedOperation),

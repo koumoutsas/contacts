@@ -41,7 +41,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 	@Override
 	public void registerUnconfirmedIdentity1(final Set<HashBuffer> uSet,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(new SetHashBufferPlaintextSerializer(uSet),signature,future,new After()
+		verify(new SetHashBufferPlaintextSerializer(uSet),signature,new Reply(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

@@ -27,7 +27,7 @@ public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.co
 	@Override
 	public void modifyUserAgent1(final UserAgent userAgent,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(new UserAgentPlaintextSerializer(userAgent),signature,future,new After()
+		verify(new UserAgentPlaintextSerializer(userAgent),signature,new Reply(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

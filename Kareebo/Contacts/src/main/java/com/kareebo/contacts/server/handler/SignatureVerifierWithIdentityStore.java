@@ -6,7 +6,6 @@ import com.kareebo.contacts.server.gora.HashIdentityValue;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
-import org.vertx.java.core.Future;
 
 import java.nio.ByteBuffer;
 
@@ -45,10 +44,10 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	}
 
 	@Override
-	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<?> future,final After after)
+	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Reply<?> reply,final After after)
 	{
-		super.verify(plaintextSerializer,signature,future,after);
-		if(future.succeeded())
+		super.verify(plaintextSerializer,signature,reply,after);
+		if(!reply.failed())
 		{
 			identityDatastore.close();
 		}

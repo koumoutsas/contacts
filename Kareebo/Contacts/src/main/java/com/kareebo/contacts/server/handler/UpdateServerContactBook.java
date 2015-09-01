@@ -46,7 +46,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 	public void updateServerContactBook1(final Set<ContactOperation> contactOperationSet,final SignatureBuffer
 		                                                                                     signature,final Future<Void> future)
 	{
-		verify(new ContactOperationSetPlaintextSerializer(contactOperationSet),signature,future,new After()
+		verify(new ContactOperationSetPlaintextSerializer(contactOperationSet),signature,new Reply(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

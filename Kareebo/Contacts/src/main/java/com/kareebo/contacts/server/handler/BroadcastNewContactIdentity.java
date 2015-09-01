@@ -11,6 +11,7 @@ import org.vertx.java.core.Future;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifier implements co
 	public void broadcastNewContactIdentity1(final long userIdB,final SignatureBuffer signature,final Future<Map<Long,EncryptionKey>> future)
 	{
 		final Map<Long,EncryptionKey> reply=new HashMap<>();
-		verify(new LongPlaintextSerializer(userIdB),signature,future,new After()
+		verify(new LongPlaintextSerializer(userIdB),signature,new Reply<>(future,reply),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
@@ -56,10 +57,6 @@ public class BroadcastNewContactIdentity extends SignatureVerifier implements co
 				}
 			}
 		});
-		if(future.succeeded())
-		{
-			future.setResult(reply);
-		}
 	}
 
 	@Override

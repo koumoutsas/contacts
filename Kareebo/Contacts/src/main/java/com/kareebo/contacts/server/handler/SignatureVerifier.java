@@ -9,7 +9,6 @@ import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vertx.java.core.Future;
 
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
@@ -41,10 +40,10 @@ abstract class SignatureVerifier
 	 *
 	 * @param plaintextSerializer The plaintext serializer
 	 * @param signature           The signature
-	 * @param future              The future used to communicate the result
+	 * @param reply               The reply future used to communicate the result
 	 * @param after               The after hook
 	 */
-	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<?> future,final After after)
+	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Reply<?> reply,final After after)
 	{
 		final Client client;
 		try
@@ -53,7 +52,7 @@ abstract class SignatureVerifier
 		}
 		catch(FailedOperation failedOperation)
 		{
-			future.setFailure(failedOperation);
+			reply.setFailure(failedOperation);
 			return;
 		}
 		try
@@ -63,7 +62,7 @@ abstract class SignatureVerifier
 			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,plaintextSerializer))
 			{
 				logger.error("Verification failure for "+client.toString());
-				future.setFailure(new FailedOperation());
+				reply.setFailure(new FailedOperation());
 				return;
 			}
 			after.run(clientDBAccessor.user,client);
@@ -71,16 +70,16 @@ abstract class SignatureVerifier
 		catch(NoSuchProviderException|NoSuchAlgorithmException|SignatureException|InvalidKeyException|InvalidKeySpecException e)
 		{
 			logger.error("Verification failure with exception",e);
-			future.setFailure(new FailedOperation());
+			reply.setFailure(new FailedOperation());
 			return;
 		}
 		catch(FailedOperation failedOperation)
 		{
-			future.setFailure(failedOperation);
+			reply.setFailure(failedOperation);
 			return;
 		}
 		clientDBAccessor.close();
-		future.setResult(null);
+		reply.setReply();
 	}
 
 	/**

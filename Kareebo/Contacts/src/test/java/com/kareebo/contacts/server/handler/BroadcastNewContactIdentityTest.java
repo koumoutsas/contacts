@@ -15,6 +15,9 @@ import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.EncryptionAlgorithm;
 import com.kareebo.contacts.thrift.EncryptionKey;
 import org.apache.gora.store.DataStore;
+import org.apache.gora.store.DataStoreFactory;
+import org.apache.gora.util.GoraException;
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
@@ -325,10 +328,16 @@ public class BroadcastNewContactIdentityTest
 	 */
 	abstract private class Base extends SignatureVerifierTestBase
 	{
+		final DataStore<ByteBuffer,HashIdentity> identityDataStore;
+
+		Base() throws GoraException
+		{
+			identityDataStore=DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration());
+		}
 		@Override
 		SignatureVerifier construct(final DataStore<Long,User> dataStore)
 		{
-			return new BroadcastNewContactIdentity(dataStore);
+			return new BroadcastNewContactIdentity(dataStore,identityDataStore);
 		}
 	}
 

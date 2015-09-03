@@ -921,6 +921,7 @@ Client extends Common.Client
 {
   keys, PublicKeys
   comparisonIdentities, set(EncryptedBuffer)
+  deviceToken, 64-bit signed integer
 }
 \end{verbbox}
 \begin{center}
@@ -939,6 +940,7 @@ The structure extends a client description with a field to indicate whether this
 \begin{description}
  \item[keys] The public keys of the client.
  \item[comparisonIdentities] The set of encrypted identities used for matching identities between different client contact books.
+ \item[deviceToken] The device identifier for the push notification system. It is represented internally as a 64-bit integer, although each push notification system may have slightly different representations. The 64-bit integer representation is a superset of all system-specific representations.
 \end{description}
 
 \subsubsection{User}

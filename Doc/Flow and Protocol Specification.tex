@@ -330,7 +330,7 @@ entire flow.
  \item \Client{A} sends to \Server{} \signedData{}, \identity{B}.
  \item \Server{} populates \publicKeys{} from \identity{A}.
  \item \Server{} verifies \signedData{}.
- \item \Server{} sends to \Client{B} \signingKey{}, \signedData{}.
+ \item \Server{} sends to \Client{B} \verificationKey{}, \signedData{}.
  \item \Client{B} verifies \signedData{}.
  \item \Client{B} retrieves \identity{C} and $U(C)$ from \encryptedData{}.
  \item \Client{B} adds \identity{C} to contact book with blinded identity $U(C)$.
@@ -338,7 +338,7 @@ entire flow.
  \begin{enumerate}
   \item \Client{B} populates $U'(C)$ with the known blinded identity.
   \item \Client{B} populates \privateKeys{} from local storage.
-  \item \Client{B} populates \signedData{} from \signingKey{} and $U'(C)$.
+  \item \Client{B} populates \signedData{} from \signingKey{} and $U(C)$ and $U'(C)$.
   \item \Client{B} sends \signedData{} to \Server{}.
   \item \Server{} populates \publicKeys{} from UserSet for \identity{B}.
   \item \Server{} verifies \signedData{}.
@@ -350,7 +350,7 @@ entire flow.
 becomes an alias.
   \end {enumerate}
  \end{enumerate}
- \item If the mapping doesn't exist already, \Client{B} executes the Broadcase New Contact Identity \ref{broadcast_new_contact_identity_flow} flow for all its contacts.
+ \item If the mapping doesn't exist already, \Client{B} executes the Broadcast New Contact Identity \ref{broadcast_new_contact_identity_flow} flow for all its contacts.
  \item \Client{B} triggers the Send Contact Card \ref{send_contact_card_flow} with \User{C}.
 \end{enumerate}
 

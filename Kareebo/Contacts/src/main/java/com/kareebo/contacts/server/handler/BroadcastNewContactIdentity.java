@@ -1,15 +1,20 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.CollectionPlaintextSerializer;
+import com.kareebo.contacts.base.EncryptedBufferPlaintextSerializer;
+import com.kareebo.contacts.base.HashBufferPairPlaintextSerializer;
 import com.kareebo.contacts.base.LongPlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.Client;
+import com.kareebo.contacts.server.gora.HashIdentity;
+import com.kareebo.contacts.server.gora.HashIdentityValue;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.*;
 import org.apache.gora.store.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
+import org.vertx.java.core.impl.DefaultFutureResult;
 
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
@@ -18,7 +23,7 @@ import java.util.*;
 /**
  * Server-side service implementation of the broadcast new contact identity operation
  */
-public class BroadcastNewContactIdentity extends SignatureVerifier implements com.kareebo.contacts.thrift.BroadcastNewContactIdentity.AsyncIface
+public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStore implements com.kareebo.contacts.thrift.BroadcastNewContactIdentity.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(BroadcastNewContactIdentity.class.getName());
 
@@ -27,9 +32,10 @@ public class BroadcastNewContactIdentity extends SignatureVerifier implements co
 	 *
 	 * @param dataStore The datastore
 	 */
-	BroadcastNewContactIdentity(final DataStore<Long,User> dataStore)
+	BroadcastNewContactIdentity(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity>
+		                                                                 identityDatastore)
 	{
-		super(dataStore);
+		super(dataStore,identityDatastore);
 	}
 
 	@Override
@@ -108,15 +114,127 @@ public class BroadcastNewContactIdentity extends SignatureVerifier implements co
 	@Override
 	public void broadcastNewContactIdentity3(final Set<EncryptedBufferSigned> encryptedBuffers,final Future<Void> future)
 	{
+		for(final EncryptedBufferSigned encryptedBufferSigned : encryptedBuffers)
+		{
+			final DefaultFutureResult<Void> result=new DefaultFutureResult<>();
+			verify(new EncryptedBufferPlaintextSerializer(encryptedBufferSigned.getEncryptedBuffer()),encryptedBufferSigned.getSignature(),
+				      new Reply<>(result),new After()
+				{
+					@Override
+					public void run(final User user,final Client client) throws FailedOperation
+					{
+						try
+						{
+							new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()));
+							//TODO notifications here
+						}
+						catch(NoSuchAlgorithmException e)
+						{
+							logger.error("Unknown algorithm",e);
+							throw new FailedOperation();
+						}
+					}
+				});
+			if(result.failed())
+			{
+				future.setFailure(new FailedOperation());
+				return;
+			}
+		}
+		future.setResult(null);
 	}
 
 	@Override
 	public void broadcastNewContactIdentity4(final SignedRandomNumber signature,final Future<EncryptedBufferSignedWithVerificationKey> future)
 	{
+		final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
+			                                                                                        EncryptedBufferSignedWithVerificationKey();
+		verify(new LongPlaintextSerializer(signature.getI()),signature.getSignature(),new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After(){
+			@Override
+			public void run(final User user,final Client client) throws FailedOperation
+			{
+				//TODO retrieve the notification payload
+				final EncryptedBufferSignedWithVerificationKey retrieved=null;
+				encryptedBufferSignedWithVerificationKey.setEncryptedBufferSigned(retrieved.getEncryptedBufferSigned());
+				encryptedBufferSignedWithVerificationKey.setVerificationKey(retrieved.getVerificationKey());
+			}
+		});
 	}
 
 	@Override
-	public void BroadcastNewContactIdentity5(final HashBuffer uC,final SignatureBuffer signature,final Future<Void> future)
+	public void BroadcastNewContactIdentity5(final HashBufferPair uCs,final SignatureBuffer signature,final Future<Void> future)
 	{
+		verify(new HashBufferPairPlaintextSerializer(uCs),signature,new Reply<>(future),new After(){
+			@Override
+			public void run(final User user,final Client client) throws FailedOperation
+			{
+				final HashBuffer uC=uCs.getUC();
+				final ByteBuffer keyUC=uC.bufferForBuffer();
+				final HashIdentityValue value1=get(keyUC);
+				if(value1==null)
+				{
+					logger.error("Identity "+uC+" not found");
+					throw new FailedOperation();
+				}
+				final HashBuffer uPrimeC=uCs.getUPrimeC();
+				final ByteBuffer keyUPrimeC=uPrimeC.bufferForBuffer();
+				final HashIdentityValue value2=get(keyUPrimeC);
+				if(value2==null)
+				{
+					logger.error("Identity "+uPrimeC+" not found");
+					throw new FailedOperation();
+				}
+				final List<Long> confirmers1=value1.getConfirmers();
+				final List<Long> confirmers2=value2.getConfirmers();
+				HashIdentityValue valueBig;
+				List<Long> confirmersSmall,confirmersBig;
+				ByteBuffer keySmall,keyBig;
+				if(confirmers1.size()<confirmers2.size())
+				{
+					valueBig=value2;
+					confirmersSmall=confirmers1;
+					confirmersBig=confirmers2;
+					keySmall=keyUC;
+					keyBig=keyUPrimeC;
+				}
+				else if(confirmers2.size()<confirmers1.size())
+				{
+					valueBig=value1;
+					confirmersSmall=confirmers2;
+					confirmersBig=confirmers1;
+					keySmall=keyUPrimeC;
+					keyBig=keyUC;
+				}
+				else
+				{
+					final int comparison=keyUC.compareTo(keyUPrimeC);
+					if(comparison<0)
+					{
+						valueBig=value2;
+						confirmersSmall=confirmers1;
+						confirmersBig=confirmers2;
+						keySmall=keyUC;
+						keyBig=keyUPrimeC;
+					}
+					else if(comparison>0)
+					{
+						valueBig=value1;
+						confirmersSmall=confirmers2;
+						confirmersBig=confirmers1;
+						keySmall=keyUPrimeC;
+						keyBig=keyUC;
+					}
+					else
+					{
+						logger.error("Both identities are the same: "+keyUC.toString());
+						throw new FailedOperation();
+					}
+				}
+				confirmersBig.addAll(confirmersSmall);
+				valueBig.setConfirmers(confirmersBig);
+				put(keyBig,valueBig);
+				aliasTo(keySmall,keyBig);
+			}
+		});
 	}
 }

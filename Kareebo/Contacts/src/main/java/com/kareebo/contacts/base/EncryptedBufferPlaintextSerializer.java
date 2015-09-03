@@ -8,7 +8,7 @@ import com.kareebo.contacts.thrift.EncryptionAlgorithm;
  */
 public class EncryptedBufferPlaintextSerializer extends CryptoPlaintextSerializer<EncryptionAlgorithm>
 {
-	EncryptedBufferPlaintextSerializer(final EncryptedBuffer encryptedBuffer)
+	public EncryptedBufferPlaintextSerializer(final EncryptedBuffer encryptedBuffer)
 	{
 		super(encryptedBuffer.getAlgorithm(),
 			     encryptedBuffer.getBuffer());

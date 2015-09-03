@@ -169,6 +169,12 @@ service RegisterUnconfirmedIdentity
 	void registerUnconfirmedIdentity1(1:set<HashBuffer> uSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
+struct HashBufferPair
+{
+	1:HashBuffer UC,
+	2:HashBuffer UPrimeC,
+}
+
 service BroadcastNewContactIdentity
 {
 	// Steps 3-5
@@ -184,8 +190,8 @@ service BroadcastNewContactIdentity
 	// Step 22
 	EncryptedBufferSignedWithVerificationKey broadcastNewContactIdentity4(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
 
-	// Steps 26.c-26.f
-	void BroadcastNewContactIdentity5(1:HashBuffer uC,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	// Steps 26.c-26.g
+	void BroadcastNewContactIdentity5(1:HashBufferPair uCs,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
 service ModifyKeys

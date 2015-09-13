@@ -14,9 +14,7 @@ import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Vector;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link Utils}
@@ -77,17 +75,17 @@ public class UtilsTest
 		Utils.verifySignature(wrongKey,signature,plaintextSerializer);
 	}
 
-	private void testXor(final byte[] a,final byte[] b,final byte[] x)
-	{
-		assertArrayEquals(x,Utils.xor(a,b));
-		assertArrayEquals(x,Utils.xor(b,a));
-	}
-
 	@Test
 	public void testXor() throws Exception
 	{
 		testXor(new byte[]{1,0},new byte[]{0,1},new byte[]{1,1});
 		testXor(new byte[]{1,0},new byte[]{1,0},new byte[]{0,0});
 		testXor(new byte[]{1,0,1},new byte[]{1,0},new byte[]{0,0,1});
+	}
+
+	private void testXor(final byte[] a,final byte[] b,final byte[] x)
+	{
+		assertArrayEquals(x,Utils.xor(a,b));
+		assertArrayEquals(x,Utils.xor(b,a));
 	}
 }

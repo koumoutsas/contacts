@@ -24,13 +24,14 @@ public class RegisterIdentityInputPlaintextSerializer implements PlaintextSerial
 			                                                                           *HashBufferPlaintextSerializer
 				                                                                            .LENGTH+LongPlaintextSerializer
 					                                                                                    .LENGTH+UserAgentPlaintextSerializer
-						                                                                                            .LENGTH);
+						                                                                                            .LENGTH+LongPlaintextSerializer.LENGTH);
 		ret.addAll(new PublicKeysPlaintextSerializer(registerIdentityInput.getPublicKeys()).serialize());
 		ret.addAll(new HashBufferPlaintextSerializer(registerIdentityInput.getUA()).serialize());
 		ret.addAll(new LongPlaintextSerializer(registerIdentityInput.getUserIdA()).serialize());
 		ret.addAll(new CollectionPlaintextSerializer<>(registerIdentityInput.getUSet()).serialize());
 		ret.addAll(new HashBufferPlaintextSerializer(registerIdentityInput.getUJ()).serialize());
 		ret.addAll(new UserAgentPlaintextSerializer(registerIdentityInput.getUserAgent()).serialize());
+		ret.addAll(new LongPlaintextSerializer(registerIdentityInput.getDeviceToken()).serialize());
 		return ret;
 	}
 }

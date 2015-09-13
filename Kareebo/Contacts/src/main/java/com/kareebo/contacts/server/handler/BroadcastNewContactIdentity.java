@@ -26,6 +26,7 @@ import java.util.*;
 public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStore implements com.kareebo.contacts.thrift.BroadcastNewContactIdentity.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(BroadcastNewContactIdentity.class.getName());
+	private final ClientNotifier clientNotifier;
 
 	/**
 	 * Constructor from a datastore
@@ -33,9 +34,10 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	 * @param dataStore The datastore
 	 */
 	BroadcastNewContactIdentity(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity>
-		                                                                 identityDatastore)
+		                                                                 identityDatastore,final ClientNotifier clientNotifier)
 	{
 		super(dataStore,identityDatastore);
+		this.clientNotifier=clientNotifier;
 	}
 
 	@Override
@@ -125,8 +127,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 					{
 						try
 						{
-							new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()));
-							//TODO notifications here
+							clientNotifier.put(client.getDeviceToken(),new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification())));
 						}
 						catch(NoSuchAlgorithmException e)
 						{
@@ -149,12 +150,14 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	{
 		final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
 			                                                                                        EncryptedBufferSignedWithVerificationKey();
-		verify(new LongPlaintextSerializer(signature.getI()),signature.getSignature(),new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After(){
+		final long notificationId=signature.getI();
+		verify(new LongPlaintextSerializer(notificationId),signature.getSignature(),new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After()
+		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
 			{
-				//TODO retrieve the notification payload
-				final EncryptedBufferSignedWithVerificationKey retrieved=null;
+				final EncryptedBufferSignedWithVerificationKey retrieved=new EncryptedBufferSignedWithVerificationKey();
+				clientNotifier.get(retrieved,notificationId);
 				encryptedBufferSignedWithVerificationKey.setEncryptedBufferSigned(retrieved.getEncryptedBufferSigned());
 				encryptedBufferSignedWithVerificationKey.setVerificationKey(retrieved.getVerificationKey());
 			}
@@ -164,7 +167,8 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	@Override
 	public void BroadcastNewContactIdentity5(final HashBufferPair uCs,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(new HashBufferPairPlaintextSerializer(uCs),signature,new Reply<>(future),new After(){
+		verify(new HashBufferPairPlaintextSerializer(uCs),signature,new Reply<>(future),new After()
+		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
 			{
@@ -187,8 +191,8 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 				final List<Long> confirmers1=value1.getConfirmers();
 				final List<Long> confirmers2=value2.getConfirmers();
 				HashIdentityValue valueBig;
-				List<Long> confirmersSmall,confirmersBig;
-				ByteBuffer keySmall,keyBig;
+				List<Long> confirmersSmall, confirmersBig;
+				ByteBuffer keySmall, keyBig;
 				if(confirmers1.size()<confirmers2.size())
 				{
 					valueBig=value2;

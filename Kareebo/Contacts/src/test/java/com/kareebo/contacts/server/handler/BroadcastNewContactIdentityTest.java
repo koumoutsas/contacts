@@ -67,10 +67,6 @@ public class BroadcastNewContactIdentityTest
 				final Future<Map<ClientId,EncryptionKey>> future=new DefaultFutureResult<>();
 				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity2(encryptedBufferPairs,signature,future);
 				check(future);
-			}			@Override
-			PlaintextSerializer constructPlaintext()
-			{
-				return new CollectionPlaintextSerializer<>(encryptedBufferPairs);
 			}
 
 			/**
@@ -92,6 +88,10 @@ public class BroadcastNewContactIdentityTest
 							                                                                                                                              (clientId.getClient())).getKeys().getEncryption());
 					assertEquals(expectedEncryptionKey,encryptionKey);
 				}
+			}			@Override
+			PlaintextSerializer constructPlaintext()
+			{
+				return new CollectionPlaintextSerializer<>(encryptedBufferPairs);
 			}
 
 			/**
@@ -329,15 +329,17 @@ public class BroadcastNewContactIdentityTest
 	abstract private class Base extends SignatureVerifierTestBase
 	{
 		final DataStore<ByteBuffer,HashIdentity> identityDataStore;
+		final ClientNotifier clientNotifier=new ClientNotifier(null,null);
 
 		Base() throws GoraException
 		{
 			identityDataStore=DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration());
 		}
+
 		@Override
 		SignatureVerifier construct(final DataStore<Long,User> dataStore)
 		{
-			return new BroadcastNewContactIdentity(dataStore,identityDataStore);
+			return new BroadcastNewContactIdentity(dataStore,identityDataStore,clientNotifier);
 		}
 	}
 

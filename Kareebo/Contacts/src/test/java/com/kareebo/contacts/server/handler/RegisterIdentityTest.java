@@ -188,6 +188,7 @@ public class RegisterIdentityTest
 				assertEquals(confirmers,((HashIdentityValue)identityDataStore.get(uC.bufferForBuffer()).getHashIdentity())
 					                        .getConfirmers());
 				assertEquals(uC.bufferForBuffer(),identityDataStore.get(uA.bufferForBuffer()).getHashIdentity());
+				assertEquals(deviceToken,(long)clientRetrieved.getDeviceToken());
 				for(final HashBuffer h : uSet)
 				{
 					final HashIdentityValue value=(HashIdentityValue)identityDataStore.get(h.bufferForBuffer()).getHashIdentity();
@@ -469,6 +470,7 @@ public class RegisterIdentityTest
 		final UserAgent userAgent=new UserAgent();
 		final RegisterIdentity registerIdentity;
 		final List<Long> confirmers=new ArrayList<>(1);
+		final long deviceToken=10;
 		HashBuffer uA;
 		HashBuffer uC;
 		Set<HashBuffer> uSet;
@@ -504,6 +506,7 @@ public class RegisterIdentityTest
 				registerIdentityInput.setUserIdA(user);
 				registerIdentityInput.setUSet(uSet);
 				registerIdentityInput.setUserAgent(userAgent);
+				registerIdentityInput.setDeviceToken(deviceToken);
 				final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
 				ecdsaSign.initSign(keyPair.getPrivate());
 				for(final Object a : new RegisterIdentityInputPlaintextSerializer(registerIdentityInput).serialize())

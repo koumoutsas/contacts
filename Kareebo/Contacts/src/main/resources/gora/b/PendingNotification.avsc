@@ -1,0 +1,16 @@
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "PendingNotification",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "id",
+            "type": "long"
+        },
+        {
+            "name": "payload",
+            "type": "bytes"
+        }
+    ]
+}

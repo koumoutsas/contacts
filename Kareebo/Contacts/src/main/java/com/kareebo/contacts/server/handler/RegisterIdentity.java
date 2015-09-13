@@ -111,6 +111,7 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 			final Client client=clientDBAccessor.get(signature.getClient());
 			client.setKeys(TypeConverter.convert(registerIdentityInput.getPublicKeys()));
 			client.setUserAgent(TypeConverter.convert(registerIdentityInput.getUserAgent()));
+			client.setDeviceToken(registerIdentityInput.getDeviceToken());
 			clientDBAccessor.put(client);
 		}
 		catch(FailedOperation failedOperation)

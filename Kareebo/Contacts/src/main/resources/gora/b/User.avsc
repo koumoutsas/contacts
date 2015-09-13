@@ -64,6 +64,10 @@
                                 "type": "array",
                                 "items": "EncryptedBuffer"
                             }
+                        },
+                        {
+                            "name": "deviceToken",
+                            "type": "long"
                         }
                     ]
                 }

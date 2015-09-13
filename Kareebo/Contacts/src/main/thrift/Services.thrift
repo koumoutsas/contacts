@@ -150,7 +150,9 @@ struct RegisterIdentityInput
 	4:set<HashBuffer> uSet,
 	5:HashBuffer uJ,
 	6:UserAgent userAgent,
+	7:i64 deviceToken,
 }
+
 service RegisterIdentity
 {
 	// Steps 10-14

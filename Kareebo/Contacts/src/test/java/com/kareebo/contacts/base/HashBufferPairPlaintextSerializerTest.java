@@ -1,6 +1,8 @@
 package com.kareebo.contacts.base;
 
-import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.HashAlgorithm;
+import com.kareebo.contacts.thrift.HashBuffer;
+import com.kareebo.contacts.thrift.HashBufferPair;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;

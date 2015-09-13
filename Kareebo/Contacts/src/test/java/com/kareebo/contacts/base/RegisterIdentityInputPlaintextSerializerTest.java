@@ -30,11 +30,14 @@ public class RegisterIdentityInputPlaintextSerializerTest
 		final HashBuffer uB=new HashBuffer(b,HashAlgorithm.SHA256);
 		uSet.add(uB);
 		final UserAgent userAgent=new UserAgent("a","b");
+		final long deviceToken=67;
 		final Vector<byte[]> plaintext=new RegisterIdentityInputPlaintextSerializer(new RegisterIdentityInput(publicKeys,uA,userIdA,uSet,
-			                                                                                                     uB,userAgent)).serialize();
+			                                                                                                     uB,userAgent,deviceToken))
+			                               .serialize();
 		assertEquals(PublicKeysPlaintextSerializer.LENGTH+(uSet.size()+2)*HashBufferPlaintextSerializer
 			                                                                  .LENGTH+LongPlaintextSerializer
-				                                                                          .LENGTH+UserAgentPlaintextSerializer.LENGTH,plaintext.size());
+				                                                                          .LENGTH+UserAgentPlaintextSerializer
+					                                                                                  .LENGTH+LongPlaintextSerializer.LENGTH,plaintext.size());
 		final Vector<byte[]> expected=new Vector<>(plaintext.size());
 		expected.addAll(new PublicKeysPlaintextSerializer(publicKeys).serialize());
 		expected.addAll(new HashBufferPlaintextSerializer(uA).serialize());
@@ -42,6 +45,7 @@ public class RegisterIdentityInputPlaintextSerializerTest
 		expected.addAll(new CollectionPlaintextSerializer<>(uSet).serialize());
 		expected.addAll(new HashBufferPlaintextSerializer(uB).serialize());
 		expected.addAll(new UserAgentPlaintextSerializer(userAgent).serialize());
+		expected.addAll(new LongPlaintextSerializer(deviceToken).serialize());
 		for(int i=0;i<expected.size();++i)
 		{
 			assertArrayEquals(expected.elementAt(i),plaintext.elementAt(i));

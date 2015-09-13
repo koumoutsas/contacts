@@ -75,6 +75,7 @@ dependencies {
   provided "org.slf4j:slf4j-api:${SLF4J_VERSION}"
   provided "org.slf4j:slf4j-log4j12:${SLF4J_VERSION}"
   provided 'log4j:log4j:1.2.14'
+  provided 'org.apache.thrift:libthrift:0.9.1'
 }
 
 test {

@@ -86,7 +86,10 @@ struct ContactOperation
 	3:EncryptedBuffer comparisonIdentity,
 }
 
-typedef set<ContactOperation> ContactOperationSet
+struct ContactOperationSet
+{
+	1:set<ContactOperation> contactOperations,
+}
 
 typedef binary RandomHashPad
 
@@ -114,9 +117,15 @@ struct EncryptedBufferSignedWithVerificationKey
 	2:VerificationKey verificationKey,
 }
 
+// Wrapper around i64 to allow the usage of Thrift serializers with long
+struct LongId
+{
+	1:Id id,
+}
+
 struct SignedRandomNumber
 {
-	1:i64 i,
+	1:LongId i,
 	2:SignatureBuffer signature,
 }
 
@@ -165,10 +174,15 @@ service RegisterIdentity
 	void registerIdentity3(1:RegisterIdentityInput registerIdentityInput,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
+struct HashBufferSet
+{
+	1:set<HashBuffer> hashBuffers,
+}
+
 service RegisterUnconfirmedIdentity
 {
 	// Steps 8-12
-	void registerUnconfirmedIdentity1(1:set<HashBuffer> uSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	void registerUnconfirmedIdentity1(1:HashBufferSet uSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
 struct HashBufferPair
@@ -177,13 +191,19 @@ struct HashBufferPair
 	2:HashBuffer UPrimeC,
 }
 
+struct EncryptedBufferPairSet
+{
+	1:set<EncryptedBufferPair> encryptedBufferPairs,
+}
+
 service BroadcastNewContactIdentity
 {
 	// Steps 3-5
-	map<ClientId,EncryptionKey> broadcastNewContactIdentity1(1:Id userIdB,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	map<ClientId,EncryptionKey> broadcastNewContactIdentity1(1:LongId userIdB,2:SignatureBuffer signature) throws (1:FailedOperation
+	failedOperation),
 
 	// Steps 11-15
-	map<ClientId,EncryptionKey> broadcastNewContactIdentity2(1:set<EncryptedBufferPair> encryptedBufferPairs,2:SignatureBuffer signature) throws
+	map<ClientId,EncryptionKey> broadcastNewContactIdentity2(1:EncryptedBufferPairSet encryptedBufferPairs,2:SignatureBuffer signature) throws
 	(1:FailedOperation failedOperation),
 
 	// Steps 19-21

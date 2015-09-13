@@ -1,7 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.PlaintextSerializer;
-import com.kareebo.contacts.base.PublicKeysPlaintextSerializer;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.EncryptionAlgorithm;
 import com.kareebo.contacts.thrift.EncryptionKey;
@@ -94,7 +94,7 @@ public class ModifyKeysTest
 		@Override
 		PlaintextSerializer constructPlaintext()
 		{
-			return new PublicKeysPlaintextSerializer(newPublicKeys);
+			return new BasePlaintextSerializer<>(newPublicKeys);
 		}
 	}
 }

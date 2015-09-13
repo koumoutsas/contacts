@@ -1,8 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.HashBufferPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.RandomHashPad;
-import com.kareebo.contacts.base.RegisterIdentityInputPlaintextSerializer;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
@@ -40,7 +39,7 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 	public void registerIdentity1(final HashBuffer uA,final SignatureBuffer signature,final Future<RegisterIdentityReply> future)
 	{
 		final RegisterIdentityReply reply=new RegisterIdentityReply();
-		verify(new HashBufferPlaintextSerializer(uA),signature,new Reply<>(future,reply),new After()
+		verify(new BasePlaintextSerializer<>(uA),signature,new Reply<>(future,reply),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
@@ -125,7 +124,7 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 			future.setFailure(new FailedOperation());
 			return;
 		}
-		verify(new RegisterIdentityInputPlaintextSerializer(registerIdentityInput),signature,new Reply<>(future),new After()
+		verify(new BasePlaintextSerializer<>(registerIdentityInput),signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

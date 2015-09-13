@@ -1,6 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.CollectionPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
@@ -58,7 +58,8 @@ public class UpdateServerContactBookTest
 					encryptedBuffer.setBuffer(key);
 					clientValid.getComparisonIdentities().add(encryptedBuffer);
 				}
-				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
+				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
+					                                                                     signature,result);
 			}
 		}
 		new Test().run();
@@ -82,7 +83,8 @@ public class UpdateServerContactBookTest
 			@Override
 			void runImpl(final Future<Void> result)
 			{
-				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
+				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
+					                                                                     signature,result);
 				graph.close();
 			}
 		}
@@ -108,7 +110,8 @@ public class UpdateServerContactBookTest
 			@Override
 			void runImpl(final Future<Void> result)
 			{
-				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
+				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
+					                                                                     signature,result);
 			}
 		}
 		new Test().run();
@@ -141,7 +144,8 @@ public class UpdateServerContactBookTest
 			@Override
 			void runImpl(final Future<Void> result)
 			{
-				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
+				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
+					                                                                     signature,result);
 			}
 		}
 		new Test().run();
@@ -211,7 +215,8 @@ public class UpdateServerContactBookTest
 			void runImpl(final Future<Void> result)
 			{
 				expectedEdges.add(new Edge(clientIdValid.getUser(),userId));
-				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
+				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
+					                                                                     signature,result);
 			}
 		}
 		new Test().run();
@@ -243,7 +248,8 @@ public class UpdateServerContactBookTest
 			@Override
 			void runImpl(final Future<Void> result)
 			{
-				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
+				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
+					                                                                     signature,result);
 			}
 		}
 		new Test().run();
@@ -274,7 +280,8 @@ public class UpdateServerContactBookTest
 			@Override
 			void runImpl(final Future<Void> result)
 			{
-				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
+				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
+					                                                                     signature,result);
 			}
 		}
 		new Test().run();
@@ -315,7 +322,8 @@ public class UpdateServerContactBookTest
 				clientValid.getComparisonIdentities().add(encryptedBuffer);
 				expectedEdges.add(new Edge(clientIdValid.getUser(),userId));
 			}
-			((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(contactOperations,signature,result);
+			((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),signature,
+				                                                                     result);
 		}
 	}
 
@@ -356,7 +364,7 @@ public class UpdateServerContactBookTest
 				}
 			}
 			adjustContactOperations();
-			return new CollectionPlaintextSerializer<>(contactOperations);
+			return new BasePlaintextSerializer<>(new ContactOperationSet(contactOperations));
 		}
 
 		abstract void setupOperations();

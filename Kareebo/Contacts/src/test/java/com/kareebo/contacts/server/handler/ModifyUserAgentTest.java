@@ -1,7 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.PlaintextSerializer;
-import com.kareebo.contacts.base.UserAgentPlaintextSerializer;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.UserAgent;
 import org.apache.gora.store.DataStore;
@@ -38,7 +38,7 @@ public class ModifyUserAgentTest extends SignatureVerifierTestBase
 	@Override
 	PlaintextSerializer constructPlaintext()
 	{
-		return new UserAgentPlaintextSerializer(newUserAgent);
+		return new BasePlaintextSerializer<>(newUserAgent);
 	}
 
 	@Test

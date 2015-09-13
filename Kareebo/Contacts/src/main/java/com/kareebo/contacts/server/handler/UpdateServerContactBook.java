@@ -1,14 +1,11 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.CollectionPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.User;
-import com.kareebo.contacts.thrift.ContactOperation;
-import com.kareebo.contacts.thrift.FailedOperation;
-import com.kareebo.contacts.thrift.HashBuffer;
-import com.kareebo.contacts.thrift.SignatureBuffer;
+import com.kareebo.contacts.thrift.*;
 import org.apache.gora.store.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,15 +40,16 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 	}
 
 	@Override
-	public void updateServerContactBook1(final Set<ContactOperation> contactOperationSet,final SignatureBuffer
+	public void updateServerContactBook1(final ContactOperationSet contactOperationSet,final SignatureBuffer
 		                                                                                     signature,final Future<Void> future)
 	{
-		verify(new CollectionPlaintextSerializer<>(contactOperationSet),signature,new Reply<>(future),new After()
+		verify(new BasePlaintextSerializer<>(contactOperationSet),signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
 			{
-				final int maxSize=contactOperationSet.size();
+				final Set<ContactOperation> contactOperations=contactOperationSet.getContactOperations();
+				final int maxSize=contactOperations.size();
 				if(maxSize==0)
 				{
 					return;
@@ -59,7 +57,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 				final ArrayList<ContactOperation> addOperations=new ArrayList<>(maxSize);
 				final ArrayList<ContactOperation> deleteOperations=new ArrayList<>(maxSize);
 				final ArrayList<ContactOperation> updateOperations=new ArrayList<>(maxSize);
-				for(final ContactOperation contactOperation : contactOperationSet)
+				for(final ContactOperation contactOperation : contactOperations)
 				{
 					switch(contactOperation.getType())
 					{

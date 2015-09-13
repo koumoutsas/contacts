@@ -1,8 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.HashBufferPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.PlaintextSerializer;
-import com.kareebo.contacts.base.RegisterIdentityInputPlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
@@ -509,10 +508,7 @@ public class RegisterIdentityTest
 				registerIdentityInput.setDeviceToken(deviceToken);
 				final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
 				ecdsaSign.initSign(keyPair.getPrivate());
-				for(final Object a : new RegisterIdentityInputPlaintextSerializer(registerIdentityInput).serialize())
-				{
-					ecdsaSign.update((byte[])a);
-				}
+				ecdsaSign.update(new BasePlaintextSerializer<>(registerIdentityInput).serialize());
 				signature.setClient(clientId);
 				signature.setBuffer(ecdsaSign.sign());
 			}
@@ -521,7 +517,7 @@ public class RegisterIdentityTest
 				e.printStackTrace();
 				fail();
 			}
-			return new RegisterIdentityInputPlaintextSerializer(registerIdentityInput);
+			return new BasePlaintextSerializer<>(registerIdentityInput);
 		}
 
 		abstract void setupRegisterIdentityInput() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException;
@@ -617,7 +613,7 @@ public class RegisterIdentityTest
 			b.mark();
 			uA=new HashBuffer(b,HashAlgorithm.SHA256);
 			setupDatastores();
-			return new HashBufferPlaintextSerializer(uA);
+			return new BasePlaintextSerializer<>(uA);
 		}
 
 		abstract void setupDatastores();

@@ -1,6 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.CollectionPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
@@ -8,6 +8,7 @@ import com.kareebo.contacts.server.gora.HashIdentityValue;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.HashBuffer;
+import com.kareebo.contacts.thrift.HashBufferSet;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
 import org.slf4j.Logger;
@@ -39,15 +40,16 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 	}
 
 	@Override
-	public void registerUnconfirmedIdentity1(final Set<HashBuffer> uSet,final SignatureBuffer signature,final Future<Void> future)
+	public void registerUnconfirmedIdentity1(final HashBufferSet uSet,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(new CollectionPlaintextSerializer<>(uSet),signature,new Reply<>(future),new After()
+		verify(new BasePlaintextSerializer<>(uSet),signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
 			{
 				final Set<com.kareebo.contacts.server.gora.HashBuffer> identitySet=Utils.convertToSet(user.getIdentities());
-				for(final HashBuffer h : uSet)
+				final Set<HashBuffer> hashBuffers=uSet.getHashBuffers();
+				for(final HashBuffer h : hashBuffers)
 				{
 					try
 					{

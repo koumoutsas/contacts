@@ -19,7 +19,6 @@ import org.vertx.java.core.impl.DefaultFutureResult;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import static org.junit.Assert.*;
 
@@ -56,10 +55,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 	@Override
 	PlaintextSerializer constructPlaintext()
 	{
-		final Vector<byte[]> ret=new Vector<>(2);
-		ret.add("abc".getBytes());
-		ret.add("cde".getBytes());
-		return new TestPlaintextSerializer(ret);
+		return new TestPlaintextSerializer("abc".getBytes());
 	}
 
 	@Test

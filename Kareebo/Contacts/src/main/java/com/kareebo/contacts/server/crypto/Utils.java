@@ -47,10 +47,7 @@ public class Utils
 		verificationByteBuffer.get(verificationBytes);
 		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(
 			                                                                                                      verificationBytes)));
-		for(final Object aPlaintext : plaintextSerializer.serialize())
-		{
-			verify.update((byte[])aPlaintext);
-		}
+		verify.update(plaintextSerializer.serialize());
 		final byte[] signatureBytes=new byte[signature.remaining()];
 		signature.get(signatureBytes);
 		return verify.verify(signatureBytes);

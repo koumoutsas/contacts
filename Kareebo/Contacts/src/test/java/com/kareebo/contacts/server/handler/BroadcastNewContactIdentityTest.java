@@ -1,7 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.CollectionPlaintextSerializer;
-import com.kareebo.contacts.base.LongPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
@@ -65,7 +64,9 @@ public class BroadcastNewContactIdentityTest
 			void run() throws NoSuchAlgorithmException
 			{
 				final Future<Map<ClientId,EncryptionKey>> future=new DefaultFutureResult<>();
-				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity2(encryptedBufferPairs,signature,future);
+				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity2(new EncryptedBufferPairSet
+					                                                                              (encryptedBufferPairs),signature,
+					                                                                             future);
 				check(future);
 			}
 
@@ -91,7 +92,7 @@ public class BroadcastNewContactIdentityTest
 			}			@Override
 			PlaintextSerializer constructPlaintext()
 			{
-				return new CollectionPlaintextSerializer<>(encryptedBufferPairs);
+				return new BasePlaintextSerializer<>(new EncryptedBufferPairSet(encryptedBufferPairs));
 			}
 
 			/**
@@ -267,7 +268,7 @@ public class BroadcastNewContactIdentityTest
 				newUser.setClients(clients);
 				dataStore.put(i,newUser);
 				final Future<Map<ClientId,EncryptionKey>> result=new DefaultFutureResult<>();
-				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity1(i,signature,result);
+				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity1(new LongId(i),signature,result);
 				assertTrue(result.succeeded());
 				final Map<ClientId,EncryptionKey> reply=result.result();
 				for(final EncryptionKey e : reply.values())
@@ -315,7 +316,7 @@ public class BroadcastNewContactIdentityTest
 				newUser.setClients(clients);
 				dataStore.put(i,newUser);
 				final Future<Map<ClientId,EncryptionKey>> result=new DefaultFutureResult<>();
-				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity1(i,signature,result);
+				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity1(new LongId(i),signature,result);
 				assertTrue(result.failed());
 				//noinspection ThrowableResultOfMethodCallIgnored
 				assertEquals(FailedOperation.class,result.cause().getClass());
@@ -359,7 +360,7 @@ public class BroadcastNewContactIdentityTest
 		@Override
 		PlaintextSerializer constructPlaintext()
 		{
-			return new LongPlaintextSerializer(i);
+			return new BasePlaintextSerializer<>(new LongId(i));
 		}
 	}
 }

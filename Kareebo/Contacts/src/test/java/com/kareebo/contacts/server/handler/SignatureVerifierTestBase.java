@@ -86,10 +86,7 @@ abstract class SignatureVerifierTestBase
 		final KeyPair keyPair=g.generateKeyPair();
 		final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
-		for(final Object a : plaintext.serialize())
-		{
-			ecdsaSign.update((byte[])a);
-		}
+		ecdsaSign.update(plaintext.serialize());
 		signature.setClient(clientIdValid);
 		signature.setBuffer(ecdsaSign.sign());
 		ecdsaSign.update("fgh".getBytes());

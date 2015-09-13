@@ -1,6 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.CollectionPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.HashIdentity;
@@ -9,6 +9,7 @@ import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.HashAlgorithm;
 import com.kareebo.contacts.thrift.HashBuffer;
+import com.kareebo.contacts.thrift.HashBufferSet;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -37,7 +38,8 @@ public class RegisterUnconfirmedIdentityTest
 			void run() throws NoSuchAlgorithmException
 			{
 				final Future<Void> result=new DefaultFutureResult<>();
-				((RegisterUnconfirmedIdentity)signatureVerifier).registerUnconfirmedIdentity1(hashBufferSet,signature,result);
+				((RegisterUnconfirmedIdentity)signatureVerifier).registerUnconfirmedIdentity1(new HashBufferSet(hashBufferSet),
+					                                                                             signature,result);
 				assertTrue(result.succeeded());
 				assertTrue(((MemStore)identityDataStore).hasBeenClosed());
 				final HashSet<com.kareebo.contacts.server.gora.HashBuffer> newIdentities=new HashSet<>(hashBufferSet.size());
@@ -135,7 +137,7 @@ public class RegisterUnconfirmedIdentityTest
 		@Override
 		PlaintextSerializer constructPlaintext()
 		{
-			return new CollectionPlaintextSerializer<>(hashBufferSet);
+			return new BasePlaintextSerializer<>(new HashBufferSet(hashBufferSet));
 		}
 	}
 
@@ -150,7 +152,8 @@ public class RegisterUnconfirmedIdentityTest
 			setUpFailure();
 			final Set<com.kareebo.contacts.server.gora.HashBuffer> original=Utils.convertToSet(getUserValid().getIdentities());
 			final Future<Void> result=new DefaultFutureResult<>();
-			((RegisterUnconfirmedIdentity)signatureVerifier).registerUnconfirmedIdentity1(hashBufferSet,signature,result);
+			((RegisterUnconfirmedIdentity)signatureVerifier).registerUnconfirmedIdentity1(new HashBufferSet(hashBufferSet),signature,
+				                                                                             result);
 			assertTrue(result.failed());
 			//noinspection ThrowableResultOfMethodCallIgnored
 			assertEquals(FailedOperation.class,result.cause().getClass());

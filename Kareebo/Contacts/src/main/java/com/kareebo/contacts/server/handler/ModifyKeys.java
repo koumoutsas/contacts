@@ -1,6 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.PublicKeysPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
@@ -37,7 +37,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	public void modifyKeys1(final PublicKeys newPublicKeys,final SignatureBuffer signature,final Future<Void>
 		                                                                                       future)
 	{
-		verify(new PublicKeysPlaintextSerializer(newPublicKeys),signature,new Reply<>(future),new After()
+		verify(new BasePlaintextSerializer<>(newPublicKeys),signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

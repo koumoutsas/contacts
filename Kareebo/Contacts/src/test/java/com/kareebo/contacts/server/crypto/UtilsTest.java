@@ -12,7 +12,6 @@ import org.junit.Test;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Vector;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +28,7 @@ public class UtilsTest
 		new Utils();
 	}
 
-	final private Vector<byte[]> plaintext=new Vector<>(2);
+	private final byte[] plaintext="abc".getBytes();
 	final private VerificationKey verificationKey=new VerificationKey();
 	private ByteBuffer signature;
 
@@ -41,14 +40,9 @@ public class UtilsTest
 		final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
 		g.initialize(ecSpec,new SecureRandom());
 		final KeyPair keyPair=g.generateKeyPair();
-		plaintext.add("abc".getBytes());
-		plaintext.add("cde".getBytes());
 		Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
-		for(final Object a : plaintext)
-		{
-			ecdsaSign.update((byte[])a);
-		}
+		ecdsaSign.update(plaintext);
 		signature=ByteBuffer.wrap(ecdsaSign.sign());
 		signature.mark();
 		final ByteBuffer buffer=ByteBuffer.wrap(new X509EncodedKeySpec(
@@ -66,8 +60,7 @@ public class UtilsTest
 		signature.rewind();
 		final TestPlaintextSerializer plaintextSerializer=new TestPlaintextSerializer(plaintext);
 		assertTrue(Utils.verifySignature(verificationKey,signature,plaintextSerializer));
-		final Vector<byte[]> plainTextWrong=new Vector<>(1);
-		plainTextWrong.add(plaintext.get(0));
+		final byte[] plainTextWrong="def".getBytes();
 		signature.rewind();
 		assertFalse(Utils.verifySignature(verificationKey,signature,new TestPlaintextSerializer(plainTextWrong)));
 		final VerificationKey wrongKey=verificationKey;

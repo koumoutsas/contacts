@@ -1,9 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.CollectionPlaintextSerializer;
-import com.kareebo.contacts.base.EncryptedBufferPlaintextSerializer;
-import com.kareebo.contacts.base.HashBufferPairPlaintextSerializer;
-import com.kareebo.contacts.base.LongPlaintextSerializer;
+import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
@@ -41,20 +38,22 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	}
 
 	@Override
-	public void broadcastNewContactIdentity1(final long userIdB,final SignatureBuffer signature,final Future<Map<ClientId,EncryptionKey>> future)
+	public void broadcastNewContactIdentity1(final LongId userIdB,final SignatureBuffer signature,final Future<Map<ClientId,EncryptionKey>>
+		                                                                                              future)
 	{
 		final Map<ClientId,EncryptionKey> reply=new HashMap<>();
-		verify(new LongPlaintextSerializer(userIdB),signature,new Reply<>(future,reply),new After()
+		verify(new BasePlaintextSerializer<>(userIdB),signature,new Reply<>(future,reply),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
 			{
-				final Map<CharSequence,Client> clients=clientDBAccessor.get(userIdB).getClients();
+				final long userId=userIdB.getId();
+				final Map<CharSequence,Client> clients=clientDBAccessor.get(userId).getClients();
 				for(final Map.Entry<CharSequence,Client> entry : clients.entrySet())
 				{
 					try
 					{
-						reply.put(new ClientId(userIdB,TypeConverter.convert(entry.getKey())),TypeConverter.convert(entry
+						reply.put(new ClientId(userId,TypeConverter.convert(entry.getKey())),TypeConverter.convert(entry
 							                                                                                            .getValue().getKeys()
 							                                                                                            .getEncryption()));
 					}
@@ -69,15 +68,17 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	}
 
 	@Override
-	public void broadcastNewContactIdentity2(final Set<EncryptedBufferPair> encryptedBufferPairs,final SignatureBuffer signature,final Future<Map<ClientId,EncryptionKey>> future)
+	public void broadcastNewContactIdentity2(final EncryptedBufferPairSet encryptedBufferPairs,final SignatureBuffer signature,final
+	Future<Map<ClientId,EncryptionKey>> future)
 	{
-		final Map<ClientId,EncryptionKey> reply=new HashMap<>(encryptedBufferPairs.size());
-		verify(new CollectionPlaintextSerializer<>(encryptedBufferPairs),signature,new Reply<>(future,reply),new After()
+		final Set<EncryptedBufferPair> encryptedBufferPairsSet=encryptedBufferPairs.getEncryptedBufferPairs();
+		final Map<ClientId,EncryptionKey> reply=new HashMap<>(encryptedBufferPairsSet.size());
+		verify(new BasePlaintextSerializer<>(encryptedBufferPairs),signature,new Reply<>(future,reply),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
 			{
-				for(final EncryptedBufferPair e : encryptedBufferPairs)
+				for(final EncryptedBufferPair e : encryptedBufferPairsSet)
 				{
 					final byte[] I=e.getI().getBuffer();
 					final byte[] IR=e.getIR().getBuffer();
@@ -119,7 +120,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 		for(final EncryptedBufferSigned encryptedBufferSigned : encryptedBuffers)
 		{
 			final DefaultFutureResult<Void> result=new DefaultFutureResult<>();
-			verify(new EncryptedBufferPlaintextSerializer(encryptedBufferSigned.getEncryptedBuffer()),encryptedBufferSigned.getSignature(),
+			verify(new BasePlaintextSerializer<>(encryptedBufferSigned.getEncryptedBuffer()),encryptedBufferSigned.getSignature(),
 				      new Reply<>(result),new After()
 				{
 					@Override
@@ -150,14 +151,14 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	{
 		final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
 			                                                                                        EncryptedBufferSignedWithVerificationKey();
-		final long notificationId=signature.getI();
-		verify(new LongPlaintextSerializer(notificationId),signature.getSignature(),new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After()
+		final LongId notificationId=signature.getI();
+		verify(new BasePlaintextSerializer<>(notificationId),signature.getSignature(),new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
 			{
 				final EncryptedBufferSignedWithVerificationKey retrieved=new EncryptedBufferSignedWithVerificationKey();
-				clientNotifier.get(retrieved,notificationId);
+				clientNotifier.get(retrieved,notificationId.getId());
 				encryptedBufferSignedWithVerificationKey.setEncryptedBufferSigned(retrieved.getEncryptedBufferSigned());
 				encryptedBufferSignedWithVerificationKey.setVerificationKey(retrieved.getVerificationKey());
 			}
@@ -167,7 +168,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	@Override
 	public void BroadcastNewContactIdentity5(final HashBufferPair uCs,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(new HashBufferPairPlaintextSerializer(uCs),signature,new Reply<>(future),new After()
+		verify(new BasePlaintextSerializer<>(uCs),signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

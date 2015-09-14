@@ -213,7 +213,7 @@ service BroadcastNewContactIdentity
 	EncryptedBufferSignedWithVerificationKey broadcastNewContactIdentity4(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
 
 	// Steps 26.c-26.g
-	void BroadcastNewContactIdentity5(1:HashBufferPair uCs,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	void broadcastNewContactIdentity5(1:HashBufferPair uCs,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
 service ModifyKeys

@@ -81,8 +81,13 @@ class TypeConverter
 	static com.kareebo.contacts.thrift.VerificationKey convert(final VerificationKey verificationKey) throws
 		NoSuchAlgorithmException
 	{
-		return new com.kareebo.contacts.thrift.VerificationKey(verificationKey.getBuffer(),convert(verificationKey
-			                                                                                           .getAlgorithm()));
+		final ByteBuffer b=verificationKey.getBuffer();
+		b.rewind();
+		final byte[] bytes=new byte[b.remaining()];
+		b.get(bytes);
+		final ByteBuffer copy=ByteBuffer.wrap(bytes);
+		copy.mark();
+		return new com.kareebo.contacts.thrift.VerificationKey(copy,convert(verificationKey.getAlgorithm()));
 	}
 
 	static com.kareebo.contacts.thrift.EncryptionAlgorithm convert(final EncryptionAlgorithm algorithm) throws
@@ -157,8 +162,13 @@ class TypeConverter
 	static com.kareebo.contacts.thrift.HashBuffer convert(final HashBuffer cryptoBuffer) throws
 		NoSuchAlgorithmException
 	{
-		return new com.kareebo.contacts.thrift.HashBuffer(cryptoBuffer.getBuffer(),convert(cryptoBuffer
-			                                                                                   .getAlgorithm()));
+		final ByteBuffer b=cryptoBuffer.getBuffer();
+		b.rewind();
+		final byte[] bytes=new byte[b.remaining()];
+		b.get(bytes);
+		final ByteBuffer copy=ByteBuffer.wrap(bytes);
+		copy.mark();
+		return new com.kareebo.contacts.thrift.HashBuffer(copy,convert(cryptoBuffer.getAlgorithm()));
 	}
 
 	static com.kareebo.contacts.thrift.HashAlgorithm convert(final HashAlgorithm algorithm) throws

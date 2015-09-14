@@ -5,6 +5,7 @@ import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
+import com.kareebo.contacts.server.gora.HashAlgorithm;
 import com.kareebo.contacts.server.gora.HashBuffer;
 import com.kareebo.contacts.server.gora.PublicKeys;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
@@ -17,13 +18,16 @@ import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.gora.util.GoraException;
 import org.apache.hadoop.conf.Configuration;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
 import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.*;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -33,6 +37,527 @@ import static org.junit.Assert.*;
  */
 public class BroadcastNewContactIdentityTest
 {
+	/**
+	 * Create a client (0,0), create two hash identities uC and uC' mapping to two other users (1 and 2), set their confirmers to various sizes
+	 * and check that they're aliased correctly.
+	 */
+	@Test
+	public void testBroadcastNewContactIdentity5() throws Exception
+	{
+		abstract class Base5 extends SignatureVerifierTestBase
+		{
+			final HashBufferPair hashBufferPair=new HashBufferPair();
+			final DataStore<ByteBuffer,HashIdentity> identityDataStore;
+
+			private Base5() throws Exception
+			{
+				identityDataStore=DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration());
+				setupIdentityDatastore();
+				setUp();
+			}
+
+			private void setupIdentityDatastore() throws NoSuchAlgorithmException
+			{
+				final List<String> ids=getIds();
+				final HashBuffer uC=new HashBuffer();
+				uC.setAlgorithm(HashAlgorithm.SHA256);
+				final ByteBuffer b1=ByteBuffer.wrap(ids.get(0).getBytes());
+				b1.mark();
+				uC.setBuffer(b1);
+				hashBufferPair.setUC(TypeConverter.convert(uC));
+				final HashIdentity identity1=new HashIdentity();
+				identity1.setHash(b1);
+				final HashIdentityValue hashIdentityValue1=new HashIdentityValue();
+				hashIdentityValue1.setId((long)1);
+				identity1.setHashIdentity(hashIdentityValue1);
+				final HashBuffer uCP=new HashBuffer();
+				uCP.setAlgorithm(HashAlgorithm.SHA256);
+				final ByteBuffer b2=ByteBuffer.wrap(ids.get(1).getBytes());
+				b2.mark();
+				uCP.setBuffer(b2);
+				hashBufferPair.setUPrimeC(TypeConverter.convert(uCP));
+				final HashIdentity identity2=new HashIdentity();
+				identity2.setHash(b1);
+				final HashIdentityValue hashIdentityValue2=new HashIdentityValue();
+				hashIdentityValue2.setId((long)2);
+				identity2.setHashIdentity(hashIdentityValue2);
+				setupIdentityDatastoreImplementation(identity1,identity2);
+				final List<Boolean> adds=add();
+				if(adds.get(0))
+				{
+					identityDataStore.put(b1,identity1);
+				}
+				if(adds.get(1))
+				{
+					identityDataStore.put(b2,identity2);
+				}
+				identityDataStore.close();
+			}
+
+			abstract List<String> getIds();
+
+			abstract void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2);
+
+			abstract List<Boolean> add();
+
+			@Override
+			SignatureVerifier construct(final DataStore<Long,User> dataStore)
+			{
+				return new BroadcastNewContactIdentity(dataStore,identityDataStore,null);
+			}
+
+			@Override
+			PlaintextSerializer constructPlaintext()
+			{
+				return new BasePlaintextSerializer<>(hashBufferPair);
+			}
+
+			void run()
+			{
+				final Future<Void> result=new DefaultFutureResult<>();
+				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity5(hashBufferPair,signature,result);
+				check(result);
+			}
+
+			abstract void check(final Future<Void> result);
+		}
+		new Base5()
+		{
+			@Override
+			List<String> getIds()
+			{
+				return Arrays.asList("1","2");
+			}			@Override
+			List<Boolean> add()
+			{
+				return Arrays.asList(true,true);
+			}
+
+			@Override
+			void check(final Future<Void> result)
+			{
+				assertTrue(result.succeeded());
+				final Object o1=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
+				final Object o2=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
+				assertTrue(o1 instanceof HashIdentityValue);
+				assertTrue(o2 instanceof ByteBuffer);
+				assertEquals(hashBufferPair.getUC().bufferForBuffer(),o2);
+				final List<Long> mergedConfirmers=((HashIdentityValue)o1).getConfirmers();
+				assertEquals(4,mergedConfirmers.size());
+				assertTrue(mergedConfirmers.containsAll(Arrays.asList((long)2,(long)3,(long)4,(long)5)));
+			}
+
+			@Override
+			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
+			{
+				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
+				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
+				final List<Long> confirmers1=new ArrayList<>(3);
+				confirmers1.add((long)2);
+				confirmers1.add((long)3);
+				confirmers1.add((long)4);
+				hashIdentityValue1.setConfirmers(confirmers1);
+				final List<Long> confirmers2=new ArrayList<>(2);
+				confirmers1.add((long)4);
+				confirmers1.add((long)5);
+				hashIdentityValue2.setConfirmers(confirmers2);
+			}
+
+
+		}.run();
+		new Base5()
+		{
+			@Override
+			List<Boolean> add()
+			{
+				return Arrays.asList(true,true);
+			}
+
+			@Override
+			void check(final Future<Void> result)
+			{
+				assertTrue(result.succeeded());
+				final Object o1=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
+				final Object o2=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
+				assertTrue(o1 instanceof HashIdentityValue);
+				assertTrue(o2 instanceof ByteBuffer);
+				assertEquals(hashBufferPair.getUPrimeC().bufferForBuffer(),o2);
+				final List<Long> mergedConfirmers=((HashIdentityValue)o1).getConfirmers();
+				assertEquals(4,mergedConfirmers.size());
+				assertTrue(mergedConfirmers.containsAll(Arrays.asList((long)2,(long)3,(long)4,(long)5)));
+			}
+
+			@Override
+			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
+			{
+				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
+				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
+				final List<Long> confirmers2=new ArrayList<>(3);
+				confirmers2.add((long)2);
+				confirmers2.add((long)3);
+				confirmers2.add((long)4);
+				hashIdentityValue2.setConfirmers(confirmers2);
+				final List<Long> confirmers1=new ArrayList<>(2);
+				confirmers1.add((long)4);
+				confirmers1.add((long)5);
+				hashIdentityValue1.setConfirmers(confirmers1);
+			}
+
+			@Override
+			List<String> getIds()
+			{
+				return Arrays.asList("1","2");
+			}
+		}.run();
+		new Base5()
+		{
+			@Override
+			List<Boolean> add()
+			{
+				return Arrays.asList(true,true);
+			}
+
+			@Override
+			void check(final Future<Void> result)
+			{
+				assertTrue(result.succeeded());
+				final Object o1=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
+				final Object o2=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
+				assertTrue(o1 instanceof HashIdentityValue);
+				assertTrue(o2 instanceof ByteBuffer);
+				assertEquals(hashBufferPair.getUPrimeC().bufferForBuffer(),o2);
+				final List<Long> mergedConfirmers=((HashIdentityValue)o1).getConfirmers();
+				assertEquals(4,mergedConfirmers.size());
+				assertTrue(mergedConfirmers.containsAll(Arrays.asList((long)2,(long)3,(long)4,(long)5)));
+			}
+
+			@Override
+			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
+			{
+				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
+				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
+				final List<Long> confirmers2=new ArrayList<>(3);
+				confirmers2.add((long)2);
+				confirmers2.add((long)3);
+				hashIdentityValue2.setConfirmers(confirmers2);
+				final List<Long> confirmers1=new ArrayList<>(2);
+				confirmers1.add((long)4);
+				confirmers1.add((long)5);
+				hashIdentityValue1.setConfirmers(confirmers1);
+			}
+
+			@Override
+			List<String> getIds()
+			{
+				return Arrays.asList("1","2");
+			}
+		}.run();
+		new Base5()
+		{
+			@Override
+			List<Boolean> add()
+			{
+				return Arrays.asList(true,true);
+			}
+
+			@Override
+			void check(final Future<Void> result)
+			{
+				assertTrue(result.succeeded());
+				final Object o1=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
+				final Object o2=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
+				assertTrue(o1 instanceof HashIdentityValue);
+				assertTrue(o2 instanceof ByteBuffer);
+				assertEquals(hashBufferPair.getUC().bufferForBuffer(),o2);
+				final List<Long> mergedConfirmers=((HashIdentityValue)o1).getConfirmers();
+				assertEquals(4,mergedConfirmers.size());
+				assertTrue(mergedConfirmers.containsAll(Arrays.asList((long)2,(long)3,(long)4,(long)5)));
+			}
+
+			@Override
+			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
+			{
+				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
+				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
+				final List<Long> confirmers2=new ArrayList<>(2);
+				confirmers2.add((long)2);
+				confirmers2.add((long)3);
+				hashIdentityValue2.setConfirmers(confirmers2);
+				final List<Long> confirmers1=new ArrayList<>(2);
+				confirmers1.add((long)4);
+				confirmers1.add((long)5);
+				hashIdentityValue1.setConfirmers(confirmers1);
+			}
+
+			@Override
+			List<String> getIds()
+			{
+				return Arrays.asList("2","1");
+			}
+		}.run();
+		new Base5()
+		{
+			@Override
+			List<Boolean> add()
+			{
+				return Arrays.asList(true,true);
+			}
+
+			@Override
+			void check(final Future<Void> result)
+			{
+				assertTrue(result.failed());
+				final Object o1=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
+				final Object o2=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
+				assertTrue(o1 instanceof HashIdentityValue);
+				assertTrue(o2 instanceof HashIdentityValue);
+			}
+
+			@Override
+			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
+			{
+				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
+				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
+				final List<Long> confirmers2=new ArrayList<>();
+				hashIdentityValue2.setConfirmers(confirmers2);
+				final List<Long> confirmers1=new ArrayList<>(1);
+				hashIdentityValue1.setConfirmers(confirmers1);
+			}
+
+			@Override
+			List<String> getIds()
+			{
+				return Arrays.asList("1","1");
+			}
+		}.run();
+		new Base5()
+		{
+			@Override
+			List<Boolean> add()
+			{
+				return Arrays.asList(true,false);
+			}
+
+			@Override
+			void check(final Future<Void> result)
+			{
+				assertTrue(result.failed());
+			}
+
+			@Override
+			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
+			{
+				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
+				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
+				final List<Long> confirmers2=new ArrayList<>();
+				hashIdentityValue2.setConfirmers(confirmers2);
+				final List<Long> confirmers1=new ArrayList<>(1);
+				hashIdentityValue1.setConfirmers(confirmers1);
+			}
+
+			@Override
+			List<String> getIds()
+			{
+				return Arrays.asList("1","2");
+			}
+		}.run();
+		new Base5()
+		{
+			@Override
+			List<Boolean> add()
+			{
+				return Arrays.asList(false,true);
+			}
+
+			@Override
+			void check(final Future<Void> result)
+			{
+				assertTrue(result.failed());
+			}
+
+			@Override
+			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
+			{
+				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
+				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
+				final List<Long> confirmers2=new ArrayList<>();
+				hashIdentityValue2.setConfirmers(confirmers2);
+				final List<Long> confirmers1=new ArrayList<>(1);
+				hashIdentityValue1.setConfirmers(confirmers1);
+			}
+
+			@Override
+			List<String> getIds()
+			{
+				return Arrays.asList("1","2");
+			}
+		}.run();
+	}
+
+	/**
+	 * Create a client (0,0), add a notification to pending notifications, sign the notification id and retrieve the EncryptedBufferSignedWithVerificationKey
+	 */
+	@Test
+	public void testBroadcastNewContactIdentity4() throws Exception
+	{
+		class Base4 extends Base34
+		{
+			private EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey;
+
+			private Base4() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, FailedOperation
+			{
+			}
+
+			@Override
+			BroadcastNewContactIdentity construct() throws GoraException
+			{
+				return new BroadcastNewContactIdentity(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
+					                                                                                                    .class,new Configuration()),clientNotifier);
+			}
+
+			void run() throws FailedOperation, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
+			{
+				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
+				final LongId notificationId=new LongId(notifierBackend.sentNotifications.values().iterator().next());
+				broadcastNewContactIdentity.broadcastNewContactIdentity4(new SignedRandomNumber(notificationId,sign(new
+					                                                                                                    BasePlaintextSerializer<>(notificationId).serialize(),
+					                                                                                                   clientId)),future);
+				check(future);
+			}			@Override
+			void setupUserDatastore() throws FailedOperation
+			{
+				final ByteBuffer b=ByteBuffer.wrap("1".getBytes());
+				b.mark();
+				encryptedBufferSignedWithVerificationKey=new
+					                                         EncryptedBufferSignedWithVerificationKey();
+				encryptedBufferSignedWithVerificationKey.setEncryptedBufferSigned(new EncryptedBufferSigned(new com.kareebo.contacts.thrift.EncryptedBuffer(b,EncryptionAlgorithm.RSA2048,clientId),new SignatureBuffer(b,com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1,clientId
+				)));
+				encryptedBufferSignedWithVerificationKey.setVerificationKey(new com.kareebo.contacts.thrift.VerificationKey(b,
+					                                                                                                           com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1
+				));
+				clientNotifier.put(deviceToken,encryptedBufferSignedWithVerificationKey);
+			}
+
+			void check(final Future<EncryptedBufferSignedWithVerificationKey> future)
+			{
+				assertTrue(future.succeeded());
+				assertEquals(encryptedBufferSignedWithVerificationKey,future.result());
+			}
+
+
+
+			@Override
+			SignatureAlgorithm getSignatureAlgorithm()
+			{
+				return SignatureAlgorithm.SHA256withECDSAprime239v1;
+			}
+		}
+		new Base4().run();
+	}
+
+	/**
+	 * Create a user (10), create two clients (0,1), create an encrypted buffer for each client and sign it, send it and check if the client
+	 * notifier has received the two notifications
+	 */
+	@Test
+	public void testBroadcastNewContactIdentity3() throws Exception
+	{
+		new Base3()
+		{
+			void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException
+			{
+				assertTrue(future.succeeded());
+				assertEquals(clientNumber,notifierBackend.sentNotifications.size());
+				for(long i=0;i<clientNumber;++i)
+				{
+					final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
+						                                                                                        EncryptedBufferSignedWithVerificationKey();
+					clientNotifier.get(encryptedBufferSignedWithVerificationKey,notifierBackend.sentNotifications.get(i));
+					final EncryptedBufferSignedWithVerificationKey expected=new EncryptedBufferSignedWithVerificationKey
+						                                                        (encryptedBuffersMap.get(i),
+							                                                        TypeConverter.convert(verificationKey));
+					assertEquals(expected,encryptedBufferSignedWithVerificationKey);
+				}
+			}			@Override
+			BroadcastNewContactIdentity construct() throws GoraException
+			{
+				return new BroadcastNewContactIdentity(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
+					                                                                                                    .class,new Configuration()),clientNotifier);
+			}
+
+			@Override
+			SignatureAlgorithm getSignatureAlgorithm()
+			{
+				return SignatureAlgorithm.SHA256withECDSAprime239v1;
+			}
+
+
+		}.run();
+	}
+
+	/**
+	 * Contrived test for 100% coverage. The code that it covers is inaccessible, because if the algorithm is invalid, verify has already
+	 * stopped the execution
+	 */
+	@Test
+	public void testBroadcastNewContactIdentity3AlgorithmError() throws Exception
+	{
+		new Base3()
+		{
+			@Override
+			BroadcastNewContactIdentity construct() throws GoraException
+			{
+				class BroadcastNewContactIdentityFake extends BroadcastNewContactIdentity
+				{
+					BroadcastNewContactIdentityFake(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
+					{
+						super(dataStore,identityDatastore,clientNotifier);
+					}
+
+					@Override
+					void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Reply<?> reply,final After after)
+					{
+						final Client client;
+						try
+						{
+							client=clientDBAccessor.get(signature.getClient());
+						}
+						catch(FailedOperation failedOperation)
+						{
+							reply.setFailure(failedOperation);
+							return;
+						}
+						try
+						{
+							after.run(clientDBAccessor.user,client);
+						}
+						catch(FailedOperation failedOperation)
+						{
+							reply.setFailure(failedOperation);
+							return;
+						}
+						clientDBAccessor.close();
+						reply.setReply();
+					}
+				}
+				return new BroadcastNewContactIdentityFake(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
+					                                                                                                        .class,new Configuration()),clientNotifier);
+			}
+
+			@Override
+			SignatureAlgorithm getSignatureAlgorithm()
+			{
+				return SignatureAlgorithm.Fake;
+			}
+
+			void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException
+			{
+				assertTrue(future.failed());
+				assertEquals(0,notifierBackend.sentNotifications.size());
+			}
+		}.run();
+	}
+
 	/**
 	 * Create a user (10), create four clients (0,1,2,3) and set an encryption key for each of them.
 	 * 0: Create I and IR that match
@@ -89,10 +614,6 @@ public class BroadcastNewContactIdentityTest
 							                                                                                                                              (clientId.getClient())).getKeys().getEncryption());
 					assertEquals(expectedEncryptionKey,encryptionKey);
 				}
-			}			@Override
-			PlaintextSerializer constructPlaintext()
-			{
-				return new BasePlaintextSerializer<>(new EncryptedBufferPairSet(encryptedBufferPairs));
 			}
 
 			/**
@@ -142,6 +663,10 @@ public class BroadcastNewContactIdentityTest
 				client.setComparisonIdentities(comparisonIdentities);
 				clients.put(TypeConverter.convert(id.getClient()),client);
 				return client;
+			}			@Override
+			PlaintextSerializer constructPlaintext()
+			{
+				return new BasePlaintextSerializer<>(new EncryptedBufferPairSet(encryptedBufferPairs));
 			}
 
 			private Client setupValidClient(final ClientId id,final HashMap<CharSequence,Client> clients)
@@ -322,6 +847,185 @@ public class BroadcastNewContactIdentityTest
 				assertEquals(FailedOperation.class,result.cause().getClass());
 			}
 		}.run();
+	}
+
+	abstract class Base34
+	{
+		protected final Notifier notifierBackend=new Notifier();
+		protected final ClientNotifier clientNotifier;
+		protected final BroadcastNewContactIdentity broadcastNewContactIdentity;
+		protected final ClientId clientId=new ClientId(0,0);
+		protected final long deviceToken=0;
+		protected DataStore<Long,User> userDataStore;
+		protected VerificationKey verificationKey;
+		private KeyPair keyPair;
+		private DataStore<Long,PendingNotification> pendingNotificationDataStore;
+
+		private Base34() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException,
+			                        InvalidKeyException, SignatureException, FailedOperation
+		{
+			userDataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
+			pendingNotificationDataStore=DataStoreFactory.getDataStore(Long.class,PendingNotification.class,new Configuration());
+			clientNotifier=new ClientNotifier(notifierBackend,pendingNotificationDataStore);
+			broadcastNewContactIdentity=construct();
+			setupMainUser();
+			setupUserDatastore();
+		}
+
+		abstract BroadcastNewContactIdentity construct() throws GoraException;
+
+		private void setupMainUser() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException,
+			                                    InvalidKeyException
+		{
+			final User user=new User();
+			final ByteBuffer b=ByteBuffer.wrap("".getBytes());
+			b.mark();
+			user.setBlind(b);
+			user.setId(clientId.getUser());
+			final Map<CharSequence,Client> clients=new HashMap<>(1);
+			final Client client=new Client();
+			client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+			client.setDeviceToken(deviceToken);
+			final PublicKeys publicKeys=new PublicKeys();
+			final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
+				                                                                       .EncryptionKey();
+			encryptionKey.setAlgorithm(com.kareebo.contacts.server.gora.EncryptionAlgorithm.RSA2048);
+			encryptionKey.setBuffer(b);
+			publicKeys.setEncryption(encryptionKey);
+			verificationKey=createSignatureKeys();
+			publicKeys.setVerification(verificationKey);
+			client.setKeys(publicKeys);
+			final UserAgent userAgent=new UserAgent();
+			userAgent.setPlatform("");
+			userAgent.setVersion("");
+			client.setUserAgent(userAgent);
+			clients.put(TypeConverter.convert(clientId.getClient()),client);
+			user.setClients(clients);
+			user.setIdentities(new ArrayList<HashBuffer>());
+			user.setSentRequests(new ArrayList<HashBuffer>());
+			userDataStore.put(user.getId(),user);
+		}
+
+		abstract void setupUserDatastore() throws FailedOperation, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
+
+		VerificationKey createSignatureKeys() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException
+		{
+			Security.addProvider(new BouncyCastleProvider());
+			final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
+			final KeyPairGenerator g=KeyPairGenerator.getInstance("ECDSA",Utils.getProvider());
+			g.initialize(ecSpec,new SecureRandom());
+			keyPair=g.generateKeyPair();
+			return setUpVerificationKey(new X509EncodedKeySpec(keyPair.getPublic().getEncoded()).getEncoded());
+		}
+
+		private VerificationKey setUpVerificationKey(final byte[] buffer)
+		{
+			final VerificationKey verificationKey=new VerificationKey();
+			verificationKey.setAlgorithm(getSignatureAlgorithm());
+			final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
+			byteBuffer.mark();
+			verificationKey.setBuffer(byteBuffer);
+			return verificationKey;
+		}
+
+		abstract SignatureAlgorithm getSignatureAlgorithm();
+
+		SignatureBuffer sign(final byte[] buffer,final ClientId clientId) throws NoSuchProviderException,
+			                                                                         NoSuchAlgorithmException, InvalidKeyException, SignatureException
+		{
+			final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
+			ecdsaSign.initSign(keyPair.getPrivate());
+			ecdsaSign.update(buffer);
+			final SignatureBuffer signatureBuffer=new SignatureBuffer();
+			signatureBuffer.setBuffer(ecdsaSign.sign());
+			signatureBuffer.setAlgorithm(com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1);
+			signatureBuffer.setClient(clientId);
+			return signatureBuffer;
+		}
+	}
+
+	private class Notifier implements ClientNotifierBackend
+	{
+		final Map<Long,Long> sentNotifications=new HashMap<>();
+
+		@Override
+		public void notify(final long deviceToken,final long notificationId) throws FailedOperation
+		{
+			sentNotifications.put(deviceToken,notificationId);
+		}
+	}
+
+	abstract class Base3 extends Base34
+	{
+		static final int clientNumber=2;
+		protected Map<Long,EncryptedBufferSigned> encryptedBuffersMap;
+		private Set<EncryptedBufferSigned> encryptedBuffers;
+
+		private Base3() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, FailedOperation
+		{
+		}
+
+		/**
+		 * Set up the datastores, make call 2 and check the results
+		 */
+		void run() throws NoSuchAlgorithmException, FailedOperation
+		{
+			final Future<Void> future=new DefaultFutureResult<>();
+			broadcastNewContactIdentity.broadcastNewContactIdentity3(encryptedBuffers,future);
+			check(future);
+		}		@Override
+		void setupUserDatastore() throws FailedOperation, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
+		{
+			encryptedBuffers=new HashSet<>(clientNumber);
+			encryptedBuffersMap=new HashMap<>(clientNumber);
+			final User user=new User();
+			final ByteBuffer b=ByteBuffer.wrap("".getBytes());
+			b.mark();
+			user.setBlind(b);
+			user.setId((long)10);
+			final Map<CharSequence,Client> clients=new HashMap<>(clientNumber);
+			for(long i=0;i<clientNumber;++i)
+			{
+				final Client client=new Client();
+				client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+				client.setDeviceToken(i);
+				final PublicKeys publicKeys=new PublicKeys();
+				final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
+					                                                                       .EncryptionKey();
+				encryptionKey.setAlgorithm(com.kareebo.contacts.server.gora.EncryptionAlgorithm.RSA2048);
+				encryptionKey.setBuffer(b);
+				publicKeys.setEncryption(encryptionKey);
+				final VerificationKey verificationKey=new VerificationKey();
+				verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
+				verificationKey.setBuffer(b);
+				publicKeys.setVerification(verificationKey);
+				client.setKeys(publicKeys);
+				final UserAgent userAgent=new UserAgent();
+				userAgent.setPlatform("");
+				userAgent.setVersion("");
+				client.setUserAgent(userAgent);
+				clients.put(TypeConverter.convert(i),client);
+				final ByteBuffer buffer=ByteBuffer.wrap(TypeConverter.convert(i).toString().getBytes());
+				buffer.mark();
+				final ClientId clientId=new ClientId(user.getId(),i);
+				final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer=new com.kareebo.contacts.thrift
+					                                                                      .EncryptedBuffer(buffer,
+						                                                                                      EncryptionAlgorithm.RSA2048,clientId);
+				final EncryptedBufferSigned encryptedBufferSigned=new EncryptedBufferSigned(encryptedBuffer,sign(new BasePlaintextSerializer<>
+					                                                                                                 (encryptedBuffer).serialize(),this
+						                                                                                                                               .clientId));
+				encryptedBuffers.add(encryptedBufferSigned);
+				encryptedBuffersMap.put(i,encryptedBufferSigned);
+			}
+			user.setClients(clients);
+			user.setIdentities(new ArrayList<HashBuffer>());
+			user.setSentRequests(new ArrayList<HashBuffer>());
+			userDataStore.put(user.getId(),user);
+		}
+
+		abstract void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException;
+
+
 	}
 
 	/**

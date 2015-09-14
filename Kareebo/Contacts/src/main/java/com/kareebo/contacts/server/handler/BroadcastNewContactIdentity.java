@@ -86,8 +86,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 					try
 					{
 						final Client clientB=clientDBAccessor.get(clientIdB);
-						final List<com.kareebo.contacts.server.gora.EncryptedBuffer> comparisonIdentities=clientB
-							                                                                                  .getComparisonIdentities();
+						final List<com.kareebo.contacts.server.gora.EncryptedBuffer> comparisonIdentities=clientB.getComparisonIdentities();
 						for(final com.kareebo.contacts.server.gora.EncryptedBuffer c : comparisonIdentities)
 						{
 							final ByteBuffer b=c.getBuffer();
@@ -120,15 +119,20 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 		for(final EncryptedBufferSigned encryptedBufferSigned : encryptedBuffers)
 		{
 			final DefaultFutureResult<Void> result=new DefaultFutureResult<>();
-			verify(new BasePlaintextSerializer<>(encryptedBufferSigned.getEncryptedBuffer()),encryptedBufferSigned.getSignature(),
+			final EncryptedBuffer encryptedBuffer=encryptedBufferSigned.getEncryptedBuffer();
+			verify(new BasePlaintextSerializer<>(encryptedBuffer),encryptedBufferSigned.getSignature(),
 				      new Reply<>(result),new After()
 				{
 					@Override
 					public void run(final User user,final Client client) throws FailedOperation
 					{
+						final ClientId clientIdB=encryptedBuffer.getClient();
+						final Client clientB=clientDBAccessor.get(clientIdB);
 						try
 						{
-							clientNotifier.put(client.getDeviceToken(),new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification())));
+							clientNotifier.put(clientB.getDeviceToken(),new EncryptedBufferSignedWithVerificationKey
+								                                            (encryptedBufferSigned,TypeConverter.convert(client.getKeys()
+									                                                                                         .getVerification())));
 						}
 						catch(NoSuchAlgorithmException e)
 						{
@@ -166,7 +170,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	}
 
 	@Override
-	public void BroadcastNewContactIdentity5(final HashBufferPair uCs,final SignatureBuffer signature,final Future<Void> future)
+	public void broadcastNewContactIdentity5(final HashBufferPair uCs,final SignatureBuffer signature,final Future<Void> future)
 	{
 		verify(new BasePlaintextSerializer<>(uCs),signature,new Reply<>(future),new After()
 		{
@@ -236,7 +240,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 					}
 				}
 				confirmersBig.addAll(confirmersSmall);
-				valueBig.setConfirmers(confirmersBig);
+				valueBig.setConfirmers(new ArrayList<>(new HashSet<>(confirmersBig)));
 				put(keyBig,valueBig);
 				aliasTo(keySmall,keyBig);
 			}

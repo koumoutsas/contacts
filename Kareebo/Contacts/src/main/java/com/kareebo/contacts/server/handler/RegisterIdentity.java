@@ -25,14 +25,14 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 	private static final Logger logger=LoggerFactory.getLogger(RegisterIdentity.class.getName());
 
 	/**
-	 * Constructor from a datastore
+	 * Constructor from datastores
 	 *
-	 * @param dataStore         The datastore
+	 * @param userDataStore     The user datastore
 	 * @param identityDataStore The identity datastore
 	 */
-	RegisterIdentity(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity> identityDataStore)
+	RegisterIdentity(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDataStore)
 	{
-		super(dataStore,identityDataStore);
+		super(userDataStore,identityDataStore);
 	}
 
 	@Override

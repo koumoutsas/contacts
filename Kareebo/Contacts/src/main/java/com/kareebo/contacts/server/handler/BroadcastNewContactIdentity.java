@@ -26,14 +26,15 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	private final ClientNotifier clientNotifier;
 
 	/**
-	 * Constructor from a datastore
+	 * Constructor from datastores
 	 *
-	 * @param dataStore The datastore
+	 * @param userDataStore     The datastore
+	 * @param identityDatastore The identity datastore
+	 * @param clientNotifier    The client notifier interface
 	 */
-	BroadcastNewContactIdentity(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity>
-		                                                                 identityDatastore,final ClientNotifier clientNotifier)
+	BroadcastNewContactIdentity(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
 	{
-		super(dataStore,identityDatastore);
+		super(userDataStore,identityDatastore);
 		this.clientNotifier=clientNotifier;
 	}
 
@@ -54,8 +55,8 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 					try
 					{
 						reply.put(new ClientId(userId,TypeConverter.convert(entry.getKey())),TypeConverter.convert(entry
-							                                                                                            .getValue().getKeys()
-							                                                                                            .getEncryption()));
+							                                                                                           .getValue().getKeys()
+							                                                                                           .getEncryption()));
 					}
 					catch(NoSuchAlgorithmException e)
 					{

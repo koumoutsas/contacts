@@ -27,7 +27,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 	final private GraphAccessor graphAccessor;
 
 	/**
-	 * Constructor from a datastore
+	 * Constructor from datastores
 	 *
 	 * @param userDataStore     The datastore of the users
 	 * @param identityDatastore The datastore of hashed identities
@@ -41,7 +41,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 
 	@Override
 	public void updateServerContactBook1(final ContactOperationSet contactOperationSet,final SignatureBuffer
-		                                                                                     signature,final Future<Void> future)
+		                                                                                   signature,final Future<Void> future)
 	{
 		verify(new BasePlaintextSerializer<>(contactOperationSet),signature,new Reply<>(future),new After()
 		{

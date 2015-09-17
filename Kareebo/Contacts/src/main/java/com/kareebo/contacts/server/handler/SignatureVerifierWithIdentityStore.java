@@ -15,18 +15,17 @@ import java.nio.ByteBuffer;
 abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 {
 	final private HashIdentityRetriever hashIdentityRetriever;
-	final private DataStore<ByteBuffer,HashIdentity>
-		identityDatastore;
+	final private DataStore<ByteBuffer,HashIdentity> identityDatastore;
 
 	/**
 	 * Constructor from a datastore
 	 *
-	 * @param dataStore The datastore
+	 * @param userDataStore     The user datastore
+	 * @param identityDatastore The identity datastore
 	 */
-	SignatureVerifierWithIdentityStore(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity>
-		                                                                        identityDatastore)
+	SignatureVerifierWithIdentityStore(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore)
 	{
-		super(dataStore);
+		super(userDataStore);
 		this.identityDatastore=identityDatastore;
 		hashIdentityRetriever=new HashIdentityRetriever(identityDatastore);
 	}

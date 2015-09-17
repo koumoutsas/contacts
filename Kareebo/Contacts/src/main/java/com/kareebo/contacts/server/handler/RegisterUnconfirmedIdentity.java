@@ -28,15 +28,15 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 	private static final Logger logger=LoggerFactory.getLogger(RegisterUnconfirmedIdentity.class.getName());
 
 	/**
-	 * Constructor from a datastore
+	 * Constructor from datastores
 	 *
-	 * @param dataStore         The datastore
+	 * @param userDataStore     The user datastore
 	 * @param identityDatastore The datastore of hashed identities
 	 */
-	public RegisterUnconfirmedIdentity(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity>
-		                                                                        identityDatastore)
+	public RegisterUnconfirmedIdentity(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity>
+		                                                                            identityDatastore)
 	{
-		super(dataStore,identityDatastore);
+		super(userDataStore,identityDatastore);
 	}
 
 	@Override

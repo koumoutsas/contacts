@@ -123,12 +123,6 @@ struct LongId
 	1:Id id,
 }
 
-struct SignedRandomNumber
-{
-	1:LongId i,
-	2:SignatureBuffer signature,
-}
-
 struct EncryptionKeys
 {
 	1:Id userId,
@@ -210,7 +204,8 @@ service BroadcastNewContactIdentity
 	void broadcastNewContactIdentity3(1:set<EncryptedBufferSigned> encryptedBuffers) throws (1:FailedOperation failedOperation),
 
 	// Step 22
-	EncryptedBufferSignedWithVerificationKey broadcastNewContactIdentity4(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+	EncryptedBufferSignedWithVerificationKey broadcastNewContactIdentity4(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation
+	failedOperation),
 
 	// Steps 26.c-26.g
 	void broadcastNewContactIdentity5(1:HashBufferPair uCs,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
@@ -240,25 +235,27 @@ service SendContactCard
 	void sendContactCard1(1:HashBuffer u,2:Id userIdB,3:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Step 9
-	EncryptionKeys sendContactCard2(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+	EncryptionKeys sendContactCard2(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Step 16
 	void sendContactCard3(1:set<EncryptedBufferSigned> encryptedBuffers) throws (1:FailedOperation failedOperation),
 
 	// Step 19.a
-	EncryptedBuffersSignedWithVerificationKey sendContactCard4(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+	EncryptedBuffersSignedWithVerificationKey sendContactCard4(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation
+	failedOperation),
 }
 
 service SuggestNewContact
 {
 	// Step 4.a
-	EncryptionKeysWithHashBuffer suggestNewContact1(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+	EncryptionKeysWithHashBuffer suggestNewContact1(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Steps 4.e-4.e
 	void suggestNewContact2(1:set<EncryptedBufferSigned> encryptedBuffers,2:HashBuffer uB,3:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Step 5
-	EncryptedBufferSignedWithVerificationKey suggestNewContact3(1:SignedRandomNumber signature) throws (1:FailedOperation failedOperation),
+	EncryptedBufferSignedWithVerificationKey suggestNewContact3(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation
+	failedOperation),
 }
 
 service ConfirmIdentity

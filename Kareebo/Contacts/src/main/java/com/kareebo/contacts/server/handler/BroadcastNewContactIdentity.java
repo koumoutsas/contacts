@@ -151,18 +151,17 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	}
 
 	@Override
-	public void broadcastNewContactIdentity4(final SignedRandomNumber signature,final Future<EncryptedBufferSignedWithVerificationKey> future)
+	public void broadcastNewContactIdentity4(final LongId id,final SignatureBuffer signature,final Future<EncryptedBufferSignedWithVerificationKey> future)
 	{
 		final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
 			                                                                                        EncryptedBufferSignedWithVerificationKey();
-		final LongId notificationId=signature.getI();
-		verify(new BasePlaintextSerializer<>(notificationId),signature.getSignature(),new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After()
+		verify(new BasePlaintextSerializer<>(id),signature,new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
 			{
 				final EncryptedBufferSignedWithVerificationKey retrieved=new EncryptedBufferSignedWithVerificationKey();
-				clientNotifier.get(retrieved,notificationId.getId());
+				clientNotifier.get(retrieved,id.getId());
 				encryptedBufferSignedWithVerificationKey.setEncryptedBufferSigned(retrieved.getEncryptedBufferSigned());
 				encryptedBufferSignedWithVerificationKey.setVerificationKey(retrieved.getVerificationKey());
 			}

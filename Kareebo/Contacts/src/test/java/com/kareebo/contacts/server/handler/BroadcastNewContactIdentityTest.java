@@ -419,11 +419,12 @@ public class BroadcastNewContactIdentityTest
 			{
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
 				final LongId notificationId=new LongId(notifierBackend.sentNotifications.values().iterator().next());
-				broadcastNewContactIdentity.broadcastNewContactIdentity4(new SignedRandomNumber(notificationId,sign(new
-					                                                                                                    BasePlaintextSerializer<>(notificationId).serialize(),
-					                                                                                                   clientId)),future);
+				final LongId id=new LongId(notificationId);
+				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(new BasePlaintextSerializer<>(id).serialize(),clientId),future);
 				check(future);
-			}			@Override
+			}
+
+			@Override
 			void setupUserDatastore() throws FailedOperation
 			{
 				final ByteBuffer b=ByteBuffer.wrap("1".getBytes());

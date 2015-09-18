@@ -1,7 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
@@ -18,6 +16,7 @@ import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.gora.util.GoraException;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.thrift.TBase;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
@@ -106,12 +105,6 @@ public class BroadcastNewContactIdentityTest
 				return new BroadcastNewContactIdentity(dataStore,identityDataStore,null);
 			}
 
-			@Override
-			PlaintextSerializer constructPlaintext()
-			{
-				return new BasePlaintextSerializer<>(hashBufferPair);
-			}
-
 			void run()
 			{
 				final Future<Void> result=new DefaultFutureResult<>();
@@ -120,6 +113,12 @@ public class BroadcastNewContactIdentityTest
 			}
 
 			abstract void check(final Future<Void> result);
+
+			@Override
+			TBase constructPlaintext()
+			{
+				return hashBufferPair;
+			}
 		}
 		new Base5()
 		{
@@ -127,7 +126,9 @@ public class BroadcastNewContactIdentityTest
 			List<String> getIds()
 			{
 				return Arrays.asList("1","2");
-			}			@Override
+			}
+
+			@Override
 			List<Boolean> add()
 			{
 				return Arrays.asList(true,true);
@@ -162,8 +163,6 @@ public class BroadcastNewContactIdentityTest
 				confirmers1.add((long)5);
 				hashIdentityValue2.setConfirmers(confirmers2);
 			}
-
-
 		}.run();
 		new Base5()
 		{
@@ -420,8 +419,14 @@ public class BroadcastNewContactIdentityTest
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
 				final LongId notificationId=new LongId(notifierBackend.sentNotifications.values().iterator().next());
 				final LongId id=new LongId(notificationId);
-				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(new BasePlaintextSerializer<>(id).serialize(),clientId),future);
+				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(new PlaintextSerializer<>(id).serialize(),clientId),future);
 				check(future);
+			}
+
+			void check(final Future<EncryptedBufferSignedWithVerificationKey> future)
+			{
+				assertTrue(future.succeeded());
+				assertEquals(encryptedBufferSignedWithVerificationKey,future.result());
 			}
 
 			@Override
@@ -438,14 +443,6 @@ public class BroadcastNewContactIdentityTest
 				));
 				clientNotifier.put(deviceToken,encryptedBufferSignedWithVerificationKey);
 			}
-
-			void check(final Future<EncryptedBufferSignedWithVerificationKey> future)
-			{
-				assertTrue(future.succeeded());
-				assertEquals(encryptedBufferSignedWithVerificationKey,future.result());
-			}
-
-
 
 			@Override
 			SignatureAlgorithm getSignatureAlgorithm()
@@ -479,7 +476,9 @@ public class BroadcastNewContactIdentityTest
 							                                                        TypeConverter.convert(verificationKey));
 					assertEquals(expected,encryptedBufferSignedWithVerificationKey);
 				}
-			}			@Override
+			}
+
+			@Override
 			BroadcastNewContactIdentity construct() throws GoraException
 			{
 				return new BroadcastNewContactIdentity(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
@@ -491,8 +490,6 @@ public class BroadcastNewContactIdentityTest
 			{
 				return SignatureAlgorithm.SHA256withECDSAprime239v1;
 			}
-
-
 		}.run();
 	}
 
@@ -516,7 +513,7 @@ public class BroadcastNewContactIdentityTest
 					}
 
 					@Override
-					void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Reply<?> reply,final After after)
+					void verify(final TBase plaintext,final SignatureBuffer signature,final Reply<?> reply,final After after)
 					{
 						final Client client;
 						try
@@ -664,10 +661,6 @@ public class BroadcastNewContactIdentityTest
 				client.setComparisonIdentities(comparisonIdentities);
 				clients.put(TypeConverter.convert(id.getClient()),client);
 				return client;
-			}			@Override
-			PlaintextSerializer constructPlaintext()
-			{
-				return new BasePlaintextSerializer<>(new EncryptedBufferPairSet(encryptedBufferPairs));
 			}
 
 			private Client setupValidClient(final ClientId id,final HashMap<CharSequence,Client> clients)
@@ -703,6 +696,10 @@ public class BroadcastNewContactIdentityTest
 				final com.kareebo.contacts.thrift.EncryptedBuffer IR=new com.kareebo.contacts.thrift.EncryptedBuffer(iRB,
 					                                                                                                    EncryptionAlgorithm.RSA2048,id);
 				encryptedBufferPairs.add(new EncryptedBufferPair(I,IR));
+			}			@Override
+			TBase constructPlaintext()
+			{
+				return new EncryptedBufferPairSet(encryptedBufferPairs);
 			}
 
 			private HashMap<CharSequence,Client> setupClients(final Long userId)
@@ -974,7 +971,11 @@ public class BroadcastNewContactIdentityTest
 			final Future<Void> future=new DefaultFutureResult<>();
 			broadcastNewContactIdentity.broadcastNewContactIdentity3(encryptedBuffers,future);
 			check(future);
-		}		@Override
+		}
+
+		abstract void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException;
+
+		@Override
 		void setupUserDatastore() throws FailedOperation, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 		{
 			encryptedBuffers=new HashSet<>(clientNumber);
@@ -1012,7 +1013,7 @@ public class BroadcastNewContactIdentityTest
 				final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer=new com.kareebo.contacts.thrift
 					                                                                      .EncryptedBuffer(buffer,
 						                                                                                      EncryptionAlgorithm.RSA2048,clientId);
-				final EncryptedBufferSigned encryptedBufferSigned=new EncryptedBufferSigned(encryptedBuffer,sign(new BasePlaintextSerializer<>
+				final EncryptedBufferSigned encryptedBufferSigned=new EncryptedBufferSigned(encryptedBuffer,sign(new PlaintextSerializer<>
 					                                                                                                 (encryptedBuffer).serialize(),this
 						                                                                                                                               .clientId));
 				encryptedBuffers.add(encryptedBufferSigned);
@@ -1023,10 +1024,6 @@ public class BroadcastNewContactIdentityTest
 			user.setSentRequests(new ArrayList<HashBuffer>());
 			userDataStore.put(user.getId(),user);
 		}
-
-		abstract void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException;
-
-
 	}
 
 	/**
@@ -1063,9 +1060,9 @@ public class BroadcastNewContactIdentityTest
 		}
 
 		@Override
-		PlaintextSerializer constructPlaintext()
+		TBase constructPlaintext()
 		{
-			return new BasePlaintextSerializer<>(new LongId(i));
+			return new LongId(i);
 		}
 	}
 }

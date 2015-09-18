@@ -1,7 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
-import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.*;
@@ -9,7 +7,6 @@ import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
 import java.nio.ByteBuffer;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,16 +30,8 @@ public class SendContactCard extends SignatureVerifierWithIdentityStore implemen
 	}
 
 	@Override
-	public void sendContactCard1(final HashBufferWithId hashBufferWithId,final SignatureBuffer signature,final Future<Void> future)
+	public void sendContactCard1(final HashBuffer u,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(new BasePlaintextSerializer<>(hashBufferWithId),signature,new Reply<>(future),new After()
-		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
-			{
-				final Map<CharSequence,Client> clients=clientDBAccessor.get(hashBufferWithId.getUserId()).getClients();
-			}
-		});
 	}
 
 	@Override

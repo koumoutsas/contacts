@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
@@ -43,7 +42,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 		                                                                                              future)
 	{
 		final Map<ClientId,EncryptionKey> reply=new HashMap<>();
-		verify(new BasePlaintextSerializer<>(userIdB),signature,new Reply<>(future,reply),new After()
+		verify(userIdB,signature,new Reply<>(future,reply),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
@@ -74,7 +73,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	{
 		final Set<EncryptedBufferPair> encryptedBufferPairsSet=encryptedBufferPairs.getEncryptedBufferPairs();
 		final Map<ClientId,EncryptionKey> reply=new HashMap<>(encryptedBufferPairsSet.size());
-		verify(new BasePlaintextSerializer<>(encryptedBufferPairs),signature,new Reply<>(future,reply),new After()
+		verify(encryptedBufferPairs,signature,new Reply<>(future,reply),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
@@ -121,7 +120,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 		{
 			final DefaultFutureResult<Void> result=new DefaultFutureResult<>();
 			final EncryptedBuffer encryptedBuffer=encryptedBufferSigned.getEncryptedBuffer();
-			verify(new BasePlaintextSerializer<>(encryptedBuffer),encryptedBufferSigned.getSignature(),
+			verify(encryptedBuffer,encryptedBufferSigned.getSignature(),
 				      new Reply<>(result),new After()
 				{
 					@Override
@@ -156,7 +155,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	{
 		final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
 			                                                                                        EncryptedBufferSignedWithVerificationKey();
-		verify(new BasePlaintextSerializer<>(id),signature,new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After()
+		verify(id,signature,new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation
@@ -172,7 +171,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	@Override
 	public void broadcastNewContactIdentity5(final HashBufferPair uCs,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(new BasePlaintextSerializer<>(uCs),signature,new Reply<>(future),new After()
+		verify(uCs,signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

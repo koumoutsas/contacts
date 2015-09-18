@@ -1,12 +1,14 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
+import org.apache.thrift.TBase;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +40,12 @@ abstract class SignatureVerifier
 	/**
 	 * Verify the signature
 	 *
-	 * @param plaintextSerializer The plaintext serializer
-	 * @param signature           The signature
-	 * @param reply               The reply future used to communicate the result
-	 * @param after               The after hook
+	 * @param plaintext The plaintext serializer
+	 * @param signature The signature
+	 * @param reply     The reply future used to communicate the result
+	 * @param after     The after hook
 	 */
-	void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Reply<?> reply,final After after)
+	void verify(final TBase plaintext,final SignatureBuffer signature,final Reply<?> reply,final After after)
 	{
 		final Client client;
 		try
@@ -59,7 +61,7 @@ abstract class SignatureVerifier
 		{
 			final ByteBuffer signatureBuffer=signature.bufferForBuffer();
 			signatureBuffer.rewind();
-			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,plaintextSerializer))
+			if(!Utils.verifySignature(client.getKeys().getVerification(),signatureBuffer,new TSerializer().serialize(plaintext)))
 			{
 				logger.error("Verification failure for "+client);
 				reply.setFailure(new FailedOperation());
@@ -76,6 +78,12 @@ abstract class SignatureVerifier
 		catch(FailedOperation failedOperation)
 		{
 			reply.setFailure(failedOperation);
+			return;
+		}
+		catch(TException e)
+		{
+			logger.error("Serialization error",e);
+			reply.setFailure(new FailedOperation());
 			return;
 		}
 		clientDBAccessor.close();

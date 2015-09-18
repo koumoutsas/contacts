@@ -1,7 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
@@ -17,6 +15,7 @@ import com.kareebo.contacts.thrift.UserAgent;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.thrift.TBase;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
@@ -508,7 +507,7 @@ public class RegisterIdentityTest
 				registerIdentityInput.setDeviceToken(deviceToken);
 				final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
 				ecdsaSign.initSign(keyPair.getPrivate());
-				ecdsaSign.update(new BasePlaintextSerializer<>(registerIdentityInput).serialize());
+				ecdsaSign.update(new PlaintextSerializer<>(registerIdentityInput).serialize());
 				signature.setClient(clientId);
 				signature.setBuffer(ecdsaSign.sign());
 			}
@@ -517,7 +516,7 @@ public class RegisterIdentityTest
 				e.printStackTrace();
 				fail();
 			}
-			return new BasePlaintextSerializer<>(registerIdentityInput);
+			return new PlaintextSerializer<>(registerIdentityInput);
 		}
 
 		abstract void setupRegisterIdentityInput() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException;
@@ -607,13 +606,13 @@ public class RegisterIdentityTest
 		}
 
 		@Override
-		PlaintextSerializer constructPlaintext()
+		TBase constructPlaintext()
 		{
 			final ByteBuffer b=ByteBuffer.wrap("a".getBytes());
 			b.mark();
 			uA=new HashBuffer(b,HashAlgorithm.SHA256);
 			setupDatastores();
-			return new BasePlaintextSerializer<>(uA);
+			return uA;
 		}
 
 		abstract void setupDatastores();

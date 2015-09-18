@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
@@ -42,7 +41,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 	@Override
 	public void registerUnconfirmedIdentity1(final HashBufferSet uSet,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(new BasePlaintextSerializer<>(uSet),signature,new Reply<>(future),new After()
+		verify(uSet,signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

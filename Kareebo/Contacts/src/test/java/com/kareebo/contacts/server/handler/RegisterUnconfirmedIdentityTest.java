@@ -1,7 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
@@ -13,6 +11,7 @@ import com.kareebo.contacts.thrift.HashBufferSet;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.thrift.TBase;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
@@ -135,9 +134,9 @@ public class RegisterUnconfirmedIdentityTest
 		}
 
 		@Override
-		PlaintextSerializer constructPlaintext()
+		TBase constructPlaintext()
 		{
-			return new BasePlaintextSerializer<>(new HashBufferSet(hashBufferSet));
+			return new HashBufferSet(hashBufferSet);
 		}
 	}
 

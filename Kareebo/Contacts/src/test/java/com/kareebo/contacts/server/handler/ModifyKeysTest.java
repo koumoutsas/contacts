@@ -1,13 +1,12 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.EncryptionAlgorithm;
 import com.kareebo.contacts.thrift.EncryptionKey;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.PublicKeys;
 import org.apache.gora.store.DataStore;
+import org.apache.thrift.TBase;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
@@ -92,9 +91,9 @@ public class ModifyKeysTest
 		}
 
 		@Override
-		PlaintextSerializer constructPlaintext()
+		TBase constructPlaintext()
 		{
-			return new BasePlaintextSerializer<>(newPublicKeys);
+			return newPublicKeys;
 		}
 	}
 }

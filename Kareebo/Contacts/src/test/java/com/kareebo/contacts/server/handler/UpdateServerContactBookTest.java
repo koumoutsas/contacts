@@ -1,7 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
 import com.kareebo.contacts.server.gora.User;
@@ -9,6 +7,7 @@ import com.kareebo.contacts.thrift.*;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.thrift.TBase;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
@@ -352,7 +351,7 @@ public class UpdateServerContactBookTest
 		}
 
 		@Override
-		PlaintextSerializer constructPlaintext()
+		TBase constructPlaintext()
 		{
 			setupOperations();
 			setupIdentityDatastore();
@@ -364,7 +363,7 @@ public class UpdateServerContactBookTest
 				}
 			}
 			adjustContactOperations();
-			return new BasePlaintextSerializer<>(new ContactOperationSet(contactOperations));
+			return new ContactOperationSet(contactOperations);
 		}
 
 		abstract void setupOperations();

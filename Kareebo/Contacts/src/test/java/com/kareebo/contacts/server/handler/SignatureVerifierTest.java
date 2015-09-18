@@ -1,14 +1,17 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.server.gora.UserAgent;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.FailedOperation;
+import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
+import org.apache.thrift.TBase;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TProtocol;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,9 +52,9 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	}
 
 	@Override
-	PlaintextSerializer constructPlaintext()
+	TBase constructPlaintext()
 	{
-		return new TestPlaintextSerializer("abc".getBytes());
+		return new LongId(9);
 	}
 
 	@After
@@ -91,6 +94,27 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 		assertEquals(FailedOperation.class,result.cause().getClass());
 		assertEquals(signatureVerifier.clientDBAccessor.get(signature.getClient()).getUserAgent(),userAgent);
 		assertFalse(datastore.hasBeenClosed());
+	}
+
+	@Test
+	public void testInvalidSerialization() throws Exception
+	{
+		final Future<Void> result=new DefaultFutureResult<>();
+		signature.setClient(clientIdValid);
+		((SignatureVerifierMock)signatureVerifier).verify(new LongId()
+		{
+			{
+				setId(((LongId)plaintext).getId());
+			}
+
+			@Override
+			public void write(TProtocol var1) throws TException
+			{
+				throw new TException();
+			}
+		},signature,result);
+		signature.setClient(clientIdValid);
+		testFailed(result);
 	}
 
 	@Test
@@ -156,9 +180,9 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 			super(dataStore);
 		}
 
-		void verify(final PlaintextSerializer plaintextSerializer,final SignatureBuffer signature,final Future<Void> future)
+		void verify(final TBase plaintext,final SignatureBuffer signature,final Future<Void> future)
 		{
-			verify(plaintextSerializer,signature,new Reply<>(future),new After()
+			verify(plaintext,signature,new Reply<>(future),new After()
 			{
 				@Override
 				public void run(final User user,final Client client) throws FailedOperation

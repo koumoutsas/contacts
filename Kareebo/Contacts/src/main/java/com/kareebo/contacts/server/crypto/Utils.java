@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.crypto;
 
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.VerificationKey;
 import com.kareebo.contacts.thrift.FailedOperation;
@@ -24,9 +23,9 @@ public class Utils
 	/**
 	 * Verify a signature
 	 *
-	 * @param verificationKey     The verification key
-	 * @param signature           The signature
-	 * @param plaintextSerializer The plaintext serializer
+	 * @param verificationKey The verification key
+	 * @param signature       The signature
+	 * @param plaintext       The plaintext
 	 * @return Whether the signature is correct
 	 * @throws NoSuchProviderException
 	 * @throws NoSuchAlgorithmException
@@ -34,8 +33,7 @@ public class Utils
 	 * @throws InvalidKeyException
 	 * @throws InvalidKeySpecException
 	 */
-	public static boolean verifySignature(final VerificationKey verificationKey,final ByteBuffer signature,final
-	PlaintextSerializer plaintextSerializer)
+	public static boolean verifySignature(final VerificationKey verificationKey,final ByteBuffer signature,final byte[] plaintext)
 		throws
 		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException, FailedOperation
 	{
@@ -45,9 +43,8 @@ public class Utils
 		verificationByteBuffer.rewind();
 		final byte[] verificationBytes=new byte[verificationByteBuffer.remaining()];
 		verificationByteBuffer.get(verificationBytes);
-		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(
-			                                                                                                      verificationBytes)));
-		verify.update(plaintextSerializer.serialize());
+		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(verificationBytes)));
+		verify.update(plaintext);
 		final byte[] signatureBytes=new byte[signature.remaining()];
 		signature.get(signatureBytes);
 		return verify.verify(signatureBytes);

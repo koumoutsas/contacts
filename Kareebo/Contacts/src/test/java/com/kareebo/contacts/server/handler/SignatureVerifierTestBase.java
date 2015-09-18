@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.PlaintextSerializer;
 import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
@@ -14,6 +13,7 @@ import com.kareebo.contacts.thrift.VerificationKey;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.thrift.TBase;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
@@ -37,7 +37,7 @@ abstract class SignatureVerifierTestBase
 	final SignatureBuffer signature=new SignatureBuffer();
 	final SignatureBuffer wrongSignature=new SignatureBuffer();
 	final PublicKeys publicKeys=new PublicKeys();
-	PlaintextSerializer plaintext;
+	TBase plaintext;
 	com.kareebo.contacts.server.gora.VerificationKey verificationKey;
 	SignatureVerifier signatureVerifier;
 	Client clientValid;
@@ -86,7 +86,7 @@ abstract class SignatureVerifierTestBase
 		final KeyPair keyPair=g.generateKeyPair();
 		final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
-		ecdsaSign.update(plaintext.serialize());
+		ecdsaSign.update(new PlaintextSerializer<>(plaintext).serialize());
 		signature.setClient(clientIdValid);
 		signature.setBuffer(ecdsaSign.sign());
 		ecdsaSign.update("fgh".getBytes());
@@ -107,7 +107,7 @@ abstract class SignatureVerifierTestBase
 
 	abstract SignatureVerifier construct(final DataStore<Long,User> dataStore);
 
-	abstract PlaintextSerializer constructPlaintext();
+	abstract TBase constructPlaintext();
 
 	static VerificationKey setUpVerificationKey(final byte[] buffer)
 	{

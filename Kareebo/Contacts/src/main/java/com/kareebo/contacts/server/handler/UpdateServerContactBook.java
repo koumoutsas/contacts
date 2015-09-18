@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.BasePlaintextSerializer;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
 import com.kareebo.contacts.server.gora.HashIdentity;
@@ -43,7 +42,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 	public void updateServerContactBook1(final ContactOperationSet contactOperationSet,final SignatureBuffer
 		                                                                                   signature,final Future<Void> future)
 	{
-		verify(new BasePlaintextSerializer<>(contactOperationSet),signature,new Reply<>(future),new After()
+		verify(contactOperationSet,signature,new Reply<>(future),new After()
 		{
 			@Override
 			public void run(final User user,final Client client) throws FailedOperation

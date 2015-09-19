@@ -137,13 +137,7 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 
 			private void resolveAndAdd(final HashBuffer contact,final Set<Long> set) throws FailedOperation
 			{
-				final Long resolved=find(contact.bufferForBuffer());
-				if(resolved==null)
-				{
-					logger.error("Unknown contact "+contact);
-					throw new FailedOperation();
-				}
-				set.add(resolved);
+				set.add(find(contact.bufferForBuffer()));
 			}
 		});
 	}

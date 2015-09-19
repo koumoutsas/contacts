@@ -59,7 +59,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 							throw new FailedOperation();
 						}
 						final ByteBuffer b=dbH.getBuffer();
-						if(find(b)!=null)
+						if(exists(b))
 						{
 							logger.error("Hashed identity for "+h+" already exists in identity datastore");
 							throw new FailedOperation();

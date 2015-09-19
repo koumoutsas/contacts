@@ -2,7 +2,10 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
+import com.kareebo.contacts.thrift.FailedOperation;
 import org.apache.gora.store.DataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -13,6 +16,7 @@ import java.util.HashSet;
  */
 class HashIdentityRetriever
 {
+	private static final Logger logger=LoggerFactory.getLogger(HashIdentityRetriever.class.getName());
 	final private DataStore<ByteBuffer,HashIdentity> dataStore;
 
 	HashIdentityRetriever(final DataStore<ByteBuffer,HashIdentity> dataStore)
@@ -25,9 +29,9 @@ class HashIdentityRetriever
 	 *
 	 * @param key The key to look for
 	 * @return The resolved user id, null if there is no mapped value
-	 * @throws IllegalStateException When a corrupted datastore is detected
+	 * @throws FailedOperation When a corrupted datastore is detected
 	 */
-	Long find(final ByteBuffer key)
+	Long find(final ByteBuffer key) throws FailedOperation
 	{
 		final HashIdentityValue value=get(key);
 		if(value==null)
@@ -42,16 +46,17 @@ class HashIdentityRetriever
 	 *
 	 * @param key The key to look for
 	 * @return The resolved value, null if there is no mapped value
-	 * @throws IllegalStateException When a corrupted datastore is detected
+	 * @throws FailedOperation When a corrupted datastore is detected
 	 */
-	HashIdentityValue get(final ByteBuffer key)
+	HashIdentityValue get(final ByteBuffer key) throws FailedOperation
 	{
 		final HashSet<ByteBuffer> seenKeys=new HashSet<>();
 		for(ByteBuffer nextKey=key;;)
 		{
 			if(!seenKeys.add(nextKey))
 			{
-				throw new IllegalStateException("Cycle detected for key "+new String(nextKey.array(),Charset.forName("UTF-8")));
+				logger.error("Cycle detected for key "+new String(nextKey.array(),Charset.forName("UTF-8")));
+				throw new FailedOperation();
 			}
 			final HashIdentity hashIdentity=dataStore.get(nextKey);
 			if(hashIdentity==null)
@@ -70,7 +75,8 @@ class HashIdentityRetriever
 			}
 			else
 			{
-				throw new IllegalStateException("Unknown value type "+value.getClass().toString()+"for key "+nextKey.toString());
+				logger.error("Unknown value type "+value.getClass().toString()+"for key "+nextKey.toString());
+				throw new FailedOperation();
 			}
 		}
 	}

@@ -74,6 +74,32 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 		assertEquals(value.getId(),((SignatureVerifierWithIdentityStore)signatureVerifier).find(key));
 	}
 
+	@Test(expected=FailedOperation.class)
+	public void testFindFailed() throws Exception
+	{
+		final ByteBuffer key=ByteBuffer.wrap("abc".getBytes());
+		key.mark();
+		((SignatureVerifierWithIdentityStore)signatureVerifier).find(key);
+	}
+
+	@Test
+	public void testExists() throws Exception
+	{
+		final HashIdentity identity=new HashIdentity();
+		final ByteBuffer key=ByteBuffer.wrap("abc".getBytes());
+		key.mark();
+		identity.setHash(key);
+		final HashIdentityValue value=new HashIdentityValue();
+		value.setId((long)0);
+		value.setConfirmers(new ArrayList<Long>());
+		identity.setHashIdentity(value);
+		identityDatastore.put(key,identity);
+		assertTrue(((SignatureVerifierWithIdentityStore)signatureVerifier).exists(key));
+		final ByteBuffer keyFalse=ByteBuffer.wrap("def".getBytes());
+		keyFalse.mark();
+		assertFalse(((SignatureVerifierWithIdentityStore)signatureVerifier).exists(keyFalse));
+	}
+
 	@Test
 	public void testVerify() throws Exception
 	{

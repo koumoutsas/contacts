@@ -3,6 +3,7 @@ package com.kareebo.contacts.server.handler;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
 import com.kareebo.contacts.server.gora.User;
+import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
 import org.apache.thrift.TBase;
@@ -35,11 +36,27 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	 *
 	 * @param key The key to look for
 	 * @return The resolved value, null if there is no mapped value
-	 * @throws IllegalStateException When a corrupted datastore is detected
+	 * @throws FailedOperation When the datastore is corrupted or the key is not found
 	 */
-	final Long find(final ByteBuffer key)
+	final Long find(final ByteBuffer key) throws FailedOperation
 	{
-		return hashIdentityRetriever.find(key);
+		final Long ret=hashIdentityRetriever.find(key);
+		if(ret==null)
+		{
+			throw new FailedOperation();
+		}
+		return ret;
+	}
+
+	/**
+	 * Check if a key exists
+	 *
+	 * @param key The key
+	 * @return True, iff the key exists
+	 */
+	boolean exists(final ByteBuffer key) throws FailedOperation
+	{
+		return hashIdentityRetriever.find(key)!=null;
 	}
 
 	@Override
@@ -85,9 +102,9 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	 *
 	 * @param key The key
 	 * @return The identity mapped to the key, null if there isn't one
-	 * @throws IllegalStateException When a corrupted datastore is detected
+	 * @throws FailedOperation When the datastore is corrupted or the key is not found
 	 */
-	HashIdentityValue get(final ByteBuffer key)
+	HashIdentityValue get(final ByteBuffer key) throws FailedOperation
 	{
 		return hashIdentityRetriever.get(key);
 	}

@@ -2,13 +2,12 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
+import com.kareebo.contacts.thrift.FailedOperation;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -20,8 +19,6 @@ import static org.junit.Assert.*;
  */
 public class HashIdentityRetrieverTest
 {
-	@Rule
-	public ExpectedException thrown=ExpectedException.none();
 	private DataStore<ByteBuffer,HashIdentity> dataStore;
 	private HashIdentityRetriever retriever;
 
@@ -69,7 +66,7 @@ public class HashIdentityRetrieverTest
 		return alias;
 	}
 
-	@Test
+	@Test(expected=FailedOperation.class)
 	public void testWrongType() throws Exception
 	{
 		final ByteBuffer wrongKey=ByteBuffer.wrap("123".getBytes());
@@ -78,24 +75,20 @@ public class HashIdentityRetrieverTest
 		identity.setHash(wrongKey);
 		identity.setHashIdentity("456");
 		dataStore.put(wrongKey,identity);
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("Unknown value type "+String.class.toString()+"for key "+wrongKey.toString());
 		retriever.find(wrongKey);
 	}
 
-	@Test
+	@Test(expected=FailedOperation.class)
 	public void testCycle0() throws Exception
 	{
 		final String aString="123";
 		final ByteBuffer aKey=ByteBuffer.wrap(aString.getBytes());
 		aKey.mark();
 		createAlias(aString,aKey);
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("Cycle detected for key "+aString);
 		retriever.find(aKey);
 	}
 
-	@Test
+	@Test(expected=FailedOperation.class)
 	public void testCycle1() throws Exception
 	{
 		final String aString="123";
@@ -103,12 +96,10 @@ public class HashIdentityRetrieverTest
 		final ByteBuffer bKey=ByteBuffer.wrap(bString.getBytes());
 		bKey.mark();
 		final ByteBuffer aKey=createAlias(bString,createAlias(aString,bKey));
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("Cycle detected for key "+bString);
 		retriever.find(aKey);
 	}
 
-	@Test
+	@Test(expected=FailedOperation.class)
 	public void testCycle2() throws Exception
 	{
 		final String aString="123";
@@ -121,8 +112,6 @@ public class HashIdentityRetrieverTest
 		final ByteBuffer aKey=createAlias(aString,bKey);
 		createAlias(bString,cKey);
 		createAlias(cString,aKey);
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("Cycle detected for key "+aString);
 		retriever.find(aKey);
 	}
 

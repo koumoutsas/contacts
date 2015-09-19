@@ -96,71 +96,69 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 	public void registerIdentity3(final RegisterIdentityInput registerIdentityInput,final SignatureBuffer signature,final Future<Void> future)
 	{
 		final ByteBuffer uA=registerIdentityInput.getUA().bufferForBuffer();
-		final HashIdentityValue identityValue=get(uA);
-		final Long clientId=identityValue.getId();
-		if(registerIdentityInput.getUserIdA()!=clientId)
-		{
-			logger.error("Non-matching user ids. Expected "+clientId+", but got "+registerIdentityInput.getUserIdA());
-			future.setFailure(new FailedOperation());
-			return;
-		}
 		try
 		{
+			final HashIdentityValue identityValue=get(uA);
+			final Long clientId=identityValue.getId();
+			if(registerIdentityInput.getUserIdA()!=clientId)
+			{
+				logger.error("Non-matching user ids. Expected "+clientId+", but got "+registerIdentityInput.getUserIdA());
+				future.setFailure(new FailedOperation());
+				return;
+			}
 			final Client client=clientDBAccessor.get(signature.getClient());
 			client.setKeys(TypeConverter.convert(registerIdentityInput.getPublicKeys()));
 			client.setUserAgent(TypeConverter.convert(registerIdentityInput.getUserAgent()));
 			client.setDeviceToken(registerIdentityInput.getDeviceToken());
 			clientDBAccessor.put(client);
+			verify(registerIdentityInput,signature,new Reply<>(future),new After()
+			{
+				@Override
+				public void run(final User user,final Client client) throws FailedOperation
+				{
+					final List<com.kareebo.contacts.server.gora.HashBuffer> identities=user.getIdentities();
+					final HashBuffer uJ=registerIdentityInput.getUJ();
+					boolean foundUJ=false;
+					for(final HashBuffer h : registerIdentityInput.getUSet())
+					{
+						final HashIdentityValue value=new HashIdentityValue();
+						value.setId(clientId);
+						final List<Long> confirmers=new ArrayList<>();
+						if(h.equals(uJ))
+						{
+							foundUJ=true;
+							aliasTo(uA,h.bufferForBuffer());
+							confirmers.addAll(identityValue.getConfirmers());
+						}
+						value.setConfirmers(confirmers);
+						put(h.bufferForBuffer(),value);
+						try
+						{
+							identities.add(TypeConverter.convert(h));
+						}
+						catch(NoSuchAlgorithmException e)
+						{
+							logger.error("Error converting algorithm",e);
+							throw new FailedOperation();
+						}
+					}
+					if(!foundUJ)
+					{
+						logger.error("Wrong input. Unable to find the primary identity in the identity set");
+						throw new FailedOperation();
+					}
+					clientDBAccessor.put(user);
+				}
+			});
 		}
 		catch(FailedOperation failedOperation)
 		{
 			future.setFailure(failedOperation);
-			return;
 		}
 		catch(NoSuchAlgorithmException e)
 		{
 			logger.error("Error converting algorithm",e);
 			future.setFailure(new FailedOperation());
-			return;
 		}
-		verify(registerIdentityInput,signature,new Reply<>(future),new After()
-		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
-			{
-				final List<com.kareebo.contacts.server.gora.HashBuffer> identities=user.getIdentities();
-				final HashBuffer uJ=registerIdentityInput.getUJ();
-				boolean foundUJ=false;
-				for(final HashBuffer h : registerIdentityInput.getUSet())
-				{
-					final HashIdentityValue value=new HashIdentityValue();
-					value.setId(clientId);
-					final List<Long> confirmers=new ArrayList<>();
-					if(h.equals(uJ))
-					{
-						foundUJ=true;
-						aliasTo(uA,h.bufferForBuffer());
-						confirmers.addAll(identityValue.getConfirmers());
-					}
-					value.setConfirmers(confirmers);
-					put(h.bufferForBuffer(),value);
-					try
-					{
-						identities.add(TypeConverter.convert(h));
-					}
-					catch(NoSuchAlgorithmException e)
-					{
-						logger.error("Error converting algorithm",e);
-						throw new FailedOperation();
-					}
-				}
-				if(!foundUJ)
-				{
-					logger.error("Wrong input. Unable to find the primary identity in the identity set");
-					throw new FailedOperation();
-				}
-				clientDBAccessor.put(user);
-			}
-		});
 	}
 }

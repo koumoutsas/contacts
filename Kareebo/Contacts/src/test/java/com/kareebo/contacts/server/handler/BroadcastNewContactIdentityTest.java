@@ -696,10 +696,6 @@ public class BroadcastNewContactIdentityTest
 				final com.kareebo.contacts.thrift.EncryptedBuffer IR=new com.kareebo.contacts.thrift.EncryptedBuffer(iRB,
 					                                                                                                    EncryptionAlgorithm.RSA2048,id);
 				encryptedBufferPairs.add(new EncryptedBufferPair(I,IR));
-			}			@Override
-			TBase constructPlaintext()
-			{
-				return new EncryptedBufferPairSet(encryptedBufferPairs);
 			}
 
 			private HashMap<CharSequence,Client> setupClients(final Long userId)
@@ -733,7 +729,11 @@ public class BroadcastNewContactIdentityTest
 				user.setSentRequests(new ArrayList<HashBuffer>());
 			}
 
-
+			@Override
+			TBase constructPlaintext()
+			{
+				return new EncryptedBufferPairSet(encryptedBufferPairs);
+			}
 		}
 		new Base2().run();
 	}

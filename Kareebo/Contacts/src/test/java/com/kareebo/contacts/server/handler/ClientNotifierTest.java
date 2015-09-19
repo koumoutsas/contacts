@@ -14,7 +14,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -25,6 +27,7 @@ import static org.junit.Assert.*;
 public class ClientNotifierTest
 {
 	private final long deviceToken=94;
+	private final List<Long> deviceTokens=Arrays.asList(deviceToken,deviceToken+1);
 	final private UserAgent expected=new UserAgent("a","b");
 	@Rule
 	public ExpectedException thrown=ExpectedException.none();
@@ -41,7 +44,7 @@ public class ClientNotifierTest
 	}
 
 	@Test
-	public void testPut() throws Exception
+	public void testPutSingle() throws Exception
 	{
 		clientNotifier.put(deviceToken,expected);
 		assertEquals(1,notifierBackend.sentNotifications.size());
@@ -59,6 +62,27 @@ public class ClientNotifierTest
 	}
 
 	@Test
+	public void testPut() throws Exception
+	{
+		clientNotifier.put(deviceTokens,expected);
+		assertEquals(deviceTokens.size(),notifierBackend.sentNotifications.size());
+		for(final Long deviceToken2 : deviceTokens)
+		{
+			final Long notificationId=notifierBackend.sentNotifications.get(deviceToken2);
+			assertNotNull(notificationId);
+			assertTrue(datastore.hasBeenClosed());
+			final PendingNotification pendingNotification=datastore.get(notificationId);
+			assertNotNull(pendingNotification);
+			assertEquals(notificationId,pendingNotification.getId());
+			final ByteBuffer payload=pendingNotification.getPayload();
+			payload.rewind();
+			final ByteBuffer expectedPayload=ByteBuffer.wrap(new TSerializer().serialize(expected));
+			expectedPayload.mark();
+			assertEquals(expectedPayload,payload);
+		}
+	}
+
+	@Test
 	public void testPutAlreadyExists() throws Exception
 	{
 		final long useId=9;
@@ -70,7 +94,7 @@ public class ClientNotifierTest
 		datastore.put(useId,usePendingNotification);
 		datastore.useId=useId;
 		thrown.expect(FailedOperation.class);
-		clientNotifier.put(deviceToken,expected);
+		clientNotifier.put(deviceTokens,expected);
 		assertEquals(0,notifierBackend.sentNotifications.size());
 		assertFalse(datastore.hasBeenClosed());
 	}
@@ -89,7 +113,7 @@ public class ClientNotifierTest
 		o.setPlatform("");
 		o.setVersion("");
 		thrown.expect(FailedOperation.class);
-		clientNotifier.put(deviceToken,o);
+		clientNotifier.put(deviceTokens,o);
 		assertEquals(0,notifierBackend.sentNotifications.size());
 		assertFalse(datastore.hasBeenClosed());
 	}
@@ -99,7 +123,7 @@ public class ClientNotifierTest
 	{
 		notifierBackend.fail=true;
 		thrown.expect(FailedOperation.class);
-		clientNotifier.put(deviceToken,expected);
+		clientNotifier.put(deviceTokens,expected);
 		assertEquals(0,notifierBackend.sentNotifications.size());
 		assertFalse(datastore.hasBeenClosed());
 	}

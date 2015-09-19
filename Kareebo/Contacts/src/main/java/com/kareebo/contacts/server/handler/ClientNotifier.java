@@ -12,6 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Stores and retrieves pending messages to clients and interfaces with the push notification system
@@ -44,27 +48,50 @@ class ClientNotifier
 	 */
 	void put(final long deviceToken,final TBase object) throws FailedOperation
 	{
-		final long notificationId=new SecureRandom().nextLong();
-		if(pendingNotificationDataStore.get(notificationId)!=null)
+		put(Collections.singletonList(deviceToken),object);
+	}
+
+	/**
+	 * Put a notification payload in the datastore and send a notification to multiple clients
+	 *
+	 * @param deviceTokens The device tokens used by the push notification server to identify the client
+	 * @param object       The object to be stored. It is a subclass of TBase
+	 * @throws FailedOperation If either a unique id cannot be generated, the Thrift serialization fails, or the notification cannot be sent to
+	 *                         the client
+	 */
+	void put(final List<Long> deviceTokens,final TBase object) throws FailedOperation
+	{
+		final List<AbstractMap.SimpleImmutableEntry<Long,Long>> notificationIds=new ArrayList<>(deviceTokens.size());
+		for(final Long deviceToken : deviceTokens)
 		{
-			logger.error("Notification id "+notificationId+" already exists");
-			throw new FailedOperation();
+			final long notificationId=new SecureRandom().nextLong();
+			if(pendingNotificationDataStore.get(notificationId)!=null)
+			{
+				logger.error("Notification id "+notificationId+" already exists");
+				throw new FailedOperation();
+			}
+			notificationIds.add(new AbstractMap.SimpleImmutableEntry<>(deviceToken,notificationId));
 		}
-		final PendingNotification pendingNotification=new PendingNotification();
+		ByteBuffer payload;
 		try
 		{
-			final ByteBuffer payload=ByteBuffer.wrap(new TSerializer().serialize(object));
+			payload=ByteBuffer.wrap(new TSerializer().serialize(object));
 			payload.mark();
-			pendingNotification.setPayload(payload);
 		}
 		catch(TException e)
 		{
 			logger.error("Failed serialization",e);
 			throw new FailedOperation();
 		}
-		pendingNotification.setId(notificationId);
-		pendingNotificationDataStore.put(notificationId,pendingNotification);
-		clientNotifierBackend.notify(deviceToken,notificationId);
+		for(final AbstractMap.SimpleImmutableEntry<Long,Long> notification : notificationIds)
+		{
+			final PendingNotification pendingNotification=new PendingNotification();
+			pendingNotification.setPayload(payload);
+			final Long notificationId=notification.getValue();
+			pendingNotification.setId(notificationId);
+			pendingNotificationDataStore.put(notificationId,pendingNotification);
+			clientNotifierBackend.notify(notification.getKey(),notificationId);
+		}
 		pendingNotificationDataStore.close();
 	}
 

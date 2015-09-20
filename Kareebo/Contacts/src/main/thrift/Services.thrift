@@ -129,12 +129,6 @@ struct EncryptionKeys
 	2:map<Id,EncryptionKey> keys,
 }
 
-struct EncryptedBuffersSignedWithVerificationKey
-{
-	1:set<EncryptedBufferSigned> encryptedBuffers,
-	2:VerificationKey verificationKey,
-}
-
 struct EncryptionKeysWithHashBuffer
 {
 	1:EncryptionKeys encryptionKeys,
@@ -229,16 +223,10 @@ service UpdateServerContactBook
 	void updateServerContactBook1(1:ContactOperationSet contactOperationSet,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 }
 
-struct HashBufferWithId
-{
-	1:HashBuffer u,
-	2:Id userId,
-}
-
 service SendContactCard
 {
 	// Steps 5-7
-	void sendContactCard1(1:HashBufferWithId hashBufferWithId,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	void sendContactCard1(1:HashBuffer u,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Step 9
 	EncryptionKeys sendContactCard2(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
@@ -247,7 +235,7 @@ service SendContactCard
 	void sendContactCard3(1:set<EncryptedBufferSigned> encryptedBuffers) throws (1:FailedOperation failedOperation),
 
 	// Step 19.a
-	EncryptedBuffersSignedWithVerificationKey sendContactCard4(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation
+	EncryptedBufferSignedWithVerificationKey sendContactCard4(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation
 	failedOperation),
 }
 

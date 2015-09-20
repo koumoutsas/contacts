@@ -74,8 +74,14 @@ class TypeConverter
 
 	static com.kareebo.contacts.thrift.EncryptionKey convert(final EncryptionKey encryptionKey) throws NoSuchAlgorithmException
 	{
-		return new com.kareebo.contacts.thrift.EncryptionKey(encryptionKey.getBuffer(),convert(encryptionKey
-			                                                                                       .getAlgorithm()));
+		final ByteBuffer b=encryptionKey.getBuffer();
+		b.rewind();
+		final byte[] bytes=new byte[b.remaining()];
+		b.get(bytes);
+		final ByteBuffer copy=ByteBuffer.wrap(bytes);
+		copy.mark();
+		return new com.kareebo.contacts.thrift.EncryptionKey(copy,convert(encryptionKey
+			                                                                  .getAlgorithm()));
 	}
 
 	static com.kareebo.contacts.thrift.VerificationKey convert(final VerificationKey verificationKey) throws

@@ -414,11 +414,6 @@ public class BroadcastNewContactIdentityTest
 				final LongId id=new LongId(notificationId);
 				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(new TSerializer().serialize(id),clientId),future);
 				check(future);
-			}			@Override
-			BroadcastNewContactIdentity construct() throws GoraException
-			{
-				return new BroadcastNewContactIdentity(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
-					                                                                                                    .class,new Configuration()),clientNotifier);
 			}
 
 			void check(final Future<EncryptedBufferSignedWithVerificationKey> future)
@@ -431,6 +426,13 @@ public class BroadcastNewContactIdentityTest
 			SignatureAlgorithm getSignatureAlgorithm()
 			{
 				return SignatureAlgorithm.SHA256withECDSAprime239v1;
+			}
+
+			@Override
+			BroadcastNewContactIdentity construct() throws GoraException
+			{
+				return new BroadcastNewContactIdentity(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
+					                                                                                                    .class,new Configuration()),clientNotifier);
 			}
 
 			@Override
@@ -447,8 +449,6 @@ public class BroadcastNewContactIdentityTest
 				));
 				clientNotifier.put(deviceToken,encryptedBufferSignedWithVerificationKey);
 			}
-
-
 		}
 		new Base4().run();
 	}

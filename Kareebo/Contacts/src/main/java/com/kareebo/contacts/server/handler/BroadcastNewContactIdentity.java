@@ -19,10 +19,10 @@ import java.util.*;
 /**
  * Server-side service implementation of the broadcast new contact identity operation
  */
-public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStore implements com.kareebo.contacts.thrift.BroadcastNewContactIdentity.AsyncIface
+public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndNotifier implements com.kareebo.contacts.thrift
+	                                                                                                          .BroadcastNewContactIdentity.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(BroadcastNewContactIdentity.class.getName());
-	private final ClientNotifier clientNotifier;
 
 	/**
 	 * Constructor from datastores
@@ -33,8 +33,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	 */
 	BroadcastNewContactIdentity(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
 	{
-		super(userDataStore,identityDatastore);
-		this.clientNotifier=clientNotifier;
+		super(userDataStore,identityDatastore,clientNotifier);
 	}
 
 	@Override
@@ -130,9 +129,9 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 						final Client clientB=clientDBAccessor.get(clientIdB);
 						try
 						{
-							clientNotifier.put(clientB.getDeviceToken(),new EncryptedBufferSignedWithVerificationKey
-								                                            (encryptedBufferSigned,TypeConverter.convert(client.getKeys()
-									                                                                                         .getVerification())));
+							notifyClient(clientB.getDeviceToken(),new EncryptedBufferSignedWithVerificationKey
+								                                      (encryptedBufferSigned,TypeConverter.convert(client.getKeys()
+									                                                                                   .getVerification())));
 						}
 						catch(NoSuchAlgorithmException e)
 						{
@@ -153,19 +152,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	@Override
 	public void broadcastNewContactIdentity4(final LongId id,final SignatureBuffer signature,final Future<EncryptedBufferSignedWithVerificationKey> future)
 	{
-		final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
-			                                                                                        EncryptedBufferSignedWithVerificationKey();
-		verify(id,signature,new Reply<>(future,encryptedBufferSignedWithVerificationKey),new After()
-		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
-			{
-				final EncryptedBufferSignedWithVerificationKey retrieved=new EncryptedBufferSignedWithVerificationKey();
-				clientNotifier.get(retrieved,id.getId());
-				encryptedBufferSignedWithVerificationKey.setEncryptedBufferSigned(retrieved.getEncryptedBufferSigned());
-				encryptedBufferSignedWithVerificationKey.setVerificationKey(retrieved.getVerificationKey());
-			}
-		});
+		forward(new EncryptedBufferSignedWithVerificationKey(),id,signature,future);
 	}
 
 	@Override

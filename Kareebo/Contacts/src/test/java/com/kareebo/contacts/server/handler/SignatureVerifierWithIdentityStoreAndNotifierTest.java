@@ -2,7 +2,6 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.thrift.ClientId;
-import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.LongId;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
@@ -97,17 +96,6 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 		clients.put(TypeConverter.convert(clientId.getClient()),client);
 		user.setClients(clients);
 		userDataStore.put(clientId.getUser(),user);
-	}
-
-	private class Notifier implements ClientNotifierBackend
-	{
-		final Map<Long,Long> sentNotifications=new HashMap<>();
-
-		@Override
-		public void notify(final long deviceToken,final long notificationId) throws FailedOperation
-		{
-			sentNotifications.put(deviceToken,notificationId);
-		}
 	}
 
 	class TestSignatureVerifierWithIdentityStoreAndNotifier extends SignatureVerifierWithIdentityStoreAndNotifier

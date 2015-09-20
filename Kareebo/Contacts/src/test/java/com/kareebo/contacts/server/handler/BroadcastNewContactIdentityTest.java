@@ -407,13 +407,6 @@ public class BroadcastNewContactIdentityTest
 			{
 			}
 
-			@Override
-			BroadcastNewContactIdentity construct() throws GoraException
-			{
-				return new BroadcastNewContactIdentity(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
-					                                                                                                    .class,new Configuration()),clientNotifier);
-			}
-
 			void run() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
@@ -421,12 +414,23 @@ public class BroadcastNewContactIdentityTest
 				final LongId id=new LongId(notificationId);
 				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(new TSerializer().serialize(id),clientId),future);
 				check(future);
+			}			@Override
+			BroadcastNewContactIdentity construct() throws GoraException
+			{
+				return new BroadcastNewContactIdentity(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
+					                                                                                                    .class,new Configuration()),clientNotifier);
 			}
 
 			void check(final Future<EncryptedBufferSignedWithVerificationKey> future)
 			{
 				assertTrue(future.succeeded());
 				assertEquals(encryptedBufferSignedWithVerificationKey,future.result());
+			}
+
+			@Override
+			SignatureAlgorithm getSignatureAlgorithm()
+			{
+				return SignatureAlgorithm.SHA256withECDSAprime239v1;
 			}
 
 			@Override
@@ -444,11 +448,7 @@ public class BroadcastNewContactIdentityTest
 				clientNotifier.put(deviceToken,encryptedBufferSignedWithVerificationKey);
 			}
 
-			@Override
-			SignatureAlgorithm getSignatureAlgorithm()
-			{
-				return SignatureAlgorithm.SHA256withECDSAprime239v1;
-			}
+
 		}
 		new Base4().run();
 	}
@@ -905,17 +905,6 @@ public class BroadcastNewContactIdentityTest
 		}
 
 		abstract void setupUserDatastore() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
-	}
-
-	private class Notifier implements ClientNotifierBackend
-	{
-		final Map<Long,Long> sentNotifications=new HashMap<>();
-
-		@Override
-		public void notify(final long deviceToken,final long notificationId) throws FailedOperation
-		{
-			sentNotifications.put(deviceToken,notificationId);
-		}
 	}
 
 	abstract class Base3 extends Base34

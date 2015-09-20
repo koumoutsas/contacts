@@ -15,9 +15,7 @@ import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -165,21 +163,5 @@ public class ClientNotifierTest
 		clientNotifier.get(retrieved,notificationId);
 		assertFalse(datastore.hasBeenClosed());
 		assertNotNull(datastore.get(notificationId));
-	}
-
-	private class Notifier implements ClientNotifierBackend
-	{
-		final Map<Long,Long> sentNotifications=new HashMap<>();
-		boolean fail=false;
-
-		@Override
-		public void notify(final long deviceToken,final long notificationId) throws FailedOperation
-		{
-			if(fail)
-			{
-				throw new FailedOperation();
-			}
-			sentNotifications.put(deviceToken,notificationId);
-		}
 	}
 }

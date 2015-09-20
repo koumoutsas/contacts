@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.server.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
 import com.kareebo.contacts.server.gora.EncryptionAlgorithm;
@@ -16,16 +15,14 @@ import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.thrift.TBase;
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
 import java.nio.ByteBuffer;
 import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -454,12 +451,10 @@ public class RegisterIdentityTest
 		}
 	}
 
-	abstract private class Base3
+	abstract private class Base3 extends Signer
 	{
-		final static String ecdsa="ECDSA";
 		final DataStore<ByteBuffer,HashIdentity> identityDataStore;
 		final DataStore<Long,User> userDataStore;
-		final SignatureBuffer signature=new SignatureBuffer();
 		final Long user=(long)0;
 		final Long client=(long)0;
 		final ClientId clientId=new ClientId();
@@ -469,6 +464,7 @@ public class RegisterIdentityTest
 		final RegisterIdentity registerIdentity;
 		final List<Long> confirmers=new ArrayList<>(1);
 		final long deviceToken=10;
+		SignatureBuffer signature;
 		HashBuffer uA;
 		HashBuffer uC;
 		Set<HashBuffer> uSet;
@@ -481,22 +477,14 @@ public class RegisterIdentityTest
 			constructPlaintext();
 		}
 
-		PlaintextSerializer constructPlaintext() throws SignatureException, InvalidKeyException
+		void constructPlaintext() throws SignatureException, InvalidKeyException, TException
 		{
 			try
 			{
 				clientId.setUser(user);
 				clientId.setClient(client);
 				publicKeys.setEncryption(SignatureVerifierTestBase.setUpEncryptionKey("ab".getBytes()));
-				Security.addProvider(new BouncyCastleProvider());
-				final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
-				final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
-				g.initialize(ecSpec,new SecureRandom());
-				final KeyPair keyPair=g.generateKeyPair
-					                        ();
-				publicKeys.setVerification(SignatureVerifierTestBase.setUpVerificationKey(new X509EncodedKeySpec(keyPair.getPublic()
-					                                                                                                 .getEncoded
-						                                                                                                  ()).getEncoded()));
+				publicKeys.setVerification(TypeConverter.convert(verificationKey));
 				setupRegisterIdentityInput();
 				registerIdentityInput.setPublicKeys(publicKeys);
 				registerIdentityInput.setUA(uA);
@@ -505,18 +493,13 @@ public class RegisterIdentityTest
 				registerIdentityInput.setUSet(uSet);
 				registerIdentityInput.setUserAgent(userAgent);
 				registerIdentityInput.setDeviceToken(deviceToken);
-				final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
-				ecdsaSign.initSign(keyPair.getPrivate());
-				ecdsaSign.update(new PlaintextSerializer<>(registerIdentityInput).serialize());
-				signature.setClient(clientId);
-				signature.setBuffer(ecdsaSign.sign());
+				signature=sign(new TSerializer().serialize(registerIdentityInput),clientId);
 			}
 			catch(NoSuchAlgorithmException|InvalidAlgorithmParameterException|NoSuchProviderException|FailedOperation e)
 			{
 				e.printStackTrace();
 				fail();
 			}
-			return new PlaintextSerializer<>(registerIdentityInput);
 		}
 
 		abstract void setupRegisterIdentityInput() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException;

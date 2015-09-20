@@ -27,9 +27,9 @@ public class ModifyKeysTest
 		new Base()
 		{
 			@Override
-			PublicKeys createKeys()
+			PublicKeys createKeys() throws NoSuchAlgorithmException
 			{
-				return new PublicKeys(setUpEncryptionKey("abc".getBytes()),setUpVerificationKey("efg".getBytes()));
+				return new PublicKeys(setUpEncryptionKey("abc".getBytes()),TypeConverter.convert(verificationKey));
 			}
 
 			void run() throws NoSuchAlgorithmException
@@ -57,12 +57,11 @@ public class ModifyKeysTest
 			}
 
 			@Override
-			PublicKeys createKeys()
+			PublicKeys createKeys() throws NoSuchAlgorithmException
 			{
 				final EncryptionKey encryptionKey=setUpEncryptionKey("abc".getBytes());
 				encryptionKey.setAlgorithm(EncryptionAlgorithm.Fake);
-				return new PublicKeys(encryptionKey,setUpVerificationKey("efg".getBytes
-					                                                               ()));
+				return new PublicKeys(encryptionKey,TypeConverter.convert(verificationKey));
 			}
 		}.run();
 	}
@@ -82,7 +81,7 @@ public class ModifyKeysTest
 			super.setUp();
 		}
 
-		abstract PublicKeys createKeys();
+		abstract PublicKeys createKeys() throws NoSuchAlgorithmException;
 
 		@Override
 		SignatureVerifier construct(final DataStore<Long,User> dataStore)

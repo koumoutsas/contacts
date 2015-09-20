@@ -17,16 +17,14 @@ import org.apache.gora.store.DataStoreFactory;
 import org.apache.gora.util.GoraException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.thrift.TBase;
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
 import java.nio.ByteBuffer;
 import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -403,7 +401,9 @@ public class BroadcastNewContactIdentityTest
 		{
 			private EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey;
 
-			private Base4() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, FailedOperation
+			private Base4() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException,
+				                       InvalidAlgorithmParameterException, InvalidKeyException, SignatureException,
+				                       TException
 			{
 			}
 
@@ -414,12 +414,12 @@ public class BroadcastNewContactIdentityTest
 					                                                                                                    .class,new Configuration()),clientNotifier);
 			}
 
-			void run() throws FailedOperation, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
+			void run() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
 				final LongId notificationId=new LongId(notifierBackend.sentNotifications.values().iterator().next());
 				final LongId id=new LongId(notificationId);
-				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(new PlaintextSerializer<>(id).serialize(),clientId),future);
+				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(new TSerializer().serialize(id),clientId),future);
 				check(future);
 			}
 
@@ -847,7 +847,7 @@ public class BroadcastNewContactIdentityTest
 		}.run();
 	}
 
-	abstract class Base34
+	abstract class Base34 extends Signer
 	{
 		protected final Notifier notifierBackend=new Notifier();
 		protected final ClientNotifier clientNotifier;
@@ -855,13 +855,12 @@ public class BroadcastNewContactIdentityTest
 		protected final ClientId clientId=new ClientId(0,0);
 		protected final long deviceToken=0;
 		protected DataStore<Long,User> userDataStore;
-		protected VerificationKey verificationKey;
-		private KeyPair keyPair;
 		private DataStore<Long,PendingNotification> pendingNotificationDataStore;
 
 		private Base34() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException,
-			                        InvalidKeyException, SignatureException, FailedOperation
+			                        InvalidKeyException, SignatureException, TException
 		{
+			verificationKey.setAlgorithm(getSignatureAlgorithm());
 			userDataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 			pendingNotificationDataStore=DataStoreFactory.getDataStore(Long.class,PendingNotification.class,new Configuration());
 			clientNotifier=new ClientNotifier(notifierBackend,pendingNotificationDataStore);
@@ -869,6 +868,8 @@ public class BroadcastNewContactIdentityTest
 			setupMainUser();
 			setupUserDatastore();
 		}
+
+		abstract SignatureAlgorithm getSignatureAlgorithm();
 
 		abstract BroadcastNewContactIdentity construct() throws GoraException;
 
@@ -890,7 +891,6 @@ public class BroadcastNewContactIdentityTest
 			encryptionKey.setAlgorithm(com.kareebo.contacts.server.gora.EncryptionAlgorithm.RSA2048);
 			encryptionKey.setBuffer(b);
 			publicKeys.setEncryption(encryptionKey);
-			verificationKey=createSignatureKeys();
 			publicKeys.setVerification(verificationKey);
 			client.setKeys(publicKeys);
 			final UserAgent userAgent=new UserAgent();
@@ -904,42 +904,7 @@ public class BroadcastNewContactIdentityTest
 			userDataStore.put(user.getId(),user);
 		}
 
-		abstract void setupUserDatastore() throws FailedOperation, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
-
-		VerificationKey createSignatureKeys() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException
-		{
-			Security.addProvider(new BouncyCastleProvider());
-			final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
-			final KeyPairGenerator g=KeyPairGenerator.getInstance("ECDSA",Utils.getProvider());
-			g.initialize(ecSpec,new SecureRandom());
-			keyPair=g.generateKeyPair();
-			return setUpVerificationKey(new X509EncodedKeySpec(keyPair.getPublic().getEncoded()).getEncoded());
-		}
-
-		private VerificationKey setUpVerificationKey(final byte[] buffer)
-		{
-			final VerificationKey verificationKey=new VerificationKey();
-			verificationKey.setAlgorithm(getSignatureAlgorithm());
-			final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
-			byteBuffer.mark();
-			verificationKey.setBuffer(byteBuffer);
-			return verificationKey;
-		}
-
-		abstract SignatureAlgorithm getSignatureAlgorithm();
-
-		SignatureBuffer sign(final byte[] buffer,final ClientId clientId) throws NoSuchProviderException,
-			                                                                         NoSuchAlgorithmException, InvalidKeyException, SignatureException
-		{
-			final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
-			ecdsaSign.initSign(keyPair.getPrivate());
-			ecdsaSign.update(buffer);
-			final SignatureBuffer signatureBuffer=new SignatureBuffer();
-			signatureBuffer.setBuffer(ecdsaSign.sign());
-			signatureBuffer.setAlgorithm(com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1);
-			signatureBuffer.setClient(clientId);
-			return signatureBuffer;
-		}
+		abstract void setupUserDatastore() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
 	}
 
 	private class Notifier implements ClientNotifierBackend
@@ -959,7 +924,8 @@ public class BroadcastNewContactIdentityTest
 		protected Map<Long,EncryptedBufferSigned> encryptedBuffersMap;
 		private Set<EncryptedBufferSigned> encryptedBuffers;
 
-		private Base3() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, FailedOperation
+		private Base3() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException,
+			                       InvalidKeyException, SignatureException, TException
 		{
 		}
 
@@ -976,7 +942,7 @@ public class BroadcastNewContactIdentityTest
 		abstract void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException;
 
 		@Override
-		void setupUserDatastore() throws FailedOperation, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
+		void setupUserDatastore() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 		{
 			encryptedBuffers=new HashSet<>(clientNumber);
 			encryptedBuffersMap=new HashMap<>(clientNumber);
@@ -1013,9 +979,10 @@ public class BroadcastNewContactIdentityTest
 				final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer=new com.kareebo.contacts.thrift
 					                                                                      .EncryptedBuffer(buffer,
 						                                                                                      EncryptionAlgorithm.RSA2048,clientId);
-				final EncryptedBufferSigned encryptedBufferSigned=new EncryptedBufferSigned(encryptedBuffer,sign(new PlaintextSerializer<>
-					                                                                                                 (encryptedBuffer).serialize(),this
-						                                                                                                                               .clientId));
+				final EncryptedBufferSigned encryptedBufferSigned=new EncryptedBufferSigned(encryptedBuffer,sign(new TSerializer()
+					                                                                                                 .serialize
+						                                                                                                  (encryptedBuffer),this
+							                                                                                                                    .clientId));
 				encryptedBuffers.add(encryptedBufferSigned);
 				encryptedBuffersMap.put(i,encryptedBufferSigned);
 			}

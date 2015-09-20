@@ -103,7 +103,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 	@Test
 	public void testVerify() throws Exception
 	{
-		((SignatureVerifierMock)signatureVerifier).verify(plaintext,signature,new DefaultFutureResult<Void>());
+		((SignatureVerifierMock)signatureVerifier).verify(constructPlaintext(),signature,new DefaultFutureResult<Void>());
 		assertTrue(((MemStore)identityDatastore).hasBeenClosed());
 	}
 
@@ -111,7 +111,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 	public void testVerifyFailed() throws Exception
 	{
 		signature.setClient(clientIdInvalid);
-		((SignatureVerifierMock)signatureVerifier).verify(plaintext,signature,new DefaultFutureResult<Void>());
+		((SignatureVerifierMock)signatureVerifier).verify(constructPlaintext(),signature,new DefaultFutureResult<Void>());
 		assertFalse(((MemStore)identityDatastore).hasBeenClosed());
 	}
 

@@ -241,13 +241,13 @@ service SendContactCard
 
 service SuggestNewContact
 {
-	// Step 4.a
+	// Step 2.a
 	EncryptionKeysWithHashBuffer suggestNewContact1(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
-	// Steps 4.e-4.e
+	// Steps 2.e-2.f
 	void suggestNewContact2(1:set<EncryptedBufferSigned> encryptedBuffers,2:HashBuffer uB,3:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
-	// Step 5
+	// Step 3
 	EncryptedBufferSignedWithVerificationKey suggestNewContact3(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation
 	failedOperation),
 }

@@ -1,0 +1,20 @@
+{
+	"namespace": "com.kareebo.contacts.server.gora",
+	"name": "GraphNode",
+	"type": "record",
+	"fields":
+	[
+	{
+		"name": "id",
+		"type": "long"
+	},
+	{
+		"name": "adjacents",
+		"type":
+		{
+			"type": "array",
+			"items": "EncryptedBuffer"
+		}
+	}
+	]
+}

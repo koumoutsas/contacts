@@ -549,15 +549,13 @@ This flow is executed when \server{} believes that \user{A} should know \user{B}
 \paragraph{Input}
 \SpecialItem
 \begin{description}
- \item[U(A) : HashBuffer] The blinded identity of the receiver of the contact suggestion.
- \item[U(B) : HashBuffer] The blinded identity of the suggested contact.
+ \item[\userIdSimple{A} : Id] The user id of the receiver of the contact suggestion.
+ \item[\userIdSimple{B} : Id] The user id of the suggested contact.
 \end{description}
 
 \paragraph{Other Variables}
 \SpecialItem
 \begin{description}
- \item[\userIdSimple{A} : Id] The user id of $U(A)$.
- \item[\userIdSimple{B} : Id] The user id of $U(B)$.
  \item[name : string] The name of \User{A}, retrieved from the contact card.
 \end{description}
 
@@ -568,8 +566,6 @@ This flow is executed when \server{} believes that \user{A} should know \user{B}
  \begin{enumerate}
   \item If it is, the flow terminates.
  \end{enumerate}
- \item \Server{} populates \userIdSimple{B} from HashIdentityMap for $U(B)$.
- \item \Server{} populates \userIdSimple{A} from HashIdentityMap for $U(A)$.
  \item For all \Client{A} in UserSet for \userIdSimple{A}
  \begin{enumerate}
   \item \Server{} sends \userIdSimple{B}, $U(B)$, \encryptionKey{} for all clients for \userIdSimple{B}.

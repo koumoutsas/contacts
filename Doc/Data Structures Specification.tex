@@ -1043,6 +1043,54 @@ HashIdentityMap = map(HashBuffer:HashIdentity)
 \paragraph*{Comments}
 A map from blinded identities to $HashIdentity$ objects.
 
+\subsubsection{GraphNode}
+
+\begin{verbbox}
+GraphNode
+{
+  id, Id
+  adjacents, set(Id)
+}
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \infrastructure
+\end{inparaitem}
+
+\paragraph*{Comments}
+This is the node type of \ref{sec:structure:server:graph}. It represents a node with its adjacent nodes.
+
+\SpecialItem
+\begin{description}
+ \item[id] The $User.id$ of the owner of the node.
+ \item[adjacents] The set of $User$s that are ajacent to this node. By definition, there is a node for each member of this list.
+\end{description}
+
+\SpecialItem
+\begin{description}
+ \item[Foreign Key] All ids are foreign keys in $UserSet$.
+\end{description}
+
+\subsubsection{Graph}
+\label{sec:structure:server:graph}
+\begin{verbbox}
+HashIdentityMap = set(GraphNode)
+\end{verbbox}
+\begin{center}
+\theverbbox
+\end{center}
+
+\begin{inparaitem}[ ]
+ \item \secure
+ \item \persistent
+ \item \unique
+\end{inparaitem}
+
+\paragraph*{Comments}
+An adjacency list representing a the affinity graph of users. The graph is undirected. If there is an edge between $a$ and $b$, there is a $GraphNode$ for $a$, with $b$ in its adjacents, and a node for $b$, with $a$ in its adjacents.
 \bibliography{spec,dataStructures}
 \bibliographystyle{plain}
 

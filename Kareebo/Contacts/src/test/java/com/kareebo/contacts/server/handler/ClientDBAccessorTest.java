@@ -170,7 +170,7 @@ public class ClientDBAccessorTest
 	@Test(expected=FailedOperation.class)
 	public void testCreateNewUserFailed() throws Exception
 	{
-		((MemStore)dataStore).useId=userIdValid;
+		((MemStore<Long,User>)dataStore).useId=userIdValid;
 		clientDBAccessor.createNewUser();
 	}
 

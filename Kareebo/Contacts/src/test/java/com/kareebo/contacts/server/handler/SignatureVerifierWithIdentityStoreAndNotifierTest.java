@@ -100,13 +100,6 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 
 	class TestSignatureVerifierWithIdentityStoreAndNotifier extends SignatureVerifierWithIdentityStoreAndNotifier
 	{
-		/**
-		 * Constructor from a datastore
-		 *
-		 * @param userDataStore     The user datastore
-		 * @param identityDatastore The identity datastore
-		 * @param clientNotifier    The client notifier interface
-		 */
 		TestSignatureVerifierWithIdentityStoreAndNotifier(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
 		{
 			super(userDataStore,identityDatastore,clientNotifier);

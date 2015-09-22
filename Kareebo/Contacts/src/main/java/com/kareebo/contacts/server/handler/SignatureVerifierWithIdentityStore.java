@@ -19,7 +19,7 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	final private DataStore<ByteBuffer,HashIdentity> identityDatastore;
 
 	/**
-	 * Constructor from a datastore
+	 * Constructor from datastores
 	 *
 	 * @param userDataStore     The user datastore
 	 * @param identityDatastore The identity datastore

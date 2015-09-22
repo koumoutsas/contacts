@@ -22,7 +22,7 @@ public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifi
 	private static final Logger logger=LoggerFactory.getLogger(SendContactCard.class.getName());
 
 	/**
-	 * Constructor from a datastore
+	 * Constructor from datastores
 	 *
 	 * @param userDataStore     The user datastore
 	 * @param identityDatastore The identity datastore

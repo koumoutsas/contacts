@@ -260,13 +260,6 @@ public class SendContactCardTest
 
 	private class SendContactCardError extends SendContactCard
 	{
-		/**
-		 * Constructor from a datastore
-		 *
-		 * @param userDataStore     The user datastore
-		 * @param identityDatastore The identity datastore
-		 * @param clientNotifier    The client notifier interface
-		 */
 		SendContactCardError(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
 		{
 			super(userDataStore,identityDatastore,clientNotifier);

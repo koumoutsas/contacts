@@ -159,11 +159,6 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 
 	private class SignatureVerifierMock extends SignatureVerifierWithIdentityStore
 	{
-		/**
-		 * Constructor from a datastore
-		 *
-		 * @param dataStore The datastore
-		 */
 		SignatureVerifierMock(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity>
 			                                                           identityDatastore)
 		{

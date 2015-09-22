@@ -21,7 +21,7 @@ abstract class SignatureVerifierWithIdentityStoreAndNotifier extends SignatureVe
 	private final ClientNotifier clientNotifier;
 
 	/**
-	 * Constructor from a datastore
+	 * Constructor from datastores
 	 *
 	 * @param userDataStore     The user datastore
 	 * @param identityDatastore The identity datastore

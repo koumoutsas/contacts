@@ -1,6 +1,6 @@
 
 def SLF4J_VERSION = '1.6.4'
-def GORA_VERSION = '0.6.1-SNAPSHOT'
+def GORA_VERSION = '0.6.1'
 
 allprojects {
     gradle.projectsEvaluated {
@@ -55,28 +55,28 @@ install - install any jars produced to the local Maven repository (.m2)
  */
 
 dependencies {
-  /*
-  Add your module jar dependencies here
-  E.g.
-  compile "com.foo:foo-lib:1.0.1" - for compile time deps - this will end up in your module too!
-  testCompile "com.foo:foo-lib:1.0.1" - for test time deps
-  provided "com.foo:foo-lib:1.0.1" - if you DON'T want it to be packaged in the module zip
-  */
+    /*
+    Add your module jar dependencies here
+    E.g.
+    compile "com.foo:foo-lib:1.0.1" - for compile time deps - this will end up in your module too!
+    testCompile "com.foo:foo-lib:1.0.1" - for test time deps
+    provided "com.foo:foo-lib:1.0.1" - if you DON'T want it to be packaged in the module zip
+    */
 
-  // If you're creating Groovy compiled verticles you may need the following dependencies
-  provided "org.codehaus.groovy:groovy-all:$groovyVersion"
-  provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
+    // If you're creating Groovy compiled verticles you may need the following dependencies
+    provided "org.codehaus.groovy:groovy-all:$groovyVersion"
+    provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
 
-  // If you're creating Scala compiled verticles you may need the following dependencies
-  provided "org.scala-lang:scala-library:$scalaVersion"
-  provided "io.vertx:lang-scala:$scalaLangModVersion@jar"
-
-  provided "org.apache.hadoop:hadoop-core:1.2.1"
-  provided "org.slf4j:slf4j-api:${SLF4J_VERSION}"
-  provided "org.slf4j:slf4j-log4j12:${SLF4J_VERSION}"
-  provided 'log4j:log4j:1.2.14'
-  provided 'org.apache.thrift:libthrift-vertx-java:1.0-SNAPSHOT'
-  provided 'org.apache.thrift:libthrift:0.9.2'
+    // If you're creating Scala compiled verticles you may need the following dependencies
+    provided "org.scala-lang:scala-library:$scalaVersion"
+    provided "io.vertx:lang-scala:$scalaLangModVersion@jar"
+    provided "org.apache.hadoop:hadoop-core:1.2.1"
+    provided "org.slf4j:slf4j-api:${SLF4J_VERSION}"
+    provided "org.slf4j:slf4j-log4j12:${SLF4J_VERSION}"
+    provided 'log4j:log4j:1.2.14'
+    provided 'org.apache.thrift:libthrift-vertx-java:1.0-SNAPSHOT'
+    provided 'org.apache.thrift:libthrift:0.9.2'
+    provided "org.apache.gora:gora-core:${GORA_VERSION}"
 }
 
 test {
@@ -148,7 +148,6 @@ buildscript {
 }
 
 dependencies {
-    compile "org.apache.gora:gora-core:${GORA_VERSION}"
 }
 
 def jvmTestFlags = '''

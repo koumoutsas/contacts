@@ -12,6 +12,7 @@ import org.vertx.java.core.Future;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Extension of {@link SignatureVerifierWithIdentityStore} with {@link ClientNotifier}
@@ -61,5 +62,15 @@ abstract class SignatureVerifierWithIdentityStoreAndNotifier extends SignatureVe
 	protected void notifyClients(final List<Long> deviceTokens,final TBase payload) throws FailedOperation
 	{
 		clientNotifier.put(deviceTokens,payload);
+	}
+
+	protected void notifyClients(final Map<Long,TBase> notifications) throws FailedOperation
+	{
+		clientNotifier.put(notifications);
+	}
+
+	protected void get(final TBase object,final long notificationId) throws FailedOperation
+	{
+		clientNotifier.get(object,notificationId);
 	}
 }

@@ -6,6 +6,7 @@ import com.kareebo.contacts.thrift.LongId;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.thrift.TBase;
 import org.apache.thrift.TSerializer;
 import org.junit.Test;
 import org.vertx.java.core.Future;
@@ -34,19 +35,28 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 	{
 		final long deviceToken0=0;
 		final List<Long> deviceTokens=Arrays.asList(deviceToken0+1,deviceToken0+2);
+		final List<Long> deviceTokens2=Arrays.asList(deviceToken0+3,deviceToken0+4);
 		setupClient();
 		final LongId payload0=new LongId(deviceToken0);
 		final LongId payload1=new LongId(deviceToken0+1);
-		final Map<Long,LongId> expected=new HashMap<>(deviceTokens.size()+1);
+		final LongId payload2=new LongId(deviceToken0+2);
+		final Map<Long,LongId> expected=new HashMap<>(deviceTokens.size()+deviceTokens2.size()+1);
 		expected.put(deviceToken0,payload0);
 		for(final Long l : deviceTokens)
 		{
 			expected.put(l,payload1);
 		}
+		final Map<Long,TBase> notifications=new HashMap<>(deviceTokens2.size());
+		for(final Long l : deviceTokens2)
+		{
+			expected.put(l,payload2);
+			notifications.put(l,payload2);
+		}
 		final TestSignatureVerifierWithIdentityStoreAndNotifier testSignatureVerifierWithIdentityStoreAndNotifier=new
 			                                                                                                          TestSignatureVerifierWithIdentityStoreAndNotifier(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration()),clientNotifier);
 		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClient(deviceToken0,payload0);
 		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClients(deviceTokens,payload1);
+		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClients(notifications);
 		for(final Long deviceToken : expected.keySet())
 		{
 			final Long notificationId=notifierBackend.sentNotifications.get(deviceToken);
@@ -62,6 +72,10 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 				                                                                                           clientId),future);
 			assertTrue(future.failed());
 		}
+		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClient(deviceToken0,payload0);
+		final LongId retrieved=new LongId();
+		testSignatureVerifierWithIdentityStoreAndNotifier.get(retrieved,notifierBackend.sentNotifications.get(deviceToken0));
+		assertEquals(new LongId(deviceToken0),retrieved);
 	}
 
 	private void setupClient() throws Exception

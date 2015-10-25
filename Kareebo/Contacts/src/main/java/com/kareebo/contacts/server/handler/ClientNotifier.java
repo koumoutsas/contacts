@@ -13,10 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Stores and retrieves pending messages to clients and interfaces with the push notification system
@@ -62,17 +59,6 @@ class ClientNotifier
 	 */
 	void put(final List<Long> deviceTokens,final TBase object) throws FailedOperation
 	{
-		final List<AbstractMap.SimpleImmutableEntry<Long,Long>> notificationIds=new ArrayList<>(deviceTokens.size());
-		for(final Long deviceToken : deviceTokens)
-		{
-			final long notificationId=new SecureRandom().nextLong();
-			if(pendingNotificationDataStore.get(notificationId)!=null)
-			{
-				logger.error("Notification id "+notificationId+" already exists");
-				throw new FailedOperation();
-			}
-			notificationIds.add(new AbstractMap.SimpleImmutableEntry<>(deviceToken,notificationId));
-		}
 		ByteBuffer payload;
 		try
 		{
@@ -84,16 +70,65 @@ class ClientNotifier
 			logger.error("Failed serialization",e);
 			throw new FailedOperation();
 		}
+		final Map<Long,ByteBuffer> notificationsInternal=new HashMap<>(deviceTokens.size());
+		for(final Long deviceToken : deviceTokens)
+		{
+			notificationsInternal.put(deviceToken,payload);
+		}
+		putInternal(notificationsInternal);
+	}
+
+	private void putInternal(final Map<Long,ByteBuffer> notifications) throws FailedOperation
+	{
+		final List<AbstractMap.SimpleImmutableEntry<Long,Long>> notificationIds=new ArrayList<>(notifications.size());
+		for(final Long deviceToken : notifications.keySet())
+		{
+			final long notificationId=new SecureRandom().nextLong();
+			if(pendingNotificationDataStore.get(notificationId)!=null)
+			{
+				logger.error("Notification id "+notificationId+" already exists");
+				throw new FailedOperation();
+			}
+			notificationIds.add(new AbstractMap.SimpleImmutableEntry<>(deviceToken,notificationId));
+		}
 		for(final AbstractMap.SimpleImmutableEntry<Long,Long> notification : notificationIds)
 		{
 			final PendingNotification pendingNotification=new PendingNotification();
-			pendingNotification.setPayload(payload);
+			pendingNotification.setPayload(notifications.get(notification.getKey()));
 			final Long notificationId=notification.getValue();
 			pendingNotification.setId(notificationId);
 			pendingNotificationDataStore.put(notificationId,pendingNotification);
 			clientNotifierBackend.notify(notification.getKey(),notificationId);
 		}
 		pendingNotificationDataStore.close();
+	}
+
+	/**
+	 * Put a set of notification payloads in the datastore and send the notifications to multiple clients
+	 *
+	 * @param notifications A map from device tokens used by the push notification server to identify the client to objects to be sent
+	 * @throws FailedOperation If either a unique id cannot be generated, the Thrift serialization fails, or the notification cannot be sent to
+	 *                         the client
+	 */
+	void put(final Map<Long,TBase> notifications) throws FailedOperation
+	{
+		final Map<Long,ByteBuffer> notificationsInternal=new HashMap<>(notifications.size());
+		for(final Map.Entry<Long,TBase> entry : notifications.entrySet())
+		{
+			ByteBuffer payload;
+			try
+			{
+				payload=ByteBuffer.wrap(new TSerializer().serialize(entry.getValue()));
+				payload.mark();
+			}
+			catch(TException e)
+			{
+				logger.error("Failed serialization",e);
+				throw new FailedOperation();
+			}
+			notificationsInternal.put(entry.getKey(),payload);
+		}
+		putInternal(notificationsInternal);
 	}
 
 	/**

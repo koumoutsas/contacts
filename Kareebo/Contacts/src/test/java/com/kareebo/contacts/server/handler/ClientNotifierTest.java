@@ -5,6 +5,7 @@ import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.UserAgent;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TProtocol;
@@ -15,7 +16,9 @@ import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -78,6 +81,56 @@ public class ClientNotifierTest
 			expectedPayload.mark();
 			assertEquals(expectedPayload,payload);
 		}
+	}
+
+	@Test
+	public void testPutMap() throws Exception
+	{
+		final Map<Long,TBase> expectedPayloads=new HashMap<>(deviceTokens.size());
+		for(final Long deviceToken2 : deviceTokens)
+		{
+			expectedPayloads.put(deviceToken2,new UserAgent("a",TypeConverter.convert(deviceToken).toString()));
+		}
+		clientNotifier.put(expectedPayloads);
+		assertEquals(deviceTokens.size(),notifierBackend.sentNotifications.size());
+		for(final Long deviceToken2 : deviceTokens)
+		{
+			final Long notificationId=notifierBackend.sentNotifications.get(deviceToken2);
+			assertNotNull(notificationId);
+			assertTrue(datastore.hasBeenClosed());
+			final PendingNotification pendingNotification=datastore.get(notificationId);
+			assertNotNull(pendingNotification);
+			assertEquals(notificationId,pendingNotification.getId());
+			final ByteBuffer payload=pendingNotification.getPayload();
+			payload.rewind();
+			final ByteBuffer expectedPayload=ByteBuffer.wrap(new TSerializer().serialize(expectedPayloads.get(deviceToken2)));
+			expectedPayload.mark();
+			assertEquals(expectedPayload,payload);
+		}
+	}
+
+	@Test
+	public void testPutMapSerializationError() throws Exception
+	{
+		final UserAgent o=new UserAgent()
+		{
+			@Override
+			public void write(TProtocol var1) throws TException
+			{
+				throw new TException();
+			}
+		};
+		o.setPlatform("");
+		o.setVersion("");
+		final Map<Long,TBase> expectedPayloads=new HashMap<>(deviceTokens.size());
+		for(final Long deviceToken2 : deviceTokens)
+		{
+			expectedPayloads.put(deviceToken2,o);
+		}
+		thrown.expect(FailedOperation.class);
+		clientNotifier.put(expectedPayloads);
+		assertEquals(0,notifierBackend.sentNotifications.size());
+		assertFalse(datastore.hasBeenClosed());
 	}
 
 	@Test

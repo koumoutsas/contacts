@@ -851,8 +851,8 @@ public class BroadcastNewContactIdentityTest
 		protected final BroadcastNewContactIdentity broadcastNewContactIdentity;
 		protected final ClientId clientId=new ClientId(0,0);
 		protected final long deviceToken=0;
-		protected DataStore<Long,User> userDataStore;
-		private DataStore<Long,PendingNotification> pendingNotificationDataStore;
+		protected final DataStore<Long,User> userDataStore;
+		private final DataStore<Long,PendingNotification> pendingNotificationDataStore;
 
 		private Base34() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException,
 			                        InvalidKeyException, SignatureException, TException

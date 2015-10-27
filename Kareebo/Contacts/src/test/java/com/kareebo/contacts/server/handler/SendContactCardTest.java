@@ -96,7 +96,7 @@ public class SendContactCardTest
 
 			void run() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
-				sendContactCard.sendContactCard1(u,sign(new TSerializer().serialize(u),clientId),future);
+				sendContactCard.sendContactCard1(u,sign(u,clientId),future);
 				check();
 			}
 
@@ -185,14 +185,13 @@ public class SendContactCardTest
 				final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer0=new com.kareebo.contacts.thrift.EncryptedBuffer
 					                                                                   (b,com.kareebo.contacts.thrift.EncryptionAlgorithm.Fake,
 						                                                                   clientId0);
-				final EncryptedBufferSigned encryptedBufferSigned0=new EncryptedBufferSigned(encryptedBuffer0,sign(new TSerializer().serialize
-					                                                                                                                     (encryptedBuffer0),clientId));
+				final EncryptedBufferSigned encryptedBufferSigned0=new EncryptedBufferSigned(encryptedBuffer0,sign(encryptedBuffer0,clientId));
 				encryptedBufferSignedSet.add(encryptedBufferSigned0);
 				e0=new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned0,TypeConverter.convert(this.verificationKey));
 				final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer1=new com.kareebo.contacts.thrift.EncryptedBuffer
 					                                                                   (b,com.kareebo.contacts.thrift.EncryptionAlgorithm.Fake,
 						                                                                   clientId1);
-				final EncryptedBufferSigned encryptedBufferSigned1=new EncryptedBufferSigned(encryptedBuffer1,sign(new TSerializer().serialize(encryptedBuffer1),clientId));
+				final EncryptedBufferSigned encryptedBufferSigned1=new EncryptedBufferSigned(encryptedBuffer1,sign(encryptedBuffer1,clientId));
 				encryptedBufferSignedSet.add(encryptedBufferSigned1);
 				e1=new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned1,TypeConverter.convert(this.verificationKey));
 			}
@@ -313,7 +312,7 @@ public class SendContactCardTest
 			pendingNotificationDataStore.put(notificationId,pendingNotification);
 			final LongId notificationLongId=new LongId(notificationId);
 			final Future<T> future=new DefaultFutureResult<>();
-			call(notificationLongId,sign(new TSerializer().serialize(notificationLongId),clientId),future);
+			call(notificationLongId,sign(notificationLongId,clientId),future);
 			assertTrue(future.succeeded());
 			assertEquals(o,future.result());
 		}

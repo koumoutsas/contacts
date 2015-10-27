@@ -54,15 +54,11 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 			final LongId notificationLongId=new LongId(notificationId);
 			final LongId retrieved=new LongId();
 			final Future<LongId> future=new DefaultFutureResult<>();
-			testSignatureVerifierWithIdentityStoreAndNotifier.forward(retrieved,notificationLongId,sign(new TSerializer
-				                                                                                            ().serialize
-					                                                                                               (notificationLongId),
+			testSignatureVerifierWithIdentityStoreAndNotifier.forward(retrieved,notificationLongId,sign(notificationLongId,
 				                                                                                           clientId),future);
 			assertTrue(future.succeeded());
 			assertEquals(expected.get(deviceToken),retrieved);
-			testSignatureVerifierWithIdentityStoreAndNotifier.forward(retrieved,notificationLongId,sign(new TSerializer
-				                                                                                            ().serialize
-					                                                                                               (notificationLongId),
+			testSignatureVerifierWithIdentityStoreAndNotifier.forward(retrieved,notificationLongId,sign(notificationLongId,
 				                                                                                           clientId),future);
 			assertTrue(future.failed());
 		}

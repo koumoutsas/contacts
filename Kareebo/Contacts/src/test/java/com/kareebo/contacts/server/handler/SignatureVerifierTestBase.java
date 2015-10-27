@@ -10,7 +10,6 @@ import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
 
 import java.nio.ByteBuffer;
 import java.security.*;
@@ -68,7 +67,7 @@ abstract class SignatureVerifierTestBase extends Signer
 	private void setUpCrypto() throws NoSuchProviderException, NoSuchAlgorithmException,
 		                                  InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, InvalidKeySpecException, TException
 	{
-		signature=sign(new TSerializer().serialize(constructPlaintext()),clientIdValid);
+		signature=sign(constructPlaintext(),clientIdValid);
 		wrongSignature=sign("feg".getBytes(),clientIdValid);
 	}
 

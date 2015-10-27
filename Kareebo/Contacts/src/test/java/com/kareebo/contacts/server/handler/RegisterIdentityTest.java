@@ -16,7 +16,6 @@ import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
@@ -493,7 +492,7 @@ public class RegisterIdentityTest
 				registerIdentityInput.setUSet(uSet);
 				registerIdentityInput.setUserAgent(userAgent);
 				registerIdentityInput.setDeviceToken(deviceToken);
-				signature=sign(new TSerializer().serialize(registerIdentityInput),clientId);
+				signature=sign(registerIdentityInput,clientId);
 			}
 			catch(NoSuchAlgorithmException|InvalidAlgorithmParameterException|NoSuchProviderException|FailedOperation e)
 			{

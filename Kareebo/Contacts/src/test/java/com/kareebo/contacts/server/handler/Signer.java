@@ -5,6 +5,9 @@ import com.kareebo.contacts.server.gora.VerificationKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import com.kareebo.contacts.thrift.SignatureBuffer;
+import org.apache.thrift.TBase;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
@@ -48,6 +51,12 @@ class Signer
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
 		byteBuffer.mark();
 		verificationKey.setBuffer(byteBuffer);
+	}
+
+	SignatureBuffer sign(final TBase object,final ClientId clientId) throws NoSuchProviderException,
+		                                                                        NoSuchAlgorithmException, InvalidKeyException, SignatureException, TException
+	{
+		return sign(new TSerializer().serialize(object),clientId);
 	}
 
 	SignatureBuffer sign(final byte[] buffer,final ClientId clientId) throws NoSuchProviderException,

@@ -18,7 +18,6 @@ import org.apache.gora.util.GoraException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
@@ -412,7 +411,7 @@ public class BroadcastNewContactIdentityTest
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
 				final LongId notificationId=new LongId(notifierBackend.sentNotifications.values().iterator().next());
 				final LongId id=new LongId(notificationId);
-				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(new TSerializer().serialize(id),clientId),future);
+				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(id,clientId),future);
 				check(future);
 			}
 
@@ -966,10 +965,8 @@ public class BroadcastNewContactIdentityTest
 				final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer=new com.kareebo.contacts.thrift
 					                                                                      .EncryptedBuffer(buffer,
 						                                                                                      EncryptionAlgorithm.RSA2048,clientId);
-				final EncryptedBufferSigned encryptedBufferSigned=new EncryptedBufferSigned(encryptedBuffer,sign(new TSerializer()
-					                                                                                                 .serialize
-						                                                                                                  (encryptedBuffer),this
-							                                                                                                                    .clientId));
+				final EncryptedBufferSigned encryptedBufferSigned=new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer,this
+					                                                                                                                 .clientId));
 				encryptedBuffers.add(encryptedBufferSigned);
 				encryptedBuffersMap.put(i,encryptedBufferSigned);
 			}

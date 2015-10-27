@@ -39,10 +39,7 @@ public class Utils
 	{
 		final Vector<String> characteristics=decompose(verificationKey.getAlgorithm());
 		final Signature verify=Signature.getInstance(characteristics.get(1),provider);
-		final ByteBuffer verificationByteBuffer=verificationKey.getBuffer();
-		verificationByteBuffer.rewind();
-		final byte[] verificationBytes=new byte[verificationByteBuffer.remaining()];
-		verificationByteBuffer.get(verificationBytes);
+		final byte[] verificationBytes=com.kareebo.contacts.base.Utils.getBytes(verificationKey.getBuffer());
 		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(verificationBytes)));
 		verify.update(plaintext);
 		final byte[] signatureBytes=new byte[signature.remaining()];

@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.User;
@@ -121,10 +122,7 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 	public void testCorruptedSignature() throws Exception
 	{
 		final Future<Void> result=new DefaultFutureResult<>();
-		final ByteBuffer signatureBuffer=signature.bufferForBuffer();
-		signatureBuffer.rewind();
-		final byte[] falseSignatureBytes=new byte[signatureBuffer.remaining()];
-		signatureBuffer.get(falseSignatureBytes);
+		final byte[] falseSignatureBytes=Utils.getBytes(signature.bufferForBuffer());
 		falseSignatureBytes[0]=(byte)(falseSignatureBytes[0]+1);
 		final ByteBuffer falseSignatureBuffer=ByteBuffer.wrap(falseSignatureBytes);
 		falseSignatureBuffer.mark();

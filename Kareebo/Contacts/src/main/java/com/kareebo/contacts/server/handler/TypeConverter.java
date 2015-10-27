@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.*;
 
 import java.nio.ByteBuffer;
@@ -74,11 +75,7 @@ class TypeConverter
 
 	static com.kareebo.contacts.thrift.EncryptionKey convert(final EncryptionKey encryptionKey) throws NoSuchAlgorithmException
 	{
-		final ByteBuffer b=encryptionKey.getBuffer();
-		b.rewind();
-		final byte[] bytes=new byte[b.remaining()];
-		b.get(bytes);
-		final ByteBuffer copy=ByteBuffer.wrap(bytes);
+		final ByteBuffer copy=ByteBuffer.wrap(Utils.getBytes(encryptionKey.getBuffer()));
 		copy.mark();
 		return new com.kareebo.contacts.thrift.EncryptionKey(copy,convert(encryptionKey
 			                                                                  .getAlgorithm()));
@@ -87,11 +84,7 @@ class TypeConverter
 	static com.kareebo.contacts.thrift.VerificationKey convert(final VerificationKey verificationKey) throws
 		NoSuchAlgorithmException
 	{
-		final ByteBuffer b=verificationKey.getBuffer();
-		b.rewind();
-		final byte[] bytes=new byte[b.remaining()];
-		b.get(bytes);
-		final ByteBuffer copy=ByteBuffer.wrap(bytes);
+		final ByteBuffer copy=ByteBuffer.wrap(Utils.getBytes(verificationKey.getBuffer()));
 		copy.mark();
 		return new com.kareebo.contacts.thrift.VerificationKey(copy,convert(verificationKey.getAlgorithm()));
 	}
@@ -168,11 +161,7 @@ class TypeConverter
 	static com.kareebo.contacts.thrift.HashBuffer convert(final HashBuffer cryptoBuffer) throws
 		NoSuchAlgorithmException
 	{
-		final ByteBuffer b=cryptoBuffer.getBuffer();
-		b.rewind();
-		final byte[] bytes=new byte[b.remaining()];
-		b.get(bytes);
-		final ByteBuffer copy=ByteBuffer.wrap(bytes);
+		final ByteBuffer copy=ByteBuffer.wrap(Utils.getBytes(cryptoBuffer.getBuffer()));
 		copy.mark();
 		return new com.kareebo.contacts.thrift.HashBuffer(copy,convert(cryptoBuffer.getAlgorithm()));
 	}

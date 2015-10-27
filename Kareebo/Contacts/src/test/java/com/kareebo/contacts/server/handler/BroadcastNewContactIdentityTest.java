@@ -682,9 +682,7 @@ public class BroadcastNewContactIdentityTest
 				{
 					Collections.reverse(comparisonIdentities);
 				}
-				comparisonIdentity.rewind();
-				final byte[] b=new byte[comparisonIdentity.remaining()];
-				comparisonIdentity.get(b);
+				final byte[] b=com.kareebo.contacts.base.Utils.getBytes(comparisonIdentity);
 				final byte[] i=new byte[b.length];
 				new SecureRandom().nextBytes(i);
 				final ByteBuffer iB=ByteBuffer.wrap(i);

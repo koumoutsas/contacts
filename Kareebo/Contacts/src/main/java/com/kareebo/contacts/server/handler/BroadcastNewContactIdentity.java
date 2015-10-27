@@ -88,11 +88,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 						final List<com.kareebo.contacts.server.gora.EncryptedBuffer> comparisonIdentities=clientB.getComparisonIdentities();
 						for(final com.kareebo.contacts.server.gora.EncryptedBuffer c : comparisonIdentities)
 						{
-							final ByteBuffer b=c.getBuffer();
-							b.rewind();
-							final byte[] i=new byte[b.remaining()];
-							b.get(i);
-							if(Arrays.equals(IR,Utils.xor(i,I)))
+							if(Arrays.equals(IR,Utils.xor(com.kareebo.contacts.base.Utils.getBytes(c.getBuffer()),I)))
 							{
 								reply.put(clientIdB,TypeConverter.convert(clientB.getKeys().getEncryption()));
 								break;

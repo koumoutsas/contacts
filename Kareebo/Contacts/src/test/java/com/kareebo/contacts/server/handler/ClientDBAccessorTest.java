@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.FailedOperation;
@@ -78,11 +79,7 @@ public class ClientDBAccessorTest
 		final Client client=clientDBAccessor.get(clientIdPreset);
 		assertNotNull(client);
 		assertEquals(clientPreset,client);
-		final ByteBuffer byteBuffer=clientPreset.getKeys().getEncryption().getBuffer();
-		byteBuffer.rewind();
-		assertEquals(bufferBytes.length,byteBuffer.remaining());
-		final byte[] duplicateBytes=new byte[bufferBytes.length];
-		byteBuffer.get(duplicateBytes);
+		final byte[] duplicateBytes=Utils.getBytes(clientPreset.getKeys().getEncryption().getBuffer());
 		assertArrayEquals(bufferBytes,duplicateBytes);
 	}
 

@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.PendingNotification;
 import com.kareebo.contacts.thrift.FailedOperation;
 import org.apache.gora.store.DataStore;
@@ -110,13 +111,9 @@ class ClientNotifier
 			logger.error("Unable to find notification id "+notificationId);
 			throw new FailedOperation();
 		}
-		final ByteBuffer buffer=pendingNotification.getPayload();
-		buffer.rewind();
-		final byte[] bytes=new byte[buffer.remaining()];
-		buffer.get(bytes);
 		try
 		{
-			new TDeserializer().deserialize(object,bytes);
+			new TDeserializer().deserialize(object,Utils.getBytes(pendingNotification.getPayload()));
 		}
 		catch(TException e)
 		{

@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Unit test for {@link Utils}
@@ -46,5 +45,12 @@ public class UtilsTest
 		{
 			assertTrue(set.contains(l));
 		}
+	}
+
+	@Test
+	public void testGetBytes() throws Exception
+	{
+		final byte[] expected="abc".getBytes();
+		assertArrayEquals(expected,Utils.getBytes(ByteBuffer.wrap(expected)));
 	}
 }

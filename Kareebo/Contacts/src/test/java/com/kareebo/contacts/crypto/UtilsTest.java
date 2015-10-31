@@ -1,4 +1,4 @@
-package com.kareebo.contacts.server.crypto;
+package com.kareebo.contacts.crypto;
 
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.VerificationKey;

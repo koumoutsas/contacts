@@ -1,5 +1,6 @@
 package com.kareebo.contacts.crypto;
 
+import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.VerificationKey;
 import com.kareebo.contacts.thrift.FailedOperation;
@@ -19,6 +20,10 @@ public class Utils
 	 * Crypto provider Bouncy Castle
 	 */
 	private static final String provider="BC";
+	/// The index of the public string in the result of decompose
+	private static final int Public=0;
+	/// The index of the private string in the result of decompose
+	private static final int Private=1;
 
 	/**
 	 * Verify a signature
@@ -38,9 +43,9 @@ public class Utils
 		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException, FailedOperation
 	{
 		final Vector<String> characteristics=decompose(verificationKey.getAlgorithm());
-		final Signature verify=Signature.getInstance(characteristics.get(1),provider);
+		final Signature verify=Signature.getInstance(characteristics.get(Private),provider);
 		final byte[] verificationBytes=com.kareebo.contacts.base.Utils.getBytes(verificationKey.getBuffer());
-		verify.initVerify(KeyFactory.getInstance(characteristics.get(0)).generatePublic(new X509EncodedKeySpec(verificationBytes)));
+		verify.initVerify(KeyFactory.getInstance(characteristics.get(Public)).generatePublic(new X509EncodedKeySpec(verificationBytes)));
 		verify.update(plaintext);
 		final byte[] signatureBytes=new byte[signature.remaining()];
 		signature.get(signatureBytes);
@@ -51,7 +56,7 @@ public class Utils
 	 * Break an {@link SignatureAlgorithm} to strings that can be passed to the Java crypto API
 	 *
 	 * @param algorithm The {@link SignatureAlgorithm}
-	 * @return A list of strings that can be passed to the Java API. Their placement in the list is case-dependent
+	 * @return A list of strings that can be passed to the Java API. First comes the public part, then the private
 	 */
 	private static Vector<String> decompose(final SignatureAlgorithm algorithm) throws NoSuchAlgorithmException
 	{
@@ -109,5 +114,17 @@ public class Utils
 			ret[i]=longer[i];
 		}
 		return ret;
+	}
+
+	/**
+	 * Get a string that can be passed to the Java crypto API from {@link com.kareebo.contacts.thrift.SignatureAlgorithm} to
+	 *
+	 * @param algorithm The {@link com.kareebo.contacts.thrift.SignatureAlgorithm}
+	 * @return A string that can be passed to the Java API
+	 * @throws NoSuchAlgorithmException
+	 */
+	public static String getSignatureAlgorithm(final com.kareebo.contacts.thrift.SignatureAlgorithm algorithm) throws NoSuchAlgorithmException
+	{
+		return decompose(TypeConverter.convert(algorithm)).elementAt(Private);
 	}
 }

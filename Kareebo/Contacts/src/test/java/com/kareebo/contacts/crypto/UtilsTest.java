@@ -79,4 +79,10 @@ public class UtilsTest
 		assertArrayEquals(x,Utils.xor(a,b));
 		assertArrayEquals(x,Utils.xor(b,a));
 	}
+
+	@Test
+	public void testGetSignatureAlgorithm() throws Exception
+	{
+		assertEquals("SHA256withECDSA",Utils.getSignatureAlgorithm(com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1));
+	}
 }

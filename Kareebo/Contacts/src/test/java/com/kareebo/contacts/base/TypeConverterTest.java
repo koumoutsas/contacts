@@ -1,4 +1,4 @@
-package com.kareebo.contacts.server.handler;
+package com.kareebo.contacts.base;
 
 import com.kareebo.contacts.server.gora.*;
 import org.junit.Test;

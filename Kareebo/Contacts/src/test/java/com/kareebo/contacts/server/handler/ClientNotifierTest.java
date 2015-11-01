@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.PendingNotification;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.UserAgent;

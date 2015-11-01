@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.FailedOperation;

@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
@@ -13,7 +14,7 @@ import org.vertx.java.core.Future;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Key modification operation
+ * Server-side implementation of the modify keys operation
  */
 public class ModifyKeys extends SignatureVerifier implements com.kareebo.contacts.thrift.ModifyKeys.AsyncIface
 {

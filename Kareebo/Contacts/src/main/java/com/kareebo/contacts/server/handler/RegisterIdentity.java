@@ -1,6 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.RandomHashPad;
+import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;

@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
@@ -7,7 +8,6 @@ import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.thrift.TBase;
-import org.apache.thrift.TSerializer;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;

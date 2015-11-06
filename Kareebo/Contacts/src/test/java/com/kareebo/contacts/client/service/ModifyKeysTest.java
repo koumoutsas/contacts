@@ -10,14 +10,15 @@ import java.security.*;
 /**
  * Unit test for {@link ModifyKeys}
  */
-public class ModifyKeysTest extends SimpleTestBase<PublicKeys>
+public class ModifyKeysTest extends SimpleTestHarness.SimpleTestBase<PublicKeys,Void>
 {
 	public ModifyKeysTest() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 	{
+		super("newPublicKeys");
 	}
 
 	@Override
-	void perform(final PublicKeys object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> asyncResultHandler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+	protected void perform(final PublicKeys object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> asyncResultHandler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 	{
 		new ModifyKeys(clientManager,signingKey,clientId).modifyKeys1(object,asyncResultHandler);
 	}
@@ -28,11 +29,5 @@ public class ModifyKeysTest extends SimpleTestBase<PublicKeys>
 		final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
 		buffer.mark();
 		return new PublicKeys(new EncryptionKey(buffer,EncryptionAlgorithm.RSA2048),new VerificationKey(buffer,SignatureAlgorithm.Fake));
-	}
-
-	@Override
-	protected String getFieldName()
-	{
-		return "newPublicKeys";
 	}
 }

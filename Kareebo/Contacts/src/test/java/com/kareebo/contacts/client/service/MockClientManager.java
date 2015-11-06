@@ -76,5 +76,5 @@ abstract class MockClientManager<T> extends TAsyncClientManager
 		}
 	}
 
-	abstract void callInternal(final TAsyncMethodCall method);
+	abstract protected void callInternal(final TAsyncMethodCall method);
 }

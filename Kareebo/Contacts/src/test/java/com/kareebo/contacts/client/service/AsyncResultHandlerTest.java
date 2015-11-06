@@ -19,4 +19,21 @@ public class AsyncResultHandlerTest
 		new AsyncResultHandler<>(handler).handle(new MockVoidResult(false));
 		assertFalse(handler.succeeded);
 	}
+
+	private class MockVoidResult extends MockResult<Void>
+	{
+		/**
+		 * @param success Whether the result was successful
+		 */
+		MockVoidResult(final boolean success)
+		{
+			super(success);
+		}
+
+		@Override
+		public Void result()
+		{
+			return null;
+		}
+	}
 }

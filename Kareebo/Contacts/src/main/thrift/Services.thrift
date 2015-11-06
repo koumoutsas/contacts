@@ -107,7 +107,7 @@ struct EncryptedBufferPair
 
 struct EncryptedBufferSigned
 {
-	1:EncryptedBuffer EncryptedBuffer,
+	1:EncryptedBuffer encryptedBuffer,
 	2:SignatureBuffer signature,
 }
 

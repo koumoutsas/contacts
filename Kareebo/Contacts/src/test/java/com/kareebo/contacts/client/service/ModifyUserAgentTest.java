@@ -10,16 +10,18 @@ import java.security.*;
 /**
  * Unit test for {@link ModifyUserAgent}
  */
-public class ModifyUserAgentTest extends SimpleTestBase<UserAgent>
+public class ModifyUserAgentTest extends SimpleTestHarness.SimpleTestBase<UserAgent,Void>
 {
 	public ModifyUserAgentTest() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 	{
+		super("userAgent");
 	}
 
 	@Override
-	void perform(final UserAgent object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final
-	AsyncResultHandler<Void> asyncResultHandler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException,
-		                                                    SignatureException
+	protected void perform(final UserAgent object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId
+		                                                                                                                      clientId,final
+	                       AsyncResultHandler<Void> asyncResultHandler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException,
+		                                                                           SignatureException
 	{
 		new ModifyUserAgent(clientManager,signingKey,clientId).modifyUserAgent1(object,asyncResultHandler);
 	}
@@ -28,11 +30,5 @@ public class ModifyUserAgentTest extends SimpleTestBase<UserAgent>
 	protected UserAgent construct()
 	{
 		return new UserAgent("a","b");
-	}
-
-	@Override
-	protected String getFieldName()
-	{
-		return "userAgent";
 	}
 }

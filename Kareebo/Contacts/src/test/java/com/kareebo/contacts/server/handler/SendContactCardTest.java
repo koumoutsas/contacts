@@ -49,6 +49,8 @@ public class SendContactCardTest
 		abstract class Base1 extends Base
 		{
 			protected final Future<Void> future=new DefaultFutureResult<>();
+			final protected ClientId clientId10=new ClientId(1,0);
+			final protected ClientId clientId11=new ClientId(1,1);
 			final com.kareebo.contacts.thrift.EncryptionKey e0;
 			final com.kareebo.contacts.thrift.EncryptionKey e1;
 			final com.kareebo.contacts.thrift.HashBuffer u=new com.kareebo.contacts.thrift.HashBuffer();
@@ -56,8 +58,6 @@ public class SendContactCardTest
 			Base1() throws GoraException, NoSuchAlgorithmException
 			{
 				final ClientId clientId01=new ClientId(0,1);
-				final ClientId clientId10=new ClientId(1,0);
-				final ClientId clientId11=new ClientId(1,1);
 				final ByteBuffer b0=ByteBuffer.wrap("0".getBytes());
 				b0.mark();
 				e0=new com.kareebo.contacts.thrift.EncryptionKey(b0,com.kareebo.contacts.thrift.EncryptionAlgorithm.RSA2048);
@@ -101,15 +101,19 @@ public class SendContactCardTest
 				check();
 			}
 
-			abstract void check();
+			abstract void check() throws TException;
 		}
 		new Base1()
 		{
 			@Override
-			void check()
+			void check() throws TException
 			{
 				assertTrue(future.succeeded());
-				assertEquals(2,notifier.sentNotifications.size());
+				assertEquals(2,notifier.size());
+				final Notification notification0=notifier.get(clientId10.getClient());
+				assertEquals(SendContactCard.method1,notification0.getMethod());
+				final Notification notification1=notifier.get(clientId11.getClient());
+				assertEquals(SendContactCard.method1,notification1.getMethod());
 			}
 		}.run();
 		new Base1()
@@ -124,7 +128,7 @@ public class SendContactCardTest
 			void check()
 			{
 				assertTrue(future.failed());
-				assertEquals(0,notifier.sentNotifications.size());
+				assertEquals(0,notifier.size());
 			}
 		}.run();
 	}
@@ -132,7 +136,7 @@ public class SendContactCardTest
 	@Test
 	public void testSendContactCard2() throws Exception
 	{
-		new BaseForwarding<EncryptionKeys>()
+		new BaseForwarding<EncryptionKeys>(SendContactCard.method1)
 		{
 			@Override
 			TBase construct()
@@ -197,26 +201,30 @@ public class SendContactCardTest
 				e1=new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned1,TypeConverter.convert(this.verificationKey));
 			}
 
-			void run() throws FailedOperation
+			void run() throws TException
 			{
 				sendContactCard.sendContactCard3(encryptedBufferSignedSet,future);
 				check();
 			}
 
-			abstract void check() throws FailedOperation;
+			abstract void check() throws TException;
 		}
 		new Base3()
 		{
 			@Override
-			void check() throws FailedOperation
+			void check() throws TException
 			{
 				assertTrue(future.succeeded());
-				assertEquals(2,notifier.sentNotifications.size());
+				assertEquals(2,notifier.size());
 				final EncryptedBufferSignedWithVerificationKey e0=new EncryptedBufferSignedWithVerificationKey();
-				clientNotifier.get(e0,notifier.sentNotifications.get(clientId0.getClient()));
+				final Notification notification0=notifier.get(clientId0.getClient());
+				assertEquals(SendContactCard.method3,notification0.getMethod());
+				clientNotifier.get(e0,notification0.getId());
 				assertEquals(this.e0,e0);
 				final EncryptedBufferSignedWithVerificationKey e1=new EncryptedBufferSignedWithVerificationKey();
-				clientNotifier.get(e1,notifier.sentNotifications.get(clientId1.getClient()));
+				final Notification notification1=notifier.get(clientId1.getClient());
+				assertEquals(SendContactCard.method3,notification1.getMethod());
+				clientNotifier.get(e1,notification1.getId());
 				assertEquals(this.e1,e1);
 			}
 		}.run();
@@ -231,7 +239,7 @@ public class SendContactCardTest
 			void check() throws FailedOperation
 			{
 				assertTrue(future.failed());
-				assertEquals(0,notifier.sentNotifications.size());
+				assertEquals(0,notifier.size());
 			}
 		}.run();
 	}
@@ -239,7 +247,7 @@ public class SendContactCardTest
 	@Test
 	public void testSendContactCard4() throws Exception
 	{
-		new BaseForwarding<EncryptedBufferSignedWithVerificationKey>()
+		new BaseForwarding<EncryptedBufferSignedWithVerificationKey>(SendContactCard.method3)
 		{
 			@Override
 			void call(final LongId notificationId,final SignatureBuffer signatureBuffer,final Future<EncryptedBufferSignedWithVerificationKey> future)
@@ -294,8 +302,11 @@ public class SendContactCardTest
 
 	private abstract class BaseForwarding<T extends TBase> extends Base
 	{
-		BaseForwarding() throws GoraException
+		final private NotificationMethod method;
+
+		BaseForwarding(final NotificationMethod method) throws GoraException
 		{
+			this.method=method;
 		}
 
 		void run() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException,
@@ -304,7 +315,7 @@ public class SendContactCardTest
 			final TBase o=construct();
 			final long deviceToken=99;
 			final long notificationId=999;
-			notifier.sentNotifications.put(deviceToken,notificationId);
+			notifier.put(deviceToken,new Notification(method,notificationId));
 			final PendingNotification pendingNotification=new PendingNotification();
 			pendingNotification.setId(notificationId);
 			final ByteBuffer b=ByteBuffer.wrap(new TSerializer().serialize(o));

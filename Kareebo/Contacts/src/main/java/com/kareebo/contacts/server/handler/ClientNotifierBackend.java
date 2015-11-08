@@ -10,9 +10,9 @@ interface ClientNotifierBackend
 	/**
 	 * Send a notification to a client
 	 *
-	 * @param deviceToken    The device token for the push notification backend
-	 * @param notificationId The unique id that maps to the payload in the datastore
+	 * @param deviceToken The device token for the push notification backend
+	 * @param payload     The payload of the notification
 	 * @throws FailedOperation If the notification could not be sent
 	 */
-	void notify(final long deviceToken,final long notificationId) throws FailedOperation;
+	void notify(final long deviceToken,final byte[] payload) throws FailedOperation;
 }

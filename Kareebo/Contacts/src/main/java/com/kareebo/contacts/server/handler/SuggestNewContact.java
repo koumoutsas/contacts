@@ -7,7 +7,6 @@ import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.*;
 import org.apache.gora.store.DataStore;
-import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
@@ -22,6 +21,8 @@ import java.util.*;
 public class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNotifier implements com.kareebo.contacts.thrift.SuggestNewContact.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(SuggestNewContact.class.getName());
+	private static final String serviceName="SuggestNewContact";
+	public final static NotificationMethod method2=new NotificationMethod(serviceName,"suggestNewContact2");
 
 	/**
 	 * Constructor from datastores
@@ -114,10 +115,11 @@ public class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNoti
 						throw new FailedOperation();
 					}
 				}
-				final Map<Long,TBase> notifications=new HashMap<>(encryptedBuffers.size());
+				final Map<Long,NotificationObject> notifications=new HashMap<>(encryptedBuffers.size());
 				for(EncryptedBufferSigned e : encryptedBuffers)
 				{
-					notifications.put(clientDBAccessor.get(e.getEncryptedBuffer().getClient()).getDeviceToken(),new EncryptedBufferSignedWithVerificationKey(e,verificationKey));
+					notifications.put(clientDBAccessor.get(e.getEncryptedBuffer().getClient()).getDeviceToken(),new
+						                                                                                            NotificationObject(method2,new EncryptedBufferSignedWithVerificationKey(e,verificationKey)));
 				}
 				notifyClients(notifications);
 			}

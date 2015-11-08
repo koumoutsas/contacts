@@ -48,8 +48,8 @@ public class SuggestNewContactTest
 				buffer.mark();
 				final com.kareebo.contacts.thrift.HashBuffer uB=new com.kareebo.contacts.thrift.HashBuffer(buffer,com.kareebo
 					                                                                                                  .contacts.thrift.HashAlgorithm.SHA256);
-				clientNotifier.put(deviceToken,uB);
-				final LongId notificationId=new LongId(notifierBackend.sentNotifications.values().iterator().next());
+				clientNotifier.put(deviceToken,new NotificationObject(new NotificationMethod("",""),uB));
+				final LongId notificationId=new LongId(notifierBackend.getFirst().getId());
 				final HashIdentity identity=new HashIdentity();
 				identity.setHash(buffer);
 				final HashIdentityValue hashIdentity=new HashIdentityValue();
@@ -87,8 +87,8 @@ public class SuggestNewContactTest
 				buffer.mark();
 				final com.kareebo.contacts.thrift.HashBuffer uB=new com.kareebo.contacts.thrift.HashBuffer(buffer,com.kareebo
 					                                                                                                  .contacts.thrift.HashAlgorithm.SHA256);
-				clientNotifier.put(deviceToken,uB);
-				final LongId notificationId=new LongId(notifierBackend.sentNotifications.values().iterator().next());
+				clientNotifier.put(deviceToken,new NotificationObject(new NotificationMethod("",""),uB));
+				final LongId notificationId=new LongId(notifierBackend.getFirst().getId());
 				final HashIdentity identity=new HashIdentity();
 				identity.setHash(buffer);
 				final HashIdentityValue hashIdentity=new HashIdentityValue();
@@ -160,9 +160,9 @@ public class SuggestNewContactTest
 				suggestNewContact.suggestNewContact2(new HashSet<>(Collections.singletonList(new EncryptedBufferSigned(new EncryptedBuffer
 					                                                                                                       (buffer,
 						                                                                                                       EncryptionAlgorithm.RSA2048,clientId),
-					                                                                                                      new
+						                                                                                                      new
 						                                                                                                      SignatureBuffer(buffer,SignatureAlgorithm.SHA256withECDSAprime239v1,clientId)))),uB,
-					                                    sign(uB,clientId),future);
+					sign(uB,clientId),future);
 				assertTrue(future.failed());
 				assertEquals(1,userDataStore.get(clientId.getUser()).getSentRequests().size());
 			}
@@ -194,16 +194,20 @@ public class SuggestNewContactTest
 				final EncryptedBufferSigned encryptedBufferSigned1=new EncryptedBufferSigned(encryptedBuffer1,sign
 					                                                                                              (encryptedBuffer1,clientId));
 				suggestNewContact.suggestNewContact2(new HashSet<>(Arrays.asList(encryptedBufferSigned0,encryptedBufferSigned1)),
-					                                    uB,sign(uB,clientId),future);
+					uB,sign(uB,clientId),future);
 				assertTrue(future.succeeded());
 				assertEquals(1,userDataStore.get(clientId.getUser()).getSentRequests().size());
-				assertEquals(2,notifierBackend.sentNotifications.size());
+				assertEquals(2,notifierBackend.size());
+				final Notification notification0=notifierBackend.get(deviceToken0);
+				assertEquals(SuggestNewContact.method2,notification0.getMethod());
 				final EncryptedBufferSignedWithVerificationKey retrieved0=new EncryptedBufferSignedWithVerificationKey();
-				clientNotifier.get(retrieved0,notifierBackend.sentNotifications.get(deviceToken0));
+				clientNotifier.get(retrieved0,notifierBackend.get(deviceToken0).getId());
 				final VerificationKey verificationKeyConverted=TypeConverter.convert(verificationKey);
 				assertEquals(new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned0,verificationKeyConverted),retrieved0);
 				final EncryptedBufferSignedWithVerificationKey retrieved1=new EncryptedBufferSignedWithVerificationKey();
-				clientNotifier.get(retrieved1,notifierBackend.sentNotifications.get(deviceToken1));
+				final Notification notification1=notifierBackend.get(deviceToken1);
+				assertEquals(SuggestNewContact.method2,notification1.getMethod());
+				clientNotifier.get(retrieved1,notification1.getId());
 				assertEquals(new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned1,verificationKeyConverted),retrieved1);
 			}
 		}.run();
@@ -226,9 +230,9 @@ public class SuggestNewContactTest
 				final EncryptedBufferSignedWithVerificationKey expected=new EncryptedBufferSignedWithVerificationKey(new
 					                                                                                                     EncryptedBufferSigned(new EncryptedBuffer(buffer,EncryptionAlgorithm.RSA2048,clientId),sign(bytes,clientId)),
 					                                                                                                    TypeConverter.convert(verificationKey));
-				clientNotifier.put(deviceToken,expected);
+				clientNotifier.put(deviceToken,new NotificationObject(SuggestNewContact.method2,expected));
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
-				final LongId id=new LongId(notifierBackend.sentNotifications.values().iterator().next());
+				final LongId id=new LongId(notifierBackend.getFirst().getId());
 				suggestNewContact.suggestNewContact3(id,sign(id,clientId),future);
 				assertTrue(future.succeeded());
 				assertEquals(expected,future.result());

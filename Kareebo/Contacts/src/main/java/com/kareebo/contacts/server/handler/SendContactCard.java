@@ -21,6 +21,9 @@ import java.util.*;
 public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifier implements com.kareebo.contacts.thrift.SendContactCard.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(SendContactCard.class.getName());
+	private static final String serviceName="SendContactCard";
+	public final static NotificationMethod method1=new NotificationMethod(serviceName,"sendContactCard1");
+	public final static NotificationMethod method3=new NotificationMethod(serviceName,"sendContactCard3");
 
 	/**
 	 * Constructor from datastores
@@ -68,7 +71,7 @@ public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifi
 				{
 					deviceTokens.add(clientB.getDeviceToken());
 				}
-				notifyClients(deviceTokens,encryptionKeys);
+				notifyClients(deviceTokens,new NotificationObject(method1,encryptionKeys));
 			}
 		});
 	}
@@ -93,9 +96,8 @@ public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifi
 				{
 					try
 					{
-						notifyClient(clientDBAccessor.get(encryptedBuffer.getClient()).getDeviceToken(),
-							            new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert
-								                                                                                             (client.getKeys().getVerification())));
+						notifyClient(clientDBAccessor.get(encryptedBuffer.getClient()).getDeviceToken(),new NotificationObject(method3,
+							                                                                                                      new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
 					}
 					catch(NoSuchAlgorithmException e)
 					{

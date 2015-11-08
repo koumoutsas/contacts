@@ -4,10 +4,11 @@ import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
+import com.kareebo.contacts.thrift.Notification;
+import com.kareebo.contacts.thrift.NotificationMethod;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.thrift.TBase;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
@@ -15,7 +16,8 @@ import org.vertx.java.core.impl.DefaultFutureResult;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for {@link SignatureVerifierWithIdentityStoreAndNotifier}
@@ -24,6 +26,7 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 {
 	private final Notifier notifierBackend=new Notifier();
 	private final ClientId clientId=new ClientId(0,0);
+	private final NotificationMethod method=new NotificationMethod("a","b");
 	private DataStore<Long,User> userDataStore;
 	private ClientNotifier clientNotifier;
 
@@ -46,35 +49,36 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 		{
 			expected.put(l,payload1);
 		}
-		final Map<Long,TBase> notifications=new HashMap<>(deviceTokens2.size());
+		final Map<Long,NotificationObject> notifications=new HashMap<>(deviceTokens2.size());
 		for(final Long l : deviceTokens2)
 		{
 			expected.put(l,payload2);
-			notifications.put(l,payload2);
+			notifications.put(l,new NotificationObject(method,payload2));
 		}
 		final TestSignatureVerifierWithIdentityStoreAndNotifier testSignatureVerifierWithIdentityStoreAndNotifier=new
 			                                                                                                          TestSignatureVerifierWithIdentityStoreAndNotifier(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration()),clientNotifier);
-		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClient(deviceToken0,payload0);
-		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClients(deviceTokens,payload1);
+		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClient(deviceToken0,new NotificationObject(method,payload0));
+		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClients(deviceTokens,new NotificationObject(method,payload1));
 		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClients(notifications);
 		for(final Long deviceToken : expected.keySet())
 		{
-			final Long notificationId=notifierBackend.sentNotifications.get(deviceToken);
-			assertNotNull(notificationId);
+			final Notification notification=notifierBackend.get(deviceToken);
+			assertEquals(method,notification.getMethod());
+			final Long notificationId=notification.getId();
 			final LongId notificationLongId=new LongId(notificationId);
 			final LongId retrieved=new LongId();
 			final Future<LongId> future=new DefaultFutureResult<>();
 			testSignatureVerifierWithIdentityStoreAndNotifier.forward(retrieved,notificationLongId,sign(notificationLongId,
-				                                                                                           clientId),future);
+				clientId),future);
 			assertTrue(future.succeeded());
 			assertEquals(expected.get(deviceToken),retrieved);
 			testSignatureVerifierWithIdentityStoreAndNotifier.forward(retrieved,notificationLongId,sign(notificationLongId,
-				                                                                                           clientId),future);
+				clientId),future);
 			assertTrue(future.failed());
 		}
-		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClient(deviceToken0,payload0);
+		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClient(deviceToken0,new NotificationObject(method,payload0));
 		final LongId retrieved=new LongId();
-		testSignatureVerifierWithIdentityStoreAndNotifier.get(retrieved,notifierBackend.sentNotifications.get(deviceToken0));
+		testSignatureVerifierWithIdentityStoreAndNotifier.get(retrieved,notifierBackend.get(deviceToken0).getId());
 		assertEquals(new LongId(deviceToken0),retrieved);
 	}
 

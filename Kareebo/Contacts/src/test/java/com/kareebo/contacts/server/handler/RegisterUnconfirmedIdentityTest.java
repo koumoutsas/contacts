@@ -39,7 +39,7 @@ public class RegisterUnconfirmedIdentityTest
 			{
 				final Future<Void> result=new DefaultFutureResult<>();
 				((RegisterUnconfirmedIdentity)signatureVerifier).registerUnconfirmedIdentity1(new HashBufferSet(hashBufferSet),
-					                                                                             signature,result);
+					signature,result);
 				assertTrue(result.succeeded());
 				assertTrue(((MemStore)identityDataStore).hasBeenClosed());
 				final HashSet<com.kareebo.contacts.server.gora.HashBuffer> newIdentities=new HashSet<>(hashBufferSet.size());
@@ -153,7 +153,7 @@ public class RegisterUnconfirmedIdentityTest
 			final Set<com.kareebo.contacts.server.gora.HashBuffer> original=Utils.convertToSet(getUserValid().getIdentities());
 			final Future<Void> result=new DefaultFutureResult<>();
 			((RegisterUnconfirmedIdentity)signatureVerifier).registerUnconfirmedIdentity1(new HashBufferSet(hashBufferSet),signature,
-				                                                                             result);
+				result);
 			assertTrue(result.failed());
 			//noinspection ThrowableResultOfMethodCallIgnored
 			assertEquals(FailedOperation.class,result.cause().getClass());

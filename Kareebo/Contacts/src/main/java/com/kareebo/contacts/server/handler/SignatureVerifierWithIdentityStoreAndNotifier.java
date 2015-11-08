@@ -54,17 +54,17 @@ abstract class SignatureVerifierWithIdentityStoreAndNotifier extends SignatureVe
 		});
 	}
 
-	protected void notifyClient(final long deviceToken,final TBase payload) throws FailedOperation
+	protected void notifyClient(final long deviceToken,final NotificationObject payload) throws FailedOperation
 	{
 		clientNotifier.put(deviceToken,payload);
 	}
 
-	protected void notifyClients(final List<Long> deviceTokens,final TBase payload) throws FailedOperation
+	protected void notifyClients(final List<Long> deviceTokens,final NotificationObject payload) throws FailedOperation
 	{
 		clientNotifier.put(deviceTokens,payload);
 	}
 
-	protected void notifyClients(final Map<Long,TBase> notifications) throws FailedOperation
+	protected void notifyClients(final Map<Long,NotificationObject> notifications) throws FailedOperation
 	{
 		clientNotifier.put(notifications);
 	}

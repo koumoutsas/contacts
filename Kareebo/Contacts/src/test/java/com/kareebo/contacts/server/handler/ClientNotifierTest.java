@@ -3,10 +3,11 @@ package com.kareebo.contacts.server.handler;
 import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.PendingNotification;
 import com.kareebo.contacts.thrift.FailedOperation;
+import com.kareebo.contacts.thrift.Notification;
+import com.kareebo.contacts.thrift.NotificationMethod;
 import com.kareebo.contacts.thrift.UserAgent;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TProtocol;
@@ -31,6 +32,8 @@ public class ClientNotifierTest
 	private final long deviceToken=94;
 	private final List<Long> deviceTokens=Arrays.asList(deviceToken,deviceToken+1);
 	final private UserAgent expected=new UserAgent("a","b");
+	final private NotificationMethod expectedMethod=new NotificationMethod("a","b");
+	final private NotificationObject notificationObject=new NotificationObject(expectedMethod,expected);
 	@Rule
 	public ExpectedException thrown=ExpectedException.none();
 	private MemStore<Long,PendingNotification> datastore;
@@ -48,9 +51,11 @@ public class ClientNotifierTest
 	@Test
 	public void testPutSingle() throws Exception
 	{
-		clientNotifier.put(deviceToken,expected);
-		assertEquals(1,notifierBackend.sentNotifications.size());
-		final Long notificationId=notifierBackend.sentNotifications.get(deviceToken);
+		clientNotifier.put(deviceToken,notificationObject);
+		assertEquals(1,notifierBackend.size());
+		final Notification notification=notifierBackend.get(deviceToken);
+		assertEquals(expectedMethod,notification.getMethod());
+		final Long notificationId=notification.getId();
 		assertNotNull(notificationId);
 		assertTrue(datastore.hasBeenClosed());
 		final PendingNotification pendingNotification=datastore.get(notificationId);
@@ -64,13 +69,29 @@ public class ClientNotifierTest
 	}
 
 	@Test
+	public void testPutSizeExceeds() throws Exception
+	{
+		final StringBuilder tmp=new StringBuilder();
+		for(int i=0;i<2*1024;++i)
+		{
+			tmp.append('0');
+		}
+		thrown.expect(FailedOperation.class);
+		clientNotifier.put(deviceToken,new NotificationObject(new NotificationMethod(tmp.toString(),"1"),expected));
+		assertEquals(0,notifierBackend.size());
+		assertFalse(datastore.hasBeenClosed());
+	}
+
+	@Test
 	public void testPut() throws Exception
 	{
-		clientNotifier.put(deviceTokens,expected);
-		assertEquals(deviceTokens.size(),notifierBackend.sentNotifications.size());
+		clientNotifier.put(deviceTokens,notificationObject);
+		assertEquals(deviceTokens.size(),notifierBackend.size());
 		for(final Long deviceToken2 : deviceTokens)
 		{
-			final Long notificationId=notifierBackend.sentNotifications.get(deviceToken2);
+			final Notification notification=notifierBackend.get(deviceToken2);
+			assertEquals(expectedMethod,notification.getMethod());
+			final Long notificationId=notification.getId();
 			assertNotNull(notificationId);
 			assertTrue(datastore.hasBeenClosed());
 			final PendingNotification pendingNotification=datastore.get(notificationId);
@@ -87,16 +108,19 @@ public class ClientNotifierTest
 	@Test
 	public void testPutMap() throws Exception
 	{
-		final Map<Long,TBase> expectedPayloads=new HashMap<>(deviceTokens.size());
+		final Map<Long,NotificationObject> expectedPayloads=new HashMap<>(deviceTokens.size());
 		for(final Long deviceToken2 : deviceTokens)
 		{
-			expectedPayloads.put(deviceToken2,new UserAgent("a",TypeConverter.convert(deviceToken).toString()));
+			expectedPayloads.put(deviceToken2,new NotificationObject(expectedMethod,new UserAgent("a",TypeConverter.convert
+				                                                                                                        (deviceToken).toString())));
 		}
 		clientNotifier.put(expectedPayloads);
-		assertEquals(deviceTokens.size(),notifierBackend.sentNotifications.size());
+		assertEquals(deviceTokens.size(),notifierBackend.size());
 		for(final Long deviceToken2 : deviceTokens)
 		{
-			final Long notificationId=notifierBackend.sentNotifications.get(deviceToken2);
+			final Notification notification=notifierBackend.get(deviceToken2);
+			assertEquals(expectedMethod,notification.getMethod());
+			final Long notificationId=notification.getId();
 			assertNotNull(notificationId);
 			assertTrue(datastore.hasBeenClosed());
 			final PendingNotification pendingNotification=datastore.get(notificationId);
@@ -104,8 +128,7 @@ public class ClientNotifierTest
 			assertEquals(notificationId,pendingNotification.getId());
 			final ByteBuffer payload=pendingNotification.getPayload();
 			payload.rewind();
-			final ByteBuffer expectedPayload=ByteBuffer.wrap(new TSerializer().serialize(expectedPayloads.get(deviceToken2)));
-			expectedPayload.mark();
+			final ByteBuffer expectedPayload=expectedPayloads.get(deviceToken2).getPayload();
 			assertEquals(expectedPayload,payload);
 		}
 	}
@@ -123,14 +146,14 @@ public class ClientNotifierTest
 		};
 		o.setPlatform("");
 		o.setVersion("");
-		final Map<Long,TBase> expectedPayloads=new HashMap<>(deviceTokens.size());
+		final Map<Long,NotificationObject> expectedPayloads=new HashMap<>(deviceTokens.size());
 		for(final Long deviceToken2 : deviceTokens)
 		{
-			expectedPayloads.put(deviceToken2,o);
+			expectedPayloads.put(deviceToken2,new NotificationObject(expectedMethod,o));
 		}
 		thrown.expect(FailedOperation.class);
 		clientNotifier.put(expectedPayloads);
-		assertEquals(0,notifierBackend.sentNotifications.size());
+		assertEquals(0,notifierBackend.size());
 		assertFalse(datastore.hasBeenClosed());
 	}
 
@@ -146,8 +169,8 @@ public class ClientNotifierTest
 		datastore.put(useId,usePendingNotification);
 		datastore.useId=useId;
 		thrown.expect(FailedOperation.class);
-		clientNotifier.put(deviceTokens,expected);
-		assertEquals(0,notifierBackend.sentNotifications.size());
+		clientNotifier.put(deviceTokens,notificationObject);
+		assertEquals(0,notifierBackend.size());
 		assertFalse(datastore.hasBeenClosed());
 	}
 
@@ -165,8 +188,8 @@ public class ClientNotifierTest
 		o.setPlatform("");
 		o.setVersion("");
 		thrown.expect(FailedOperation.class);
-		clientNotifier.put(deviceTokens,o);
-		assertEquals(0,notifierBackend.sentNotifications.size());
+		clientNotifier.put(deviceTokens,new NotificationObject(expectedMethod,o));
+		assertEquals(0,notifierBackend.size());
 		assertFalse(datastore.hasBeenClosed());
 	}
 
@@ -175,17 +198,19 @@ public class ClientNotifierTest
 	{
 		notifierBackend.fail=true;
 		thrown.expect(FailedOperation.class);
-		clientNotifier.put(deviceTokens,expected);
-		assertEquals(0,notifierBackend.sentNotifications.size());
+		clientNotifier.put(deviceTokens,notificationObject);
+		assertEquals(0,notifierBackend.size());
 		assertFalse(datastore.hasBeenClosed());
 	}
 
 	@Test
 	public void testGet() throws Exception
 	{
-		clientNotifier.put(deviceToken,expected);
+		clientNotifier.put(deviceToken,notificationObject);
 		final UserAgent retrieved=new UserAgent();
-		final Long notificationId=notifierBackend.sentNotifications.values().iterator().next();
+		final Notification notification=notifierBackend.getFirst();
+		assertEquals(expectedMethod,notification.getMethod());
+		final Long notificationId=notification.getId();
 		clientNotifier.get(retrieved,notificationId);
 		assertEquals(expected,retrieved);
 		assertTrue(datastore.hasBeenClosed());
@@ -203,7 +228,7 @@ public class ClientNotifierTest
 	@Test
 	public void testGetDeserializationError() throws Exception
 	{
-		clientNotifier.put(deviceToken,expected);
+		clientNotifier.put(deviceToken,notificationObject);
 		final UserAgent retrieved=new UserAgent()
 		{
 			@Override
@@ -212,7 +237,9 @@ public class ClientNotifierTest
 				throw new TException();
 			}
 		};
-		final Long notificationId=notifierBackend.sentNotifications.values().iterator().next();
+		final Notification notification=notifierBackend.getFirst();
+		assertEquals(expectedMethod,notification.getMethod());
+		final Long notificationId=notification.getId();
 		thrown.expect(FailedOperation.class);
 		clientNotifier.get(retrieved,notificationId);
 		assertFalse(datastore.hasBeenClosed());

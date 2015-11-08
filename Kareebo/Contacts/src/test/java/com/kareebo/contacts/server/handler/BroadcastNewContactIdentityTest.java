@@ -410,8 +410,7 @@ public class BroadcastNewContactIdentityTest
 			void run() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
-				final LongId notificationId=new LongId(notifierBackend.sentNotifications.values().iterator().next());
-				final LongId id=new LongId(notificationId);
+				final LongId id=new LongId(notifierBackend.getFirst().getId());
 				broadcastNewContactIdentity.broadcastNewContactIdentity4(id,sign(id,clientId),future);
 				check(future);
 			}
@@ -447,7 +446,7 @@ public class BroadcastNewContactIdentityTest
 				encryptedBufferSignedWithVerificationKey.setVerificationKey(new com.kareebo.contacts.thrift.VerificationKey(b,
 					                                                                                                           com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1
 				));
-				clientNotifier.put(deviceToken,encryptedBufferSignedWithVerificationKey);
+				clientNotifier.put(deviceToken,new NotificationObject(BroadcastNewContactIdentity.method3,encryptedBufferSignedWithVerificationKey));
 			}
 		}
 		new Base4().run();
@@ -462,18 +461,19 @@ public class BroadcastNewContactIdentityTest
 	{
 		new Base3()
 		{
-			void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException
+			void check(final Future<Void> future) throws TException, NoSuchAlgorithmException
 			{
 				assertTrue(future.succeeded());
-				assertEquals(clientNumber,notifierBackend.sentNotifications.size());
+				assertEquals(clientNumber,notifierBackend.size());
 				for(long i=0;i<clientNumber;++i)
 				{
 					final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
 						                                                                                        EncryptedBufferSignedWithVerificationKey();
-					clientNotifier.get(encryptedBufferSignedWithVerificationKey,notifierBackend.sentNotifications.get(i));
-					final EncryptedBufferSignedWithVerificationKey expected=new EncryptedBufferSignedWithVerificationKey
-						                                                        (encryptedBuffersMap.get(i),
-							                                                        TypeConverter.convert(verificationKey));
+					final Notification notification=notifierBackend.get(i);
+					assertEquals(BroadcastNewContactIdentity.method3,notification.getMethod());
+					clientNotifier.get(encryptedBufferSignedWithVerificationKey,notification.getId());
+					final EncryptedBufferSignedWithVerificationKey expected=new EncryptedBufferSignedWithVerificationKey(encryptedBuffersMap.get(i),
+						                                                                                                    TypeConverter.convert(verificationKey));
 					assertEquals(expected,encryptedBufferSignedWithVerificationKey);
 				}
 			}
@@ -551,7 +551,7 @@ public class BroadcastNewContactIdentityTest
 			void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException
 			{
 				assertTrue(future.failed());
-				assertEquals(0,notifierBackend.sentNotifications.size());
+				assertEquals(0,notifierBackend.size());
 			}
 		}.run();
 	}
@@ -589,7 +589,7 @@ public class BroadcastNewContactIdentityTest
 				final Future<Map<ClientId,EncryptionKey>> future=new DefaultFutureResult<>();
 				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity2(new EncryptedBufferPairSet
 					                                                                              (encryptedBufferPairs),signature,
-					                                                                             future);
+					future);
 				check(future);
 			}
 
@@ -919,14 +919,14 @@ public class BroadcastNewContactIdentityTest
 		/**
 		 * Set up the datastores, make call 2 and check the results
 		 */
-		void run() throws NoSuchAlgorithmException, FailedOperation
+		void run() throws NoSuchAlgorithmException, TException
 		{
 			final Future<Void> future=new DefaultFutureResult<>();
 			broadcastNewContactIdentity.broadcastNewContactIdentity3(encryptedBuffers,future);
 			check(future);
 		}
 
-		abstract void check(final Future<Void> future) throws FailedOperation, NoSuchAlgorithmException;
+		abstract void check(final Future<Void> future) throws TException, NoSuchAlgorithmException;
 
 		@Override
 		void setupUserDatastore() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException

@@ -59,7 +59,7 @@ public class UpdateServerContactBookTest
 					clientValid.getComparisonIdentities().add(encryptedBuffer);
 				}
 				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
-					                                                                     signature,result);
+					signature,result);
 			}
 		}
 		new Test().run();
@@ -84,7 +84,7 @@ public class UpdateServerContactBookTest
 			void runImpl(final Future<Void> result)
 			{
 				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
-					                                                                     signature,result);
+					signature,result);
 				graph.close();
 			}
 		}
@@ -111,7 +111,7 @@ public class UpdateServerContactBookTest
 			void runImpl(final Future<Void> result)
 			{
 				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
-					                                                                     signature,result);
+					signature,result);
 			}
 		}
 		new Test().run();
@@ -145,7 +145,7 @@ public class UpdateServerContactBookTest
 			void runImpl(final Future<Void> result)
 			{
 				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
-					                                                                     signature,result);
+					signature,result);
 			}
 		}
 		new Test().run();
@@ -216,7 +216,7 @@ public class UpdateServerContactBookTest
 			{
 				expectedEdges.add(new Edge(clientIdValid.getUser(),userId));
 				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
-					                                                                     signature,result);
+					signature,result);
 			}
 		}
 		new Test().run();
@@ -249,7 +249,7 @@ public class UpdateServerContactBookTest
 			void runImpl(final Future<Void> result)
 			{
 				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
-					                                                                     signature,result);
+					signature,result);
 			}
 		}
 		new Test().run();
@@ -281,7 +281,7 @@ public class UpdateServerContactBookTest
 			void runImpl(final Future<Void> result)
 			{
 				((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),
-					                                                                     signature,result);
+					signature,result);
 			}
 		}
 		new Test().run();
@@ -323,7 +323,7 @@ public class UpdateServerContactBookTest
 				expectedEdges.add(new Edge(clientIdValid.getUser(),userId));
 			}
 			((UpdateServerContactBook)signatureVerifier).updateServerContactBook1(new ContactOperationSet(contactOperations),signature,
-				                                                                     result);
+				result);
 		}
 	}
 

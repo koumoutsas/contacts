@@ -30,8 +30,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link SendContactCard}
@@ -51,13 +50,13 @@ public class SendContactCardTest
 			protected final Future<Void> future=new DefaultFutureResult<>();
 			final protected ClientId clientId10=new ClientId(1,0);
 			final protected ClientId clientId11=new ClientId(1,1);
+			final protected ClientId clientId01=new ClientId(0,1);
 			final com.kareebo.contacts.thrift.EncryptionKey e0;
 			final com.kareebo.contacts.thrift.EncryptionKey e1;
 			final com.kareebo.contacts.thrift.HashBuffer u=new com.kareebo.contacts.thrift.HashBuffer();
 
 			Base1() throws GoraException, NoSuchAlgorithmException
 			{
-				final ClientId clientId01=new ClientId(0,1);
 				final ByteBuffer b0=ByteBuffer.wrap("0".getBytes());
 				b0.mark();
 				e0=new com.kareebo.contacts.thrift.EncryptionKey(b0,com.kareebo.contacts.thrift.EncryptionAlgorithm.RSA2048);
@@ -112,8 +111,25 @@ public class SendContactCardTest
 				assertEquals(2,notifier.size());
 				final Notification notification0=notifier.get(clientId10.getClient());
 				assertEquals(SendContactCard.method1,notification0.getMethod());
+				checkInternal(notification0.getId());
 				final Notification notification1=notifier.get(clientId11.getClient());
 				assertEquals(SendContactCard.method1,notification1.getMethod());
+				checkInternal(notification1.getId());
+			}
+
+			private void checkInternal(final long notificationId) throws FailedOperation
+			{
+				final EncryptionKeys encryptionKeys=new EncryptionKeys();
+				clientNotifier.get(encryptionKeys,notificationId);
+				assertEquals(clientId.getUser(),encryptionKeys.getUserId());
+				final Map<Long,com.kareebo.contacts.thrift.EncryptionKey> keys=encryptionKeys.getKeys();
+				assertEquals(2,keys.size());
+				final com.kareebo.contacts.thrift.EncryptionKey e0=keys.get(clientId.getClient());
+				assertNotNull(e0);
+				assertEquals(this.e0,e0);
+				final com.kareebo.contacts.thrift.EncryptionKey e1=keys.get(clientId01.getClient());
+				assertNotNull(e1);
+				assertEquals(this.e1,e1);
 			}
 		}.run();
 		new Base1()

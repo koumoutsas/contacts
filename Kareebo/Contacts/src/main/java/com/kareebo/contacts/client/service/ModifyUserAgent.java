@@ -12,7 +12,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 
 /**
- * Client-side implementation of the modify user agent operation
+ * Client-side implementation of the modify user agent service
  */
 public class ModifyUserAgent extends Signer
 {

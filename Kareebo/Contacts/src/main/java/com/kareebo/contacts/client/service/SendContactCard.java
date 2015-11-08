@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Client-side implementation of the send contact card operation
+ * Client-side implementation of the send contact card service
  */
 public class SendContactCard extends Signer
 {

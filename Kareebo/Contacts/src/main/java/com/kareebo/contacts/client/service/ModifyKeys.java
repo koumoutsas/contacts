@@ -12,7 +12,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 
 /**
- * Client-side implementation of the modify keys operation
+ * Client-side implementation of the modify keys service
  */
 public class ModifyKeys extends Signer
 {

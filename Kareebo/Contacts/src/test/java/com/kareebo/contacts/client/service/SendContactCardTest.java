@@ -25,10 +25,10 @@ public class SendContactCardTest
 		{
 			@Override
 			protected void perform(final HashBuffer object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final
-			ClientId clientId,final AsyncResultHandler<Void> asyncResultHandler) throws NoSuchProviderException, TException,
-				                                                                            NoSuchAlgorithmException, InvalidKeyException, SignatureException
+			ClientId clientId,final AsyncResultHandler<Void> handler) throws NoSuchProviderException, TException,
+				                                                                 NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
-				new SendContactCard(clientManager,signingKey,clientId).sendContactCard1(object,asyncResultHandler);
+				new SendContactCard(clientManager,signingKey,clientId).sendContactCard1(object,handler);
 			}
 
 			@Override
@@ -43,10 +43,10 @@ public class SendContactCardTest
 		{
 			@Override
 			protected void perform(final LongId object,final MockClientManager<EncryptionKeys> clientManager,final SigningKey signingKey,final
-			ClientId clientId,final AsyncResultHandler<EncryptionKeys> asyncResultHandler) throws NoSuchProviderException, TException,
-				                                                                                      NoSuchAlgorithmException, InvalidKeyException, SignatureException
+			ClientId clientId,final AsyncResultHandler<EncryptionKeys> handler) throws NoSuchProviderException, TException,
+				                                                                           NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
-				new SendContactCard(clientManager,signingKey,clientId).sendContactCard2(object,asyncResultHandler);
+				new SendContactCard(clientManager,signingKey,clientId).sendContactCard2(object,handler);
 			}
 
 			@Override
@@ -64,7 +64,7 @@ public class SendContactCardTest
 				final ByteBuffer b1=ByteBuffer.wrap("a".getBytes());
 				b1.mark();
 				set.add(new EncryptedBuffer(b1,EncryptionAlgorithm.Fake,clientId));
-				final ByteBuffer b2=ByteBuffer.wrap("a".getBytes());
+				final ByteBuffer b2=ByteBuffer.wrap("b".getBytes());
 				b2.mark();
 				set.add(new EncryptedBuffer(b2,EncryptionAlgorithm.Fake,clientId));
 				new SendContactCard(clientManager,signingKey,clientId).sendContactCard3(set,handler);
@@ -74,10 +74,10 @@ public class SendContactCardTest
 		{
 			@Override
 			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final
-			ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> asyncResultHandler) throws NoSuchProviderException, TException,
-				                                                                                                                NoSuchAlgorithmException, InvalidKeyException, SignatureException
+			ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException,
+				                                                                                                     NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
-				new SendContactCard(clientManager,signingKey,clientId).sendContactCard4(object,asyncResultHandler);
+				new SendContactCard(clientManager,signingKey,clientId).sendContactCard4(object,handler);
 			}
 
 			@Override

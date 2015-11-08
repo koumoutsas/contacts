@@ -18,9 +18,9 @@ public class ModifyKeysTest extends SimpleTestHarness.SimpleTestBase<PublicKeys,
 	}
 
 	@Override
-	protected void perform(final PublicKeys object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> asyncResultHandler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+	protected void perform(final PublicKeys object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 	{
-		new ModifyKeys(clientManager,signingKey,clientId).modifyKeys1(object,asyncResultHandler);
+		new ModifyKeys(clientManager,signingKey,clientId).modifyKeys1(object,handler);
 	}
 
 	@Override

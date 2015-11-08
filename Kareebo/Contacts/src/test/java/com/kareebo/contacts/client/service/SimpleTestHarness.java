@@ -157,8 +157,8 @@ class SimpleTestHarness
 		abstract protected void perform(final T object,final MockClientManager<E> clientManager,final SigningKey signingKey,final ClientId
 			                                                                                                                    clientId,
 		                                final
-		                                AsyncResultHandler<E> asyncResultHandler) throws NoSuchProviderException, TException, NoSuchAlgorithmException,
-			                                                                                 InvalidKeyException, SignatureException;
+		                                AsyncResultHandler<E> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException,
+			                                                                      InvalidKeyException, SignatureException;
 
 		abstract protected T construct();
 

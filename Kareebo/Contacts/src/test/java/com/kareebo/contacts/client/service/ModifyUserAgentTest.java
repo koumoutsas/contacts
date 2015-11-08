@@ -20,10 +20,10 @@ public class ModifyUserAgentTest extends SimpleTestHarness.SimpleTestBase<UserAg
 	@Override
 	protected void perform(final UserAgent object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId
 		                                                                                                                      clientId,final
-	                       AsyncResultHandler<Void> asyncResultHandler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException,
-		                                                                           SignatureException
+	                       AsyncResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException,
+		                                                                SignatureException
 	{
-		new ModifyUserAgent(clientManager,signingKey,clientId).modifyUserAgent1(object,asyncResultHandler);
+		new ModifyUserAgent(clientManager,signingKey,clientId).modifyUserAgent1(object,handler);
 	}
 
 	@Override

@@ -18,18 +18,12 @@ public class BroadcastNewContactIdentityTest
 	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException
 	{
 		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(5);
-		tests.add(new SimpleTestHarness.SimpleTestBase<LongId,Map<ClientId,EncryptionKey>>("userIdB")
+		tests.add(new SimpleTestHarness.LongIdTestBase<Map<ClientId,EncryptionKey>>("userIdB")
 		{
 			@Override
 			protected void perform(final LongId object,final MockClientManager<Map<ClientId,EncryptionKey>> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Map<ClientId,EncryptionKey>> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
 				new BroadcastNewContactIdentity(clientManager,signingKey,clientId).broadcastNewContactIdentity1(object,handler);
-			}
-
-			@Override
-			protected LongId construct()
-			{
-				return new LongId(9);
 			}
 		});
 		tests.add(new SimpleTestHarness.SimpleTestBase<EncryptedBufferPairSet,Map<ClientId,EncryptionKey>>("encryptedBufferPairs")
@@ -71,18 +65,12 @@ public class BroadcastNewContactIdentityTest
 				new BroadcastNewContactIdentity(clientManager,signingKey,clientId).broadcastNewContactIdentity3(set,handler);
 			}
 		});
-		tests.add(new SimpleTestHarness.SimpleTestBase<LongId,EncryptedBufferSignedWithVerificationKey>("id")
+		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
 			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
 				new BroadcastNewContactIdentity(clientManager,signingKey,clientId).broadcastNewContactIdentity4(object,handler);
-			}
-
-			@Override
-			protected LongId construct()
-			{
-				return new LongId(8);
 			}
 		});
 		tests.add(new SimpleTestHarness.SimpleTestBase<HashBufferPair,Void>("uCs")

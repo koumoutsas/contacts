@@ -21,7 +21,7 @@ public class SendContactCardTest
 	public void testSendContactCard() throws Exception
 	{
 		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(4);
-		tests.add(new SimpleTestHarness.SimpleTestBase<HashBuffer,Void>("u")
+		tests.add(new SimpleTestHarness.HashBufferTestBase<Void>("u")
 		{
 			@Override
 			protected void perform(final HashBuffer object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final
@@ -30,16 +30,8 @@ public class SendContactCardTest
 			{
 				new SendContactCard(clientManager,signingKey,clientId).sendContactCard1(object,handler);
 			}
-
-			@Override
-			protected HashBuffer construct()
-			{
-				final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
-				buffer.mark();
-				return new HashBuffer(buffer,HashAlgorithm.Fake);
-			}
 		});
-		tests.add(new SimpleTestHarness.SimpleTestBase<LongId,EncryptionKeys>("id")
+		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptionKeys>("id")
 		{
 			@Override
 			protected void perform(final LongId object,final MockClientManager<EncryptionKeys> clientManager,final SigningKey signingKey,final
@@ -47,12 +39,6 @@ public class SendContactCardTest
 				                                                                           NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
 				new SendContactCard(clientManager,signingKey,clientId).sendContactCard2(object,handler);
-			}
-
-			@Override
-			protected LongId construct()
-			{
-				return new LongId(0);
 			}
 		});
 		tests.add(new SimpleTestHarness.CollectionSimpleTestBase<EncryptedBufferSigned,Void>("encryptedBuffers","encryptedBuffer")
@@ -70,7 +56,7 @@ public class SendContactCardTest
 				new SendContactCard(clientManager,signingKey,clientId).sendContactCard3(set,handler);
 			}
 		});
-		tests.add(new SimpleTestHarness.SimpleTestBase<LongId,EncryptedBufferSignedWithVerificationKey>("id")
+		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
 			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final
@@ -78,12 +64,6 @@ public class SendContactCardTest
 				                                                                                                     NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
 				new SendContactCard(clientManager,signingKey,clientId).sendContactCard4(object,handler);
-			}
-
-			@Override
-			protected LongId construct()
-			{
-				return new LongId(0);
 			}
 		});
 		new SimpleTestHarness().test(tests);

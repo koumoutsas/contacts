@@ -1,15 +1,14 @@
 package com.kareebo.contacts.client.service;
 
 import com.kareebo.contacts.client.SigningKey;
-import com.kareebo.contacts.thrift.ClientId;
-import com.kareebo.contacts.thrift.SignatureAlgorithm;
-import com.kareebo.contacts.thrift.SignatureBuffer;
+import com.kareebo.contacts.thrift.*;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncMethodCall;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.Collection;
 import java.util.List;
@@ -135,6 +134,57 @@ class SimpleTestHarness
 						tPayloadField.setAccessible(false);
 						assertTrue(new Verifier(keyPair.getPublic(),algorithm).verify(tPayload,signature.getBuffer()));
 					}
+				}
+			};
+		}
+	}
+
+	abstract static class HashBufferTestBase<E> extends SimpleTestBase<HashBuffer,E>
+	{
+		HashBufferTestBase(final String fieldName) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
+		{
+			super(fieldName);
+		}
+
+		@Override
+		protected HashBuffer construct()
+		{
+			final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
+			buffer.mark();
+			return new HashBuffer(buffer,HashAlgorithm.Fake);
+		}
+	}
+
+	abstract static class LongIdTestBase<E> extends SimpleTestBase<LongId,E>
+	{
+		LongIdTestBase(final String fieldName) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
+		{
+			super(fieldName);
+		}
+
+		@Override
+		protected LongId construct()
+		{
+			return new LongId(8);
+		}
+	}
+
+	abstract static class LongTestBase<E> extends TestBase<Long,E>
+	{
+		LongTestBase(final String fieldName) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
+		{
+			super(fieldName);
+		}
+
+		@Override
+		MyClientManager<Long,E> clientManager(final boolean success)
+		{
+			return new MyClientManager<Long,E>(success)
+			{
+				@Override
+				void handlePayload(final Long payload) throws NoSuchFieldException, NoSuchAlgorithmException, TException,
+					                                              NoSuchProviderException, InvalidKeyException, SignatureException, IllegalAccessException
+				{
 				}
 			};
 		}

@@ -18,7 +18,7 @@ public class RegisterUnconfirmedIdentity extends Signer
 {
 	final private com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient vertxClient;
 
-	RegisterUnconfirmedIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	public RegisterUnconfirmedIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(signingKey,clientId);
 		vertxClient=new com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient(asyncClientManager);

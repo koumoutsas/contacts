@@ -19,7 +19,7 @@ public class SuggestNewContact extends Signer
 {
 	final private com.kareebo.contacts.thrift.SuggestNewContact.VertxClient vertxClient;
 
-	SuggestNewContact(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	public SuggestNewContact(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(signingKey,clientId);
 		vertxClient=new com.kareebo.contacts.thrift.SuggestNewContact.VertxClient(asyncClientManager);

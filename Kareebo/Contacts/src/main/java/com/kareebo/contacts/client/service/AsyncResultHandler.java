@@ -5,7 +5,7 @@ import org.vertx.java.core.AsyncResult;
 /**
  * Wrapper around {@link org.vertx.java.core.AsyncResultHandler} that calls a {@link ResultHandler}
  */
-class AsyncResultHandler<T> implements org.vertx.java.core.AsyncResultHandler<T>
+public class AsyncResultHandler<T> implements org.vertx.java.core.AsyncResultHandler<T>
 {
 	private final ResultHandler<T> handler;
 

@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
  */
 class SimpleTestHarness
 {
-	void test(final List<TestBase> tests) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	void test(final List<TestBase> tests) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, ServiceFactory.NoSuchService, Service.NoSuchMethod, ServiceFactory.NoSuchMethod
 	{
 		for(final TestBase test : tests)
 		{
@@ -43,13 +43,13 @@ class SimpleTestHarness
 		}
 
 		@Test
-		public void run() throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException
+		public void run() throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
 		{
 			test(true);
 			test(false);
 		}
 
-		private void test(final boolean success) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+		private void test(final boolean success) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, ServiceFactory.NoSuchService, Service.NoSuchMethod, ServiceFactory.NoSuchMethod
 		{
 			perform(clientManager(success),new SigningKey(keyPair.getPrivate(),algorithm),clientId,new AsyncResultHandler<>(handler));
 			assertEquals(success,handler.succeeded);
@@ -57,7 +57,7 @@ class SimpleTestHarness
 
 		abstract void perform(final MyClientManager<T,E> clientManager,final SigningKey signingKey,final ClientId clientId,final
 		AsyncResultHandler<E>
-			                                                                                                                   handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException;
+			                                                                                                                   handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod;
 
 		abstract MyClientManager<T,E> clientManager(final boolean success);
 
@@ -199,7 +199,7 @@ class SimpleTestHarness
 
 		@Override
 		void perform(final MyClientManager<T,E> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<E>
-			                                                                                                          handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException
+			                                                                                                          handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
 		{
 			perform(construct(),clientManager,signingKey,clientId,handler);
 		}
@@ -208,7 +208,7 @@ class SimpleTestHarness
 			                                                                                                                    clientId,
 		                                final
 		                                AsyncResultHandler<E> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException,
-			                                                                      InvalidKeyException, SignatureException;
+			                                                                      InvalidKeyException, SignatureException, Service.NoSuchMethod, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod;
 
 		abstract protected T construct();
 

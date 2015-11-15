@@ -21,8 +21,6 @@ import java.util.*;
 public class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNotifier implements com.kareebo.contacts.thrift.SuggestNewContact.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(SuggestNewContact.class.getName());
-	private static final String serviceName="SuggestNewContact";
-	public final static NotificationMethod method2=new NotificationMethod(serviceName,"suggestNewContact2");
 
 	/**
 	 * Constructor from datastores
@@ -119,7 +117,7 @@ public class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNoti
 				for(EncryptedBufferSigned e : encryptedBuffers)
 				{
 					notifications.put(clientDBAccessor.get(e.getEncryptedBuffer().getClient()).getDeviceToken(),new
-						                                                                                            NotificationObject(method2,new EncryptedBufferSignedWithVerificationKey(e,verificationKey)));
+						                                                                                            NotificationObject(com.kareebo.contacts.base.service.SuggestNewContact.method2,new EncryptedBufferSignedWithVerificationKey(e,verificationKey)));
 				}
 				notifyClients(notifications);
 			}

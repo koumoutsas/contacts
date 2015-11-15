@@ -2,6 +2,7 @@ package com.kareebo.contacts.client.service;
 
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
+import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 /**
  * Client-side implementation of the send contact card service
  */
-public class SendContactCard extends Signer
+public class SendContactCard extends Signer implements Service
 {
 	final private com.kareebo.contacts.thrift.SendContactCard.VertxClient vertxClient;
 
@@ -30,11 +31,6 @@ public class SendContactCard extends Signer
 		vertxClient.sendContactCard1(u,sign(u),handler);
 	}
 
-	public void sendContactCard2(final LongId id,final AsyncResultHandler<EncryptionKeys> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
-	{
-		vertxClient.sendContactCard2(id,sign(id),handler);
-	}
-
 	public void sendContactCard3(final Set<EncryptedBuffer> encryptedBuffers,final AsyncResultHandler<Void> handler) throws InvalidKeyException,
 		                                                                                                                        TException,
 		                                                                                                                        NoSuchAlgorithmException, NoSuchProviderException, SignatureException
@@ -47,8 +43,32 @@ public class SendContactCard extends Signer
 		vertxClient.sendContactCard3(encryptedBufferSignedSet,handler);
 	}
 
-	public void sendContactCard4(final LongId id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	@Override
+	public void run(final NotificationMethod method,final long notificationId,final AsyncResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 	{
-		vertxClient.sendContactCard4(id,sign(id),handler);
+		if(method.equals(com.kareebo.contacts.base.service.SendContactCard.method1))
+		{
+			sendContactCard2(notificationId,new AsyncResultConnector<EncryptionKeys>(handler));
+		}
+		else if(method.equals(com.kareebo.contacts.base.service.SendContactCard.method3))
+		{
+			sendContactCard4(notificationId,new AsyncResultConnector<EncryptedBufferSignedWithVerificationKey>(handler));
+		}
+		else
+		{
+			throw new NoSuchMethod();
+		}
+	}
+
+	private void sendContactCard2(final long id,final AsyncResultHandler<EncryptionKeys> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	{
+		final LongId longId=new LongId(id);
+		vertxClient.sendContactCard2(longId,sign(longId),handler);
+	}
+
+	private void sendContactCard4(final long id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	{
+		final LongId longId=new LongId(id);
+		vertxClient.sendContactCard4(longId,sign(longId),handler);
 	}
 }

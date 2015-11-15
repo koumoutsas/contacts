@@ -199,14 +199,14 @@ public class SuggestNewContactTest
 				assertEquals(1,userDataStore.get(clientId.getUser()).getSentRequests().size());
 				assertEquals(2,notifierBackend.size());
 				final Notification notification0=notifierBackend.get(deviceToken0);
-				assertEquals(SuggestNewContact.method2,notification0.getMethod());
+				assertEquals(com.kareebo.contacts.base.service.SuggestNewContact.method2,notification0.getMethod());
 				final EncryptedBufferSignedWithVerificationKey retrieved0=new EncryptedBufferSignedWithVerificationKey();
 				clientNotifier.get(retrieved0,notifierBackend.get(deviceToken0).getId());
 				final VerificationKey verificationKeyConverted=TypeConverter.convert(verificationKey);
 				assertEquals(new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned0,verificationKeyConverted),retrieved0);
 				final EncryptedBufferSignedWithVerificationKey retrieved1=new EncryptedBufferSignedWithVerificationKey();
 				final Notification notification1=notifierBackend.get(deviceToken1);
-				assertEquals(SuggestNewContact.method2,notification1.getMethod());
+				assertEquals(com.kareebo.contacts.base.service.SuggestNewContact.method2,notification1.getMethod());
 				clientNotifier.get(retrieved1,notification1.getId());
 				assertEquals(new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned1,verificationKeyConverted),retrieved1);
 			}
@@ -230,7 +230,7 @@ public class SuggestNewContactTest
 				final EncryptedBufferSignedWithVerificationKey expected=new EncryptedBufferSignedWithVerificationKey(new
 					                                                                                                     EncryptedBufferSigned(new EncryptedBuffer(buffer,EncryptionAlgorithm.RSA2048,clientId),sign(bytes,clientId)),
 					                                                                                                    TypeConverter.convert(verificationKey));
-				clientNotifier.put(deviceToken,new NotificationObject(SuggestNewContact.method2,expected));
+				clientNotifier.put(deviceToken,new NotificationObject(com.kareebo.contacts.base.service.SuggestNewContact.method2,expected));
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
 				final LongId id=new LongId(notifierBackend.getFirst().getId());
 				suggestNewContact.suggestNewContact3(id,sign(id,clientId),future);

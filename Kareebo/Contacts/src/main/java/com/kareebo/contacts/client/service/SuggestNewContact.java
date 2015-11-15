@@ -2,6 +2,7 @@ package com.kareebo.contacts.client.service;
 
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
+import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 /**
  * Client-side implementation of the suggest new contact service
  */
-public class SuggestNewContact extends Signer
+public class SuggestNewContact extends Signer implements Service
 {
 	final private com.kareebo.contacts.thrift.SuggestNewContact.VertxClient vertxClient;
 
@@ -23,11 +24,6 @@ public class SuggestNewContact extends Signer
 	{
 		super(signingKey,clientId);
 		vertxClient=new com.kareebo.contacts.thrift.SuggestNewContact.VertxClient(asyncClientManager);
-	}
-
-	public void suggestNewContact1(final LongId id,final AsyncResultHandler<EncryptionKeysWithHashBuffer> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
-	{
-		vertxClient.suggestNewContact1(id,sign(id),handler);
 	}
 
 	public void suggestNewContact2(final Set<EncryptedBuffer> encryptedBuffers,final HashBuffer uB,final AsyncResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
@@ -40,8 +36,32 @@ public class SuggestNewContact extends Signer
 		vertxClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),handler);
 	}
 
-	public void suggestNewContact3(final LongId id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	@Override
+	public void run(final NotificationMethod method,final long notificationId,final AsyncResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 	{
-		vertxClient.suggestNewContact3(id,sign(id),handler);
+		if(method.equals(com.kareebo.contacts.base.service.SuggestNewContact.method0))
+		{
+			suggestNewContact1(notificationId,new AsyncResultConnector<EncryptionKeysWithHashBuffer>(handler));
+		}
+		else if(method.equals(com.kareebo.contacts.base.service.SuggestNewContact.method2))
+		{
+			suggestNewContact3(notificationId,new AsyncResultConnector<EncryptedBufferSignedWithVerificationKey>(handler));
+		}
+		else
+		{
+			throw new NoSuchMethod();
+		}
+	}
+
+	private void suggestNewContact1(final long id,final AsyncResultHandler<EncryptionKeysWithHashBuffer> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	{
+		final LongId longId=new LongId(id);
+		vertxClient.suggestNewContact1(longId,sign(longId),handler);
+	}
+
+	private void suggestNewContact3(final long id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	{
+		final LongId longId=new LongId(id);
+		vertxClient.suggestNewContact3(longId,sign(longId),handler);
 	}
 }

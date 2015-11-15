@@ -2,6 +2,7 @@ package com.kareebo.contacts.client.service;
 
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
+import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 /**
  * Client-side implementation of the broadcast new contact identity service
  */
-public class BroadcastNewContactIdentity extends Signer
+public class BroadcastNewContactIdentity extends Signer implements Service
 {
 	final private com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient vertxClient;
 
@@ -47,13 +48,27 @@ public class BroadcastNewContactIdentity extends Signer
 		vertxClient.broadcastNewContactIdentity3(set,handler);
 	}
 
-	public void broadcastNewContactIdentity4(final LongId id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
-	{
-		vertxClient.broadcastNewContactIdentity4(id,sign(id),handler);
-	}
-
 	public void broadcastNewContactIdentity5(final HashBufferPair uCs,final AsyncResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		vertxClient.broadcastNewContactIdentity5(uCs,sign(uCs),handler);
+	}
+
+	@Override
+	public void run(final NotificationMethod method,final long notificationId,final AsyncResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+	{
+		if(method.equals(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3))
+		{
+			broadcastNewContactIdentity4(notificationId,new AsyncResultConnector<EncryptedBufferSignedWithVerificationKey>(handler));
+		}
+		else
+		{
+			throw new NoSuchMethod();
+		}
+	}
+
+	private void broadcastNewContactIdentity4(final long id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	{
+		final LongId longId=new LongId(id);
+		vertxClient.broadcastNewContactIdentity4(longId,sign(longId),handler);
 	}
 }

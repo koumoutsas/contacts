@@ -17,7 +17,7 @@ import java.util.List;
 public class RegisterIdentityTest
 {
 	@Test
-	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException
+	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
 	{
 		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(3);
 		tests.add(new SimpleTestHarness.HashBufferTestBase<RegisterIdentityReply>("uA")

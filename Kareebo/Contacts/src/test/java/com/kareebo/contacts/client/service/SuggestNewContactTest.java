@@ -3,7 +3,9 @@ package com.kareebo.contacts.client.service;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
 import org.apache.thrift.TException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.security.*;
@@ -14,16 +16,19 @@ import java.util.*;
  */
 public class SuggestNewContactTest
 {
+	@Rule
+	public ExpectedException thrown=ExpectedException.none();
+
 	@Test
-	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException
+	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
 	{
-		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(4);
+		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(5);
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptionKeysWithHashBuffer>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptionKeysWithHashBuffer> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptionKeysWithHashBuffer> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+			protected void perform(final LongId object,final MockClientManager<EncryptionKeysWithHashBuffer> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptionKeysWithHashBuffer> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod
 			{
-				new SuggestNewContact(clientManager,signingKey,clientId).suggestNewContact1(object,handler);
+				ServiceFactory.run(clientManager,signingKey,clientId,com.kareebo.contacts.base.service.SuggestNewContact.method0,object.getId(),new AsyncResultConnectorReverse<>(handler));
 			}
 		});
 		tests.add(new SimpleTestHarness.HashBufferTestBase<Void>("uB")
@@ -51,9 +56,23 @@ public class SuggestNewContactTest
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod
 			{
-				new SuggestNewContact(clientManager,signingKey,clientId).suggestNewContact3(object,handler);
+				ServiceFactory.run(clientManager,signingKey,clientId,com.kareebo.contacts.base.service.SuggestNewContact.method2,object.getId(),
+					new AsyncResultConnectorReverse<>
+						(handler));
+			}
+		});
+		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
+		{
+			@Override
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, Service.NoSuchMethod
+			{
+				thrown.expect(Service.NoSuchMethod.class);
+				new SuggestNewContact(clientManager,signingKey,clientId).run(new NotificationMethod(com.kareebo.contacts
+					                                                                                    .base
+					                                                                                    .service.SuggestNewContact
+					                                                                                    .method2.getServiceName(),"random"),object.getId(),new AsyncResultConnectorReverse<>(handler));
 			}
 		});
 		new SimpleTestHarness().test(tests);

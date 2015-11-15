@@ -110,10 +110,10 @@ public class SendContactCardTest
 				assertTrue(future.succeeded());
 				assertEquals(2,notifier.size());
 				final Notification notification0=notifier.get(clientId10.getClient());
-				assertEquals(SendContactCard.method1,notification0.getMethod());
+				assertEquals(com.kareebo.contacts.base.service.SendContactCard.method1,notification0.getMethod());
 				checkInternal(notification0.getId());
 				final Notification notification1=notifier.get(clientId11.getClient());
-				assertEquals(SendContactCard.method1,notification1.getMethod());
+				assertEquals(com.kareebo.contacts.base.service.SendContactCard.method1,notification1.getMethod());
 				checkInternal(notification1.getId());
 			}
 
@@ -152,7 +152,7 @@ public class SendContactCardTest
 	@Test
 	public void testSendContactCard2() throws Exception
 	{
-		new BaseForwarding<EncryptionKeys>(SendContactCard.method1)
+		new BaseForwarding<EncryptionKeys>(com.kareebo.contacts.base.service.SendContactCard.method1)
 		{
 			@Override
 			TBase construct()
@@ -234,12 +234,12 @@ public class SendContactCardTest
 				assertEquals(2,notifier.size());
 				final EncryptedBufferSignedWithVerificationKey e0=new EncryptedBufferSignedWithVerificationKey();
 				final Notification notification0=notifier.get(clientId0.getClient());
-				assertEquals(SendContactCard.method3,notification0.getMethod());
+				assertEquals(com.kareebo.contacts.base.service.SendContactCard.method3,notification0.getMethod());
 				clientNotifier.get(e0,notification0.getId());
 				assertEquals(this.e0,e0);
 				final EncryptedBufferSignedWithVerificationKey e1=new EncryptedBufferSignedWithVerificationKey();
 				final Notification notification1=notifier.get(clientId1.getClient());
-				assertEquals(SendContactCard.method3,notification1.getMethod());
+				assertEquals(com.kareebo.contacts.base.service.SendContactCard.method3,notification1.getMethod());
 				clientNotifier.get(e1,notification1.getId());
 				assertEquals(this.e1,e1);
 			}
@@ -263,7 +263,7 @@ public class SendContactCardTest
 	@Test
 	public void testSendContactCard4() throws Exception
 	{
-		new BaseForwarding<EncryptedBufferSignedWithVerificationKey>(SendContactCard.method3)
+		new BaseForwarding<EncryptedBufferSignedWithVerificationKey>(com.kareebo.contacts.base.service.SendContactCard.method3)
 		{
 			@Override
 			void call(final LongId notificationId,final SignatureBuffer signatureBuffer,final Future<EncryptedBufferSignedWithVerificationKey> future)

@@ -24,8 +24,6 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	                                                                                                          .BroadcastNewContactIdentity.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(BroadcastNewContactIdentity.class.getName());
-	private static final String serviceName="BroadcastNewContactIdentity";
-	public final static NotificationMethod method3=new NotificationMethod(serviceName,"broadcastNewContactIdentity3");
 
 	/**
 	 * Constructor from datastores
@@ -128,8 +126,8 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 						final Client clientB=clientDBAccessor.get(clientIdB);
 						try
 						{
-							notifyClient(clientB.getDeviceToken(),new NotificationObject(method3,new EncryptedBufferSignedWithVerificationKey
-								                                                                     (encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
+							notifyClient(clientB.getDeviceToken(),new NotificationObject(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3,new EncryptedBufferSignedWithVerificationKey
+								                                                                                                                                   (encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
 						}
 						catch(NoSuchAlgorithmException e)
 						{

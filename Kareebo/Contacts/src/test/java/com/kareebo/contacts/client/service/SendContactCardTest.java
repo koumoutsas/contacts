@@ -3,7 +3,9 @@ package com.kareebo.contacts.client.service;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
 import org.apache.thrift.TException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
@@ -17,10 +19,13 @@ import java.util.*;
  */
 public class SendContactCardTest
 {
+	@Rule
+	public ExpectedException thrown=ExpectedException.none();
+
 	@Test
 	public void testSendContactCard() throws Exception
 	{
-		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(4);
+		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(5);
 		tests.add(new SimpleTestHarness.HashBufferTestBase<Void>("u")
 		{
 			@Override
@@ -36,9 +41,10 @@ public class SendContactCardTest
 			@Override
 			protected void perform(final LongId object,final MockClientManager<EncryptionKeys> clientManager,final SigningKey signingKey,final
 			ClientId clientId,final AsyncResultHandler<EncryptionKeys> handler) throws NoSuchProviderException, TException,
-				                                                                           NoSuchAlgorithmException, InvalidKeyException, SignatureException
+				                                                                           NoSuchAlgorithmException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod
 			{
-				new SendContactCard(clientManager,signingKey,clientId).sendContactCard2(object,handler);
+				ServiceFactory.run(clientManager,signingKey,clientId,com.kareebo.contacts.base.service.SendContactCard.method1,object.getId(),new AsyncResultConnectorReverse<>
+					                                                                                                                              (handler));
 			}
 		});
 		tests.add(new SimpleTestHarness.CollectionSimpleTestBase<EncryptedBufferSigned,Void>("encryptedBuffers","encryptedBuffer")
@@ -61,9 +67,22 @@ public class SendContactCardTest
 			@Override
 			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final
 			ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException,
-				                                                                                                     NoSuchAlgorithmException, InvalidKeyException, SignatureException
+				                                                                                                     NoSuchAlgorithmException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod
 			{
-				new SendContactCard(clientManager,signingKey,clientId).sendContactCard4(object,handler);
+				ServiceFactory.run(clientManager,signingKey,clientId,com.kareebo.contacts.base.service.SendContactCard.method3,object.getId(),new AsyncResultConnectorReverse<>
+					                                                                                                                              (handler));
+			}
+		});
+		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
+		{
+			@Override
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, Service.NoSuchMethod
+			{
+				thrown.expect(Service.NoSuchMethod.class);
+				new SendContactCard(clientManager,signingKey,clientId).run(new NotificationMethod(com.kareebo.contacts
+					                                                                                  .base
+					                                                                                  .service.SendContactCard
+					                                                                                  .method3.getServiceName(),"random"),object.getId(),new AsyncResultConnectorReverse<>(handler));
 			}
 		});
 		new SimpleTestHarness().test(tests);

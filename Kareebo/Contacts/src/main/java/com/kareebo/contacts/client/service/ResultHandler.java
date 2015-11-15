@@ -5,7 +5,7 @@ import org.vertx.java.core.Handler;
 /**
  * Extension of {@link Handler} with an error handling method
  */
-interface ResultHandler<E> extends Handler<E>
+public interface ResultHandler<E> extends Handler<E>
 {
 	/**
 	 * An error has happened

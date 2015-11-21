@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.HashBuffer;
@@ -26,18 +27,18 @@ public class RegisterIdentity extends Signer
 		vertxClient=new com.kareebo.contacts.thrift.RegisterIdentity.VertxClient(asyncClientManager);
 	}
 
-	public void registerIdentity1(final HashBuffer uA,final AsyncResultHandler<RegisterIdentityReply> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	public void registerIdentity1(final HashBuffer uA,final ResultHandler<RegisterIdentityReply> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.registerIdentity1(uA,sign(uA),handler);
+		vertxClient.registerIdentity1(uA,sign(uA),new AsyncResultHandler<>(handler));
 	}
 
-	public void registerIdentity2(final long userIdA,final AsyncResultHandler<RegisterIdentityReply> handler)
+	public void registerIdentity2(final long userIdA,final ResultHandler<RegisterIdentityReply> handler)
 	{
-		vertxClient.registerIdentity2(userIdA,handler);
+		vertxClient.registerIdentity2(userIdA,new AsyncResultHandler<>(handler));
 	}
 
-	public void registerIdentity3(final RegisterIdentityInput registerIdentityInput,final AsyncResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	public void registerIdentity3(final RegisterIdentityInput registerIdentityInput,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.registerIdentity3(registerIdentityInput,sign(registerIdentityInput),handler);
+		vertxClient.registerIdentity3(registerIdentityInput,sign(registerIdentityInput),new AsyncResultHandler<>(handler));
 	}
 }

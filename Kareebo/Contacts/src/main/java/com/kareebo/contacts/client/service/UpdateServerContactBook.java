@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.ContactOperationSet;
@@ -24,8 +25,8 @@ public class UpdateServerContactBook extends Signer
 		vertxClient=new com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient(asyncClientManager);
 	}
 
-	public void updateServerContactBook1(final ContactOperationSet contactOperationSet,final AsyncResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	public void updateServerContactBook1(final ContactOperationSet contactOperationSet,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.updateServerContactBook1(contactOperationSet,sign(contactOperationSet),handler);
+		vertxClient.updateServerContactBook1(contactOperationSet,sign(contactOperationSet),new AsyncResultHandler<>(handler));
 	}
 }

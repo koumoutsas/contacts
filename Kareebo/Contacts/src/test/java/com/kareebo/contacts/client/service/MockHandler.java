@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.thrift.FailedOperation;
 
 import static org.junit.Assert.assertTrue;

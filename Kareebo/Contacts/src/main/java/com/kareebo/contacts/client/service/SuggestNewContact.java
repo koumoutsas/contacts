@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
 import org.apache.thrift.TBase;
@@ -26,18 +27,18 @@ public class SuggestNewContact extends Signer implements Service
 		vertxClient=new com.kareebo.contacts.thrift.SuggestNewContact.VertxClient(asyncClientManager);
 	}
 
-	public void suggestNewContact2(final Set<EncryptedBuffer> encryptedBuffers,final HashBuffer uB,final AsyncResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	public void suggestNewContact2(final Set<EncryptedBuffer> encryptedBuffers,final HashBuffer uB,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		final Set<EncryptedBufferSigned> encryptedBufferSignedSet=new HashSet<>(encryptedBuffers.size());
 		for(final EncryptedBuffer encryptedBuffer : encryptedBuffers)
 		{
 			encryptedBufferSignedSet.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
 		}
-		vertxClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),handler);
+		vertxClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),new AsyncResultHandler<>(handler));
 	}
 
 	@Override
-	public void run(final NotificationMethod method,final long notificationId,final AsyncResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+	public void run(final NotificationMethod method,final long notificationId,final ResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 	{
 		if(method.equals(com.kareebo.contacts.base.service.SuggestNewContact.method0))
 		{

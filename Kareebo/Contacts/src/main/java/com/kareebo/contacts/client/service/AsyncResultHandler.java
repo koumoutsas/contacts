@@ -1,15 +1,16 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import org.vertx.java.core.AsyncResult;
 
 /**
  * Wrapper around {@link org.vertx.java.core.AsyncResultHandler} that calls a {@link ResultHandler}
  */
-public class AsyncResultHandler<T> implements org.vertx.java.core.AsyncResultHandler<T>
+class AsyncResultHandler<T> implements org.vertx.java.core.AsyncResultHandler<T>
 {
 	private final ResultHandler<T> handler;
 
-	public AsyncResultHandler(final ResultHandler<T> handler)
+	AsyncResultHandler(final ResultHandler<T> handler)
 	{
 		this.handler=handler;
 	}

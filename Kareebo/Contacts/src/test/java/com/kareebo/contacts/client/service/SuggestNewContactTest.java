@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
 import org.apache.thrift.TException;
@@ -26,15 +27,15 @@ public class SuggestNewContactTest
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptionKeysWithHashBuffer>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptionKeysWithHashBuffer> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptionKeysWithHashBuffer> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod
+			protected void perform(final LongId object,final MockClientManager<EncryptionKeysWithHashBuffer> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptionKeysWithHashBuffer> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod
 			{
-				ServiceFactory.run(clientManager,signingKey,clientId,com.kareebo.contacts.base.service.SuggestNewContact.method0,object.getId(),new AsyncResultConnectorReverse<>(handler));
+				ServiceFactory.run(clientManager,signingKey,clientId,com.kareebo.contacts.base.service.SuggestNewContact.method0,object.getId(),new ResultConnectorReverse<>(handler));
 			}
 		});
 		tests.add(new SimpleTestHarness.HashBufferTestBase<Void>("uB")
 		{
 			@Override
-			protected void perform(final HashBuffer object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+			protected void perform(final HashBuffer object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
 				new SuggestNewContact(clientManager,signingKey,clientId).suggestNewContact2(new HashSet<EncryptedBuffer>(),object,handler);
 			}
@@ -42,7 +43,7 @@ public class SuggestNewContactTest
 		tests.add(new SimpleTestHarness.CollectionSimpleTestBase<EncryptedBuffer,Void>("encryptedBuffers","encryptedBuffer")
 		{
 			@Override
-			void perform(final MyClientManager<Collection<EncryptedBuffer>,Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException
+			void perform(final MyClientManager<Collection<EncryptedBuffer>,Void> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<Void> handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
 				final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
 				buffer.mark();
@@ -56,23 +57,23 @@ public class SuggestNewContactTest
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod
 			{
 				ServiceFactory.run(clientManager,signingKey,clientId,com.kareebo.contacts.base.service.SuggestNewContact.method2,object.getId(),
-					new AsyncResultConnectorReverse<>
+					new ResultConnectorReverse<>
 						(handler));
 			}
 		});
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, Service.NoSuchMethod
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, Service.NoSuchMethod
 			{
 				thrown.expect(Service.NoSuchMethod.class);
 				new SuggestNewContact(clientManager,signingKey,clientId).run(new NotificationMethod(com.kareebo.contacts
 					                                                                                    .base
 					                                                                                    .service.SuggestNewContact
-					                                                                                    .method2.getServiceName(),"random"),object.getId(),new AsyncResultConnectorReverse<>(handler));
+					                                                                                    .method2.getServiceName(),"random"),object.getId(),new ResultConnectorReverse<>(handler));
 			}
 		});
 		new SimpleTestHarness().test(tests);

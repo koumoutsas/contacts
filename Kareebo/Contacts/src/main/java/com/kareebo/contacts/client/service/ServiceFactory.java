@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.NotificationMethod;
@@ -32,7 +33,7 @@ public class ServiceFactory
 	 * @param handler        @throws NoSuchMethod When the method cannot be found
 	 * @throws NoSuchService When the service cannot be found
 	 */
-	public static void run(final TAsyncClientManager clientManager,final SigningKey signingKey,final ClientId clientId,final NotificationMethod method,final long notificationId,final AsyncResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchService
+	public static void run(final TAsyncClientManager clientManager,final SigningKey signingKey,final ClientId clientId,final NotificationMethod method,final long notificationId,final ResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchService
 	{
 		try
 		{

@@ -1,8 +1,10 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.thrift.LongId;
 import org.apache.thrift.TBase;
 import org.junit.Test;
+import org.vertx.java.core.AsyncResult;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -40,12 +42,86 @@ public class AsyncResultConnectorTest
 				status.error=null;
 			}
 		};
-		final AsyncResultConnector<LongId> connector=new AsyncResultConnector<>(new AsyncResultHandler<>(handler));
+		final AsyncResultConnector<LongId> connector=new AsyncResultConnector<>(handler);
 		connector.handle(new AsyncSuccessResult<>(expectedStatus.result));
 		assertTrue(expectedStatus.result==status.result);
 		assertNull(status.error);
 		connector.handle(new AsyncErrorResult<LongId>(expectedStatus.error));
 		assertNull(status.result);
 		assertTrue(expectedStatus.error==status.error);
+	}
+
+	/**
+	 * Implementation of {@link AsyncResult} that returns only error
+	 */
+	static class AsyncErrorResult<T> implements AsyncResult<T>
+	{
+		final private Throwable cause;
+
+		AsyncErrorResult(final Throwable cause)
+		{
+			this.cause=cause;
+		}
+
+		@Override
+		public T result()
+		{
+			return null;
+		}
+
+		@Override
+		public Throwable cause()
+		{
+			return cause;
+		}
+
+		@Override
+		public boolean succeeded()
+		{
+			return false;
+		}
+
+		@Override
+		public boolean failed()
+		{
+			return true;
+		}
+	}
+
+	/**
+	 * Implementation of {@link AsyncResult} that returns only success
+	 */
+	static class AsyncSuccessResult<T> implements AsyncResult<T>
+	{
+		final private T result;
+
+		AsyncSuccessResult(final T result)
+		{
+			this.result=result;
+		}
+
+		@Override
+		public T result()
+		{
+			return result;
+		}
+
+		@Override
+		public Throwable cause()
+		{
+			return null;
+		}
+
+		@Override
+		public boolean succeeded()
+		{
+			return true;
+		}
+
+		@Override
+		public boolean failed()
+		{
+			return false;
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.HashAlgorithm;
@@ -23,7 +24,7 @@ public class RegisterUnconfirmedIdentityTest extends SimpleTestHarness.SimpleTes
 	}
 
 	@Override
-	protected void perform(final HashBufferSet object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+	protected void perform(final HashBufferSet object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 	{
 		new RegisterUnconfirmedIdentity(clientManager,signingKey,clientId).registerUnconfirmedIdentity1(object,handler);
 	}

@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.UserAgent;
@@ -20,8 +21,8 @@ public class ModifyUserAgentTest extends SimpleTestHarness.SimpleTestBase<UserAg
 	@Override
 	protected void perform(final UserAgent object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId
 		                                                                                                                      clientId,final
-	                       AsyncResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException,
-		                                                                SignatureException
+	                       ResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException,
+		                                                           SignatureException
 	{
 		new ModifyUserAgent(clientManager,signingKey,clientId).modifyUserAgent1(object,handler);
 	}

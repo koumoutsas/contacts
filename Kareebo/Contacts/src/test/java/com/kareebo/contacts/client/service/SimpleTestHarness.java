@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
 import org.apache.thrift.TBase;
@@ -51,12 +52,12 @@ class SimpleTestHarness
 
 		private void test(final boolean success) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, ServiceFactory.NoSuchService, Service.NoSuchMethod, ServiceFactory.NoSuchMethod
 		{
-			perform(clientManager(success),new SigningKey(keyPair.getPrivate(),algorithm),clientId,new AsyncResultHandler<>(handler));
+			perform(clientManager(success),new SigningKey(keyPair.getPrivate(),algorithm),clientId,handler);
 			assertEquals(success,handler.succeeded);
 		}
 
 		abstract void perform(final MyClientManager<T,E> clientManager,final SigningKey signingKey,final ClientId clientId,final
-		AsyncResultHandler<E>
+		ResultHandler<E>
 			                                                                                                                   handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod;
 
 		abstract MyClientManager<T,E> clientManager(final boolean success);
@@ -198,7 +199,7 @@ class SimpleTestHarness
 		}
 
 		@Override
-		void perform(final MyClientManager<T,E> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<E>
+		void perform(final MyClientManager<T,E> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<E>
 			                                                                                                          handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
 		{
 			perform(construct(),clientManager,signingKey,clientId,handler);
@@ -207,8 +208,8 @@ class SimpleTestHarness
 		abstract protected void perform(final T object,final MockClientManager<E> clientManager,final SigningKey signingKey,final ClientId
 			                                                                                                                    clientId,
 		                                final
-		                                AsyncResultHandler<E> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException,
-			                                                                      InvalidKeyException, SignatureException, Service.NoSuchMethod, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod;
+		                                ResultHandler<E> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException,
+			                                                                 InvalidKeyException, SignatureException, Service.NoSuchMethod, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod;
 
 		abstract protected T construct();
 

@@ -1,6 +1,5 @@
 package com.kareebo.contacts.client;
 
-import com.kareebo.contacts.client.service.AsyncResultHandler;
 import com.kareebo.contacts.client.service.ServiceFactory;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.Notification;
@@ -38,7 +37,7 @@ public class NotificationHandler
 	 * @throws TException           When deserialization of the payload fails
 	 * @throws InvalidServiceMethod When the service or the method in the notification cannot be found
 	 */
-	public void handle(final byte[] payload,final AsyncResultHandler<TBase> handler) throws TException, InvalidServiceMethod, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
+	public void handle(final byte[] payload,final ResultHandler<TBase> handler) throws TException, InvalidServiceMethod, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 	{
 		final Notification notification=new Notification();
 		new TDeserializer().deserialize(notification,payload);

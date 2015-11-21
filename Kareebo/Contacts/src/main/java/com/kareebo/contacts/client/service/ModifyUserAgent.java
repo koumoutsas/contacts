@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.UserAgent;
@@ -24,8 +25,8 @@ public class ModifyUserAgent extends Signer
 		vertxClient=new com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient(asyncClientManager);
 	}
 
-	public void modifyUserAgent1(final UserAgent userAgent,final AsyncResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	public void modifyUserAgent1(final UserAgent userAgent,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.modifyUserAgent1(userAgent,sign(userAgent),handler);
+		vertxClient.modifyUserAgent1(userAgent,sign(userAgent),new AsyncResultHandler<>(handler));
 	}
 }

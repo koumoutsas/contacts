@@ -1,7 +1,5 @@
 package com.kareebo.contacts.client;
 
-import com.kareebo.contacts.client.service.AsyncResultHandler;
-import com.kareebo.contacts.client.service.ResultHandler;
 import com.kareebo.contacts.crypto.Utils;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.Notification;
@@ -96,7 +94,7 @@ public class NotificationHandlerTest
 	public void testHandle() throws Exception
 	{
 		final boolean[] error=new boolean[1];
-		final ResultHandler<TBase> handler=new ResultHandler<TBase>()
+		notificationHandler.handle(new TSerializer().serialize(new Notification(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3,0)),new ResultHandler<TBase>()
 		{
 			@Override
 			public void handleError(final Throwable cause)
@@ -109,9 +107,7 @@ public class NotificationHandlerTest
 			{
 				error[0]=false;
 			}
-		};
-		notificationHandler.handle(new TSerializer().serialize(new Notification(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3,0)),new
-			                                                                                                                                                  AsyncResultHandler<>(handler));
+		});
 		assertTrue(error[0]);
 	}
 

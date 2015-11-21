@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
 import org.apache.thrift.TException;
@@ -23,7 +24,7 @@ public class RegisterIdentityTest
 		tests.add(new SimpleTestHarness.HashBufferTestBase<RegisterIdentityReply>("uA")
 		{
 			@Override
-			protected void perform(final HashBuffer object,final MockClientManager<RegisterIdentityReply> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<RegisterIdentityReply> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+			protected void perform(final HashBuffer object,final MockClientManager<RegisterIdentityReply> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<RegisterIdentityReply> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
 				new RegisterIdentity(clientManager,signingKey,clientId).registerIdentity1(object,handler);
 			}
@@ -31,7 +32,7 @@ public class RegisterIdentityTest
 		tests.add(new SimpleTestHarness.LongTestBase<RegisterIdentityReply>("userIdA")
 		{
 			@Override
-			void perform(final MyClientManager<Long,RegisterIdentityReply> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<RegisterIdentityReply> handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException
+			void perform(final MyClientManager<Long,RegisterIdentityReply> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<RegisterIdentityReply> handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
 				new RegisterIdentity(clientManager,signingKey,clientId).registerIdentity2(8,handler);
 			}
@@ -39,7 +40,7 @@ public class RegisterIdentityTest
 		tests.add(new SimpleTestHarness.SimpleTestBase<RegisterIdentityInput,Void>("registerIdentityInput")
 		{
 			@Override
-			protected void perform(final RegisterIdentityInput object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+			protected void perform(final RegisterIdentityInput object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 			{
 				new RegisterIdentity(clientManager,signingKey,clientId).registerIdentity3(object,handler);
 			}

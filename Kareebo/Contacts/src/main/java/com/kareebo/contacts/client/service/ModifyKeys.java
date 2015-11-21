@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.PublicKeys;
@@ -24,10 +25,10 @@ public class ModifyKeys extends Signer
 		vertxClient=new com.kareebo.contacts.thrift.ModifyKeys.VertxClient(asyncClientManager);
 	}
 
-	public void modifyKeys1(final PublicKeys newPublicKeys,final AsyncResultHandler<Void> handler) throws TException, InvalidKeyException,
-		                                                                                                      NoSuchAlgorithmException,
-		                                                                                                      NoSuchProviderException, SignatureException
+	public void modifyKeys1(final PublicKeys newPublicKeys,final ResultHandler<Void> handler) throws TException, InvalidKeyException,
+		                                                                                                 NoSuchAlgorithmException,
+		                                                                                                 NoSuchProviderException, SignatureException
 	{
-		vertxClient.modifyKeys1(newPublicKeys,sign(newPublicKeys),handler);
+		vertxClient.modifyKeys1(newPublicKeys,sign(newPublicKeys),new AsyncResultHandler<>(handler));
 	}
 }

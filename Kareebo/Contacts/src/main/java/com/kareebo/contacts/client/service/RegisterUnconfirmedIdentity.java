@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.HashBufferSet;
@@ -24,8 +25,8 @@ public class RegisterUnconfirmedIdentity extends Signer
 		vertxClient=new com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient(asyncClientManager);
 	}
 
-	public void registerUnconfirmedIdentity1(final HashBufferSet uSet,final AsyncResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	public void registerUnconfirmedIdentity1(final HashBufferSet uSet,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.registerUnconfirmedIdentity1(uSet,sign(uSet),handler);
+		vertxClient.registerUnconfirmedIdentity1(uSet,sign(uSet),new AsyncResultHandler<>(handler));
 	}
 }

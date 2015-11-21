@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.*;
 import org.apache.thrift.TException;
@@ -20,7 +21,7 @@ public class UpdateServerContactBookTest extends SimpleTestHarness.SimpleTestBas
 	}
 
 	@Override
-	protected void perform(final ContactOperationSet object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final AsyncResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+	protected void perform(final ContactOperationSet object,final MockClientManager<Void> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<Void> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 	{
 		new UpdateServerContactBook(clientManager,signingKey,clientId).updateServerContactBook1(object,handler);
 	}

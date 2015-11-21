@@ -1,4 +1,4 @@
-package com.kareebo.contacts.client.service;
+package com.kareebo.contacts.client;
 
 import org.vertx.java.core.Handler;
 

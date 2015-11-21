@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.service;
 
+import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.NotificationMethod;
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 public class ServiceFactoryTest
 {
 	final static long notificationIdExpected=0L;
-	final static AsyncResultHandler<TBase> handlerExpected=new AsyncResultHandler<>(new ResultHandler<TBase>()
+	final static ResultHandler<TBase> handlerExpected=new ResultHandler<TBase>()
 	{
 		@Override
 		public void handleError(final Throwable cause)
@@ -38,7 +39,7 @@ public class ServiceFactoryTest
 		public void handle(final TBase event)
 		{
 		}
-	});
+	};
 	final private static SigningKey signingKeyExpected=new SigningKey(new PrivateKey()
 	{
 		@Override
@@ -132,7 +133,7 @@ public class ServiceFactoryTest
 		}
 
 		@Override
-		public void run(final NotificationMethod method,final long notificationId,final AsyncResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
+		public void run(final NotificationMethod method,final long notificationId,final ResultHandler<TBase> handler) throws NoSuchMethod, NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
 		{
 			assertEquals(notificationIdExpected,notificationId);
 			assertEquals(handlerExpected,handler);

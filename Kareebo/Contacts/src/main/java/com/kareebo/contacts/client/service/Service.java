@@ -1,6 +1,5 @@
 package com.kareebo.contacts.client.service;
 
-import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.thrift.NotificationMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;

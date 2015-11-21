@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client;
 
+import com.kareebo.contacts.client.service.ResultHandler;
 import com.kareebo.contacts.crypto.Utils;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.Notification;

@@ -10,11 +10,11 @@ import java.security.*;
 /**
  * Utility class for generating a key pair
  */
-class KeyPair
+public class KeyPair
 {
 	private final java.security.KeyPair keyPair;
 
-	KeyPair() throws InvalidAlgorithmParameterException, NoSuchProviderException, NoSuchAlgorithmException
+	public KeyPair() throws InvalidAlgorithmParameterException, NoSuchProviderException, NoSuchAlgorithmException
 	{
 		Security.addProvider(new BouncyCastleProvider());
 		final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
@@ -23,7 +23,7 @@ class KeyPair
 		keyPair=g.generateKeyPair();
 	}
 
-	PrivateKey getPrivate()
+	public PrivateKey getPrivate()
 	{
 		return keyPair.getPrivate();
 	}

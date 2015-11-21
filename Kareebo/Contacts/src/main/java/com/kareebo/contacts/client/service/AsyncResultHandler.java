@@ -1,6 +1,5 @@
 package com.kareebo.contacts.client.service;
 
-import com.kareebo.contacts.client.ResultHandler;
 import org.vertx.java.core.AsyncResult;
 
 /**

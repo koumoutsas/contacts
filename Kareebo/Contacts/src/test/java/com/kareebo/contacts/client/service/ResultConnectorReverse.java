@@ -1,6 +1,5 @@
 package com.kareebo.contacts.client.service;
 
-import com.kareebo.contacts.client.ResultHandler;
 import org.apache.thrift.TBase;
 
 class ResultConnectorReverse<T extends TBase> implements ResultHandler<TBase>

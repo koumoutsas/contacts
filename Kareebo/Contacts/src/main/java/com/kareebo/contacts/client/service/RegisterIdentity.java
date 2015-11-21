@@ -1,6 +1,5 @@
 package com.kareebo.contacts.client.service;
 
-import com.kareebo.contacts.client.ResultHandler;
 import com.kareebo.contacts.client.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.HashBuffer;

@@ -24,8 +24,8 @@ public class TypeConverterTest
 	{
 		final byte[] buffer1={'a','b'};
 		final com.kareebo.contacts.thrift.EncryptionKey encryptionKey=create(
-			                                                                    com.kareebo.contacts.thrift.EncryptionAlgorithm.RSA2048,
-			                                                                    buffer1);
+			com.kareebo.contacts.thrift.EncryptionAlgorithm.RSA2048,
+			buffer1);
 		final byte[] buffer2={'c','d'};
 		final com.kareebo.contacts.thrift.VerificationKey verificationKey=create(com.kareebo.contacts.thrift.SignatureAlgorithm
 			                                                                         .SHA256withECDSAprime239v1,buffer2);
@@ -201,7 +201,7 @@ public class TypeConverterTest
 		final EncryptionAlgorithm algorithm=EncryptionAlgorithm.RSA2048;
 		final byte[] buffer={'a','b'};
 		final com.kareebo.contacts.thrift.EncryptedBuffer converted=TypeConverter.convert(createEncryptedBuffer(algorithm,
-			                                                                                                       buffer));
+			buffer));
 		assertEquals(TypeConverter.convert(algorithm),converted.getAlgorithm());
 		assertEquals(ByteBuffer.wrap(buffer),converted.bufferForBuffer());
 	}

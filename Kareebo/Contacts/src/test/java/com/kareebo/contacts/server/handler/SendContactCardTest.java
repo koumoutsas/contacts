@@ -318,9 +318,9 @@ public class SendContactCardTest
 
 	private abstract class BaseForwarding<T extends TBase> extends Base
 	{
-		final private NotificationMethod method;
+		final private ServiceMethod method;
 
-		BaseForwarding(final NotificationMethod method) throws GoraException
+		BaseForwarding(final ServiceMethod method) throws GoraException
 		{
 			this.method=method;
 		}

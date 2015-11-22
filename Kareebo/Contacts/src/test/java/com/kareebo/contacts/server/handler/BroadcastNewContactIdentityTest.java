@@ -586,7 +586,7 @@ public class BroadcastNewContactIdentityTest
 			 */
 			void run() throws NoSuchAlgorithmException
 			{
-				final Future<Map<ClientId,EncryptionKey>> future=new DefaultFutureResult<>();
+				final Future<MapClientIdEncryptionKey> future=new DefaultFutureResult<>();
 				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity2(new EncryptedBufferPairSet
 					                                                                              (encryptedBufferPairs),signature,
 					future);
@@ -598,10 +598,10 @@ public class BroadcastNewContactIdentityTest
 			 *
 			 * @param future The result to be checked
 			 */
-			private void check(final Future<Map<ClientId,EncryptionKey>> future) throws NoSuchAlgorithmException
+			private void check(final Future<MapClientIdEncryptionKey> future) throws NoSuchAlgorithmException
 			{
 				assertTrue(future.succeeded());
-				final Map<ClientId,EncryptionKey> reply=future.result();
+				final Map<ClientId,EncryptionKey> reply=future.result().getKeyMap();
 				assertEquals(expected.size(),reply.size());
 				for(final ClientId clientId : expected)
 				{
@@ -788,10 +788,10 @@ public class BroadcastNewContactIdentityTest
 				expected.put(new ClientId(newUser.getId(),1),encryptionKey1);
 				newUser.setClients(clients);
 				dataStore.put(i,newUser);
-				final Future<Map<ClientId,EncryptionKey>> result=new DefaultFutureResult<>();
+				final Future<MapClientIdEncryptionKey> result=new DefaultFutureResult<>();
 				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity1(new LongId(i),signature,result);
 				assertTrue(result.succeeded());
-				final Map<ClientId,EncryptionKey> reply=result.result();
+				final Map<ClientId,EncryptionKey> reply=result.result().getKeyMap();
 				for(final EncryptionKey e : reply.values())
 				{
 					e.bufferForBuffer().rewind();
@@ -836,7 +836,7 @@ public class BroadcastNewContactIdentityTest
 				clients.put(TypeConverter.convert(0),client0);
 				newUser.setClients(clients);
 				dataStore.put(i,newUser);
-				final Future<Map<ClientId,EncryptionKey>> result=new DefaultFutureResult<>();
+				final Future<MapClientIdEncryptionKey> result=new DefaultFutureResult<>();
 				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity1(new LongId(i),signature,result);
 				assertTrue(result.failed());
 				//noinspection ThrowableResultOfMethodCallIgnored

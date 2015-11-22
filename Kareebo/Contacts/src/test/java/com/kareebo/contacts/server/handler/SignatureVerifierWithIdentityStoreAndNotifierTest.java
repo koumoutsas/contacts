@@ -5,7 +5,7 @@ import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.Notification;
-import com.kareebo.contacts.thrift.NotificationMethod;
+import com.kareebo.contacts.thrift.ServiceMethod;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -26,7 +26,7 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 {
 	private final Notifier notifierBackend=new Notifier();
 	private final ClientId clientId=new ClientId(0,0);
-	private final NotificationMethod method=new NotificationMethod("a","b");
+	private final ServiceMethod method=new ServiceMethod("a","b");
 	private DataStore<Long,User> userDataStore;
 	private ClientNotifier clientNotifier;
 

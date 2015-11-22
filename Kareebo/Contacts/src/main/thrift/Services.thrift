@@ -184,14 +184,24 @@ struct EncryptedBufferPairSet
 	1:set<EncryptedBufferPair> encryptedBufferPairs,
 }
 
+struct MapClientIdEncryptionKey
+{
+	1:map<ClientId,EncryptionKey> keyMap,
+}
+
+struct SetEncryptedBuffer
+{
+	1:set<EncryptedBuffer> bufferSet,
+}
+
 service BroadcastNewContactIdentity
 {
 	// Steps 3-5
-	map<ClientId,EncryptionKey> broadcastNewContactIdentity1(1:LongId userIdB,2:SignatureBuffer signature) throws (1:FailedOperation
+	MapClientIdEncryptionKey broadcastNewContactIdentity1(1:LongId userIdB,2:SignatureBuffer signature) throws (1:FailedOperation
 	failedOperation),
 
 	// Steps 11-15
-	map<ClientId,EncryptionKey> broadcastNewContactIdentity2(1:EncryptedBufferPairSet encryptedBufferPairs,2:SignatureBuffer signature) throws
+	MapClientIdEncryptionKey broadcastNewContactIdentity2(1:EncryptedBufferPairSet encryptedBufferPairs,2:SignatureBuffer signature) throws
 	(1:FailedOperation failedOperation),
 
 	// Steps 19-21
@@ -237,6 +247,12 @@ service SendContactCard
 	// Step 19.a
 	EncryptedBufferSignedWithVerificationKey sendContactCard4(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation
 	failedOperation),
+}
+
+struct EncryptedBuffersWithHashBuffer
+{
+	1:set<EncryptedBuffer> buffers,
+	2:HashBuffer uB,
 }
 
 service SuggestNewContact

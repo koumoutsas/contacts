@@ -1,6 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.thrift.NotificationMethod;
+import com.kareebo.contacts.thrift.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -13,16 +13,16 @@ import java.nio.ByteBuffer;
 class NotificationObject
 {
 	final TBase object;
-	final private NotificationMethod method;
+	final private ServiceMethod method;
 	ByteBuffer payload;
 
-	NotificationObject(final NotificationMethod method,final TBase object)
+	NotificationObject(final ServiceMethod method,final TBase object)
 	{
 		this.method=method;
 		this.object=object;
 	}
 
-	NotificationMethod getMethod()
+	ServiceMethod getMethod()
 	{
 		return method;
 	}

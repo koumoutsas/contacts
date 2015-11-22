@@ -3,7 +3,7 @@ package com.kareebo.contacts.server.handler;
 import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.PendingNotification;
 import com.kareebo.contacts.thrift.FailedOperation;
-import com.kareebo.contacts.thrift.NotificationMethod;
+import com.kareebo.contacts.thrift.ServiceMethod;
 import org.apache.gora.store.DataStore;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
@@ -154,7 +154,7 @@ class ClientNotifier
 		 * @param id     The notification id
 		 * @throws SizeLimitExceeded If the payload is above the 2k limit
 		 */
-		Notification(final NotificationMethod method,final Long id) throws SizeLimitExceeded, TException
+		Notification(final ServiceMethod method,final Long id) throws SizeLimitExceeded, TException
 		{
 			super(method,id);
 			payloadBytes=new TSerializer().serialize(this);

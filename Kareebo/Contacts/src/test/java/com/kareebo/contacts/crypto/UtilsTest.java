@@ -47,7 +47,7 @@ public class UtilsTest
 		final ByteBuffer buffer=ByteBuffer.wrap(new X509EncodedKeySpec(
 			                                                              keyPair.getPublic().getEncoded
 				                                                                                  ())
-			                                        .getEncoded());
+				                                        .getEncoded());
 		buffer.mark();
 		verificationKey.setBuffer(buffer);
 		verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);

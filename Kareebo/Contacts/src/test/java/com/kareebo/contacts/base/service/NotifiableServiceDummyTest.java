@@ -1,10 +1,10 @@
 package com.kareebo.contacts.base.service;
 
-import com.kareebo.contacts.thrift.NotificationMethod;
+import com.kareebo.contacts.thrift.ServiceMethod;
 import org.junit.Test;
 
 /**
- * This test is only for achieving 100% test coverage for the {@link NotificationMethod} providers
+ * This test is only for achieving 100% test coverage for the {@link ServiceMethod} providers
  */
 public class NotifiableServiceDummyTest
 {
@@ -14,5 +14,10 @@ public class NotifiableServiceDummyTest
 		new BroadcastNewContactIdentity();
 		new SendContactCard();
 		new SuggestNewContact();
+		new ModifyKeys();
+		new ModifyUserAgent();
+		new RegisterIdentity();
+		new RegisterUnconfirmedIdentity();
+		new UpdateServerContactBook();
 	}
 }

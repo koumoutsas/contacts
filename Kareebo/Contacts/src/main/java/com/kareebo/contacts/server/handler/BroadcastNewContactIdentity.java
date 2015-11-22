@@ -38,10 +38,11 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	}
 
 	@Override
-	public void broadcastNewContactIdentity1(final LongId userIdB,final SignatureBuffer signature,final Future<Map<ClientId,EncryptionKey>>
+	public void broadcastNewContactIdentity1(final LongId userIdB,final SignatureBuffer signature,final Future<MapClientIdEncryptionKey>
 		                                                                                              future)
 	{
-		final Map<ClientId,EncryptionKey> reply=new HashMap<>();
+		final MapClientIdEncryptionKey reply=new MapClientIdEncryptionKey();
+		final Map<ClientId,EncryptionKey> replyMap=new HashMap<>();
 		verify(userIdB,signature,new Reply<>(future,reply),new After()
 		{
 			@Override
@@ -53,9 +54,9 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 				{
 					try
 					{
-						reply.put(new ClientId(userId,TypeConverter.convert(entry.getKey())),TypeConverter.convert(entry
-							                                                                                           .getValue().getKeys()
-							                                                                                           .getEncryption()));
+						replyMap.put(new ClientId(userId,TypeConverter.convert(entry.getKey())),TypeConverter.convert(entry
+							                                                                                              .getValue().getKeys()
+							                                                                                              .getEncryption()));
 					}
 					catch(NoSuchAlgorithmException e)
 					{
@@ -63,16 +64,18 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 						throw new FailedOperation();
 					}
 				}
+				reply.setKeyMap(replyMap);
 			}
 		});
 	}
 
 	@Override
 	public void broadcastNewContactIdentity2(final EncryptedBufferPairSet encryptedBufferPairs,final SignatureBuffer signature,final
-	Future<Map<ClientId,EncryptionKey>> future)
+	Future<MapClientIdEncryptionKey> future)
 	{
 		final Set<EncryptedBufferPair> encryptedBufferPairsSet=encryptedBufferPairs.getEncryptedBufferPairs();
-		final Map<ClientId,EncryptionKey> reply=new HashMap<>(encryptedBufferPairsSet.size());
+		final MapClientIdEncryptionKey reply=new MapClientIdEncryptionKey();
+		final Map<ClientId,EncryptionKey> replyMap=new HashMap<>(encryptedBufferPairsSet.size());
 		verify(encryptedBufferPairs,signature,new Reply<>(future,reply),new After()
 		{
 			@Override
@@ -91,7 +94,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 						{
 							if(Arrays.equals(IR,Utils.xor(com.kareebo.contacts.base.Utils.getBytes(c.getBuffer()),I)))
 							{
-								reply.put(clientIdB,TypeConverter.convert(clientB.getKeys().getEncryption()));
+								replyMap.put(clientIdB,TypeConverter.convert(clientB.getKeys().getEncryption()));
 								break;
 							}
 						}
@@ -105,6 +108,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 						logger.error("Invalid algorithm found for "+clientIdB,exception);
 					}
 				}
+				reply.setKeyMap(replyMap);
 			}
 		});
 	}

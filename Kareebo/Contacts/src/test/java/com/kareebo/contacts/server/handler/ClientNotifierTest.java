@@ -4,7 +4,7 @@ import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.PendingNotification;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.Notification;
-import com.kareebo.contacts.thrift.NotificationMethod;
+import com.kareebo.contacts.thrift.ServiceMethod;
 import com.kareebo.contacts.thrift.UserAgent;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -32,7 +32,7 @@ public class ClientNotifierTest
 	private final long deviceToken=94;
 	private final List<Long> deviceTokens=Arrays.asList(deviceToken,deviceToken+1);
 	final private UserAgent expected=new UserAgent("a","b");
-	final private NotificationMethod expectedMethod=new NotificationMethod("a","b");
+	final private ServiceMethod expectedMethod=new ServiceMethod("a","b");
 	final private NotificationObject notificationObject=new NotificationObject(expectedMethod,expected);
 	@Rule
 	public ExpectedException thrown=ExpectedException.none();
@@ -77,7 +77,7 @@ public class ClientNotifierTest
 			tmp.append('0');
 		}
 		thrown.expect(FailedOperation.class);
-		clientNotifier.put(deviceToken,new NotificationObject(new NotificationMethod(tmp.toString(),"1"),expected));
+		clientNotifier.put(deviceToken,new NotificationObject(new ServiceMethod(tmp.toString(),"1"),expected));
 		assertEquals(0,notifierBackend.size());
 		assertFalse(datastore.hasBeenClosed());
 	}

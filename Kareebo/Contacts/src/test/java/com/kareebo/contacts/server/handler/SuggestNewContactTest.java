@@ -48,7 +48,7 @@ public class SuggestNewContactTest
 				buffer.mark();
 				final com.kareebo.contacts.thrift.HashBuffer uB=new com.kareebo.contacts.thrift.HashBuffer(buffer,com.kareebo
 					                                                                                                  .contacts.thrift.HashAlgorithm.SHA256);
-				clientNotifier.put(deviceToken,new NotificationObject(new NotificationMethod("",""),uB));
+				clientNotifier.put(deviceToken,new NotificationObject(new ServiceMethod("",""),uB));
 				final LongId notificationId=new LongId(notifierBackend.getFirst().getId());
 				final HashIdentity identity=new HashIdentity();
 				identity.setHash(buffer);
@@ -87,7 +87,7 @@ public class SuggestNewContactTest
 				buffer.mark();
 				final com.kareebo.contacts.thrift.HashBuffer uB=new com.kareebo.contacts.thrift.HashBuffer(buffer,com.kareebo
 					                                                                                                  .contacts.thrift.HashAlgorithm.SHA256);
-				clientNotifier.put(deviceToken,new NotificationObject(new NotificationMethod("",""),uB));
+				clientNotifier.put(deviceToken,new NotificationObject(new ServiceMethod("",""),uB));
 				final LongId notificationId=new LongId(notifierBackend.getFirst().getId());
 				final HashIdentity identity=new HashIdentity();
 				identity.setHash(buffer);

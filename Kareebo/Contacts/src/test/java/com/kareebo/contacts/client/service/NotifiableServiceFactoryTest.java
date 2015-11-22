@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Unit test for {@link ServiceFactory}
  */
-public class ServiceFactoryTest
+public class NotifiableServiceFactoryTest
 {
 	final static long notificationIdExpected=0L;
 	final static ResultHandler<TBase> handlerExpected=new ResultHandler<TBase>()
@@ -98,7 +98,7 @@ public class ServiceFactoryTest
 			return null;
 		}
 	});
-	final private static String serviceName=ServiceImplementation.class.getName().substring(ServiceImplementation.class.getPackage().getName().length()+1);
+	final private static String serviceName=NotifiableServiceImplementation.class.getName().substring(NotifiableServiceImplementation.class.getPackage().getName().length()+1);
 	final private static NotificationMethod valid=new NotificationMethod(serviceName,"a");
 	final private static NotificationMethod invalid=new NotificationMethod(serviceName,"b");
 	@Rule
@@ -122,9 +122,9 @@ public class ServiceFactoryTest
 			handlerExpected);
 	}
 
-	public static class ServiceImplementation implements Service
+	public static class NotifiableServiceImplementation implements NotifiableService
 	{
-		public ServiceImplementation(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+		public NotifiableServiceImplementation(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 		{
 			assertEquals(clientManagerExpected,asyncClientManager);
 			assertEquals(signingKeyExpected,signingKey);

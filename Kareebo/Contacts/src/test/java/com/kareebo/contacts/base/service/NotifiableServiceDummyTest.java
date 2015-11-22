@@ -6,7 +6,7 @@ import org.junit.Test;
 /**
  * This test is only for achieving 100% test coverage for the {@link NotificationMethod} providers
  */
-public class ServiceDummyTest
+public class NotifiableServiceDummyTest
 {
 	@Test
 	public void test()

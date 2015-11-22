@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Client-side implementation of the suggest new contact service
  */
-public class SuggestNewContact extends Signer implements Service
+public class SuggestNewContact extends Signer implements NotifiableService
 {
 	final private com.kareebo.contacts.thrift.SuggestNewContact.VertxClient vertxClient;
 

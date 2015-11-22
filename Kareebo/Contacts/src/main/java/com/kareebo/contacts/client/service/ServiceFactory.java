@@ -15,7 +15,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 
 /**
- * Service factory returning a {@link Service} corresponding to a name
+ * Service factory returning a {@link NotifiableService} corresponding to a name
  */
 public class ServiceFactory
 {
@@ -38,14 +38,13 @@ public class ServiceFactory
 		{
 			final Class<?> serviceClass=Class.forName(packageName+method.getServiceName());
 			final Constructor<?> constructor=serviceClass.getConstructor(TAsyncClientManager.class,SigningKey.class,ClientId.class);
-			final Service service=(Service)constructor.newInstance(clientManager,signingKey,clientId);
-			service.run(method,notificationId,handler);
+			((NotifiableService)constructor.newInstance(clientManager,signingKey,clientId)).run(method,notificationId,handler);
 		}
 		catch(ClassNotFoundException|NoSuchMethodException|IllegalAccessException|InstantiationException|InvocationTargetException e)
 		{
 			throw new NoSuchService();
 		}
-		catch(Service.NoSuchMethod e)
+		catch(NotifiableService.NoSuchMethod e)
 		{
 			throw new NoSuchMethod();
 		}

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Unit test for {@link SimpleServiceHandler}
  */
-public class SimpleServiceHandlerTest
+public class SimpleNotifiableServiceHandlerTest
 {
 	@Test
 	public void testRun() throws Exception

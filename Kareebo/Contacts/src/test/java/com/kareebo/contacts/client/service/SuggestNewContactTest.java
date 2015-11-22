@@ -20,7 +20,7 @@ public class SuggestNewContactTest
 	public ExpectedException thrown=ExpectedException.none();
 
 	@Test
-	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
+	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, NotifiableService.NoSuchMethod
 	{
 		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(5);
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptionKeysWithHashBuffer>("id")
@@ -66,9 +66,9 @@ public class SuggestNewContactTest
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, Service.NoSuchMethod
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NotifiableService.NoSuchMethod
 			{
-				thrown.expect(Service.NoSuchMethod.class);
+				thrown.expect(NotifiableService.NoSuchMethod.class);
 				new SuggestNewContact(clientManager,signingKey,clientId).run(new NotificationMethod(com.kareebo.contacts
 					                                                                                    .base
 					                                                                                    .service.SuggestNewContact

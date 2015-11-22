@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Client-side implementation of the send contact card service
  */
-public class SendContactCard extends Signer implements Service
+public class SendContactCard extends Signer implements NotifiableService
 {
 	final private com.kareebo.contacts.thrift.SendContactCard.VertxClient vertxClient;
 

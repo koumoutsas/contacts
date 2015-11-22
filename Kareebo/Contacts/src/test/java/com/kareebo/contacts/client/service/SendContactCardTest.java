@@ -76,9 +76,9 @@ public class SendContactCardTest
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, Service.NoSuchMethod
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NotifiableService.NoSuchMethod
 			{
-				thrown.expect(Service.NoSuchMethod.class);
+				thrown.expect(NotifiableService.NoSuchMethod.class);
 				new SendContactCard(clientManager,signingKey,clientId).run(new NotificationMethod(com.kareebo.contacts
 					                                                                                  .base
 					                                                                                  .service.SendContactCard

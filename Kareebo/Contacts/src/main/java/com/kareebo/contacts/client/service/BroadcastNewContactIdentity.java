@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Client-side implementation of the broadcast new contact identity service
  */
-public class BroadcastNewContactIdentity extends Signer implements Service
+public class BroadcastNewContactIdentity extends Signer implements NotifiableService
 {
 	final private com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient vertxClient;
 

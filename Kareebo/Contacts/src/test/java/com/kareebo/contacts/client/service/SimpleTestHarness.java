@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
  */
 class SimpleTestHarness
 {
-	void test(final List<TestBase> tests) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, ServiceFactory.NoSuchService, Service.NoSuchMethod, ServiceFactory.NoSuchMethod
+	void test(final List<TestBase> tests) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, ServiceFactory.NoSuchService, NotifiableService.NoSuchMethod, ServiceFactory.NoSuchMethod
 	{
 		for(final TestBase test : tests)
 		{
@@ -43,13 +43,13 @@ class SimpleTestHarness
 		}
 
 		@Test
-		public void run() throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
+		public void run() throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, NotifiableService.NoSuchMethod
 		{
 			test(true);
 			test(false);
 		}
 
-		private void test(final boolean success) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, ServiceFactory.NoSuchService, Service.NoSuchMethod, ServiceFactory.NoSuchMethod
+		private void test(final boolean success) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, ServiceFactory.NoSuchService, NotifiableService.NoSuchMethod, ServiceFactory.NoSuchMethod
 		{
 			perform(clientManager(success),new SigningKey(keyPair.getPrivate(),algorithm),clientId,handler);
 			assertEquals(success,handler.succeeded);
@@ -57,7 +57,7 @@ class SimpleTestHarness
 
 		abstract void perform(final MyClientManager<T,E> clientManager,final SigningKey signingKey,final ClientId clientId,final
 		ResultHandler<E>
-			                                                                                                                   handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod;
+			                                                                                                                   handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, NotifiableService.NoSuchMethod;
 
 		abstract MyClientManager<T,E> clientManager(final boolean success);
 
@@ -199,7 +199,7 @@ class SimpleTestHarness
 
 		@Override
 		void perform(final MyClientManager<T,E> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<E>
-			                                                                                                          handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
+			                                                                                                          handler) throws NoSuchAlgorithmException, TException, NoSuchProviderException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, NotifiableService.NoSuchMethod
 		{
 			perform(construct(),clientManager,signingKey,clientId,handler);
 		}
@@ -208,7 +208,7 @@ class SimpleTestHarness
 			                                                                                                                    clientId,
 		                                final
 		                                ResultHandler<E> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException,
-			                                                                 InvalidKeyException, SignatureException, Service.NoSuchMethod, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod;
+			                                                                 InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, NotifiableService.NoSuchMethod;
 
 		abstract protected T construct();
 

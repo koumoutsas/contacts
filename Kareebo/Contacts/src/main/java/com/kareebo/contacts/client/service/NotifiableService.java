@@ -12,7 +12,7 @@ import java.security.SignatureException;
 /**
  * An interface for all services provided by the client
  */
-interface Service
+interface NotifiableService
 {
 	/**
 	 * Run a method based on its name and a notification id

@@ -20,7 +20,7 @@ public class BroadcastNewContactIdentityTest
 	public ExpectedException thrown=ExpectedException.none();
 
 	@Test
-	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, Service.NoSuchMethod
+	public void test() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, TException, InvalidKeyException, SignatureException, ServiceFactory.NoSuchService, ServiceFactory.NoSuchMethod, NotifiableService.NoSuchMethod
 	{
 		final List<SimpleTestHarness.TestBase> tests=new ArrayList<>(6);
 		tests.add(new SimpleTestHarness.LongIdTestBase<Map<ClientId,EncryptionKey>>("userIdB")
@@ -73,7 +73,7 @@ public class BroadcastNewContactIdentityTest
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, Service.NoSuchMethod
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NotifiableService.NoSuchMethod
 			{
 				new BroadcastNewContactIdentity(clientManager,signingKey,clientId).run(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3,object.getId(),new ResultConnectorReverse<>(handler));
 			}
@@ -97,9 +97,9 @@ public class BroadcastNewContactIdentityTest
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, Service.NoSuchMethod
+			protected void perform(final LongId object,final MockClientManager<EncryptedBufferSignedWithVerificationKey> clientManager,final SigningKey signingKey,final ClientId clientId,final ResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws NoSuchProviderException, TException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NotifiableService.NoSuchMethod
 			{
-				thrown.expect(Service.NoSuchMethod.class);
+				thrown.expect(NotifiableService.NoSuchMethod.class);
 				new BroadcastNewContactIdentity(clientManager,signingKey,clientId).run(new NotificationMethod(com.kareebo.contacts.base.service.BroadcastNewContactIdentity
 					                                                                                              .method3.getServiceName(),"random"),object.getId(),new ResultConnectorReverse<>(handler));
 			}

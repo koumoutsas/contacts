@@ -14,20 +14,24 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the modify keys service
  */
-public class ModifyKeys extends Signer
+public class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxClient>
 {
-	final private com.kareebo.contacts.thrift.ModifyKeys.VertxClient vertxClient;
-
 	public ModifyKeys(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(signingKey,clientId);
-		vertxClient=new com.kareebo.contacts.thrift.ModifyKeys.VertxClient(asyncClientManager);
+		super(asyncClientManager,signingKey,clientId);
+	}
+
+	@Override
+	protected com.kareebo.contacts.thrift.ModifyKeys.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	{
+		return new com.kareebo.contacts.thrift.ModifyKeys.VertxClient(asyncClientManager);
 	}
 
 	public void modifyKeys1(final PublicKeys newPublicKeys,final ResultHandler<Void> handler) throws TException, InvalidKeyException,
 		                                                                                                 NoSuchAlgorithmException,
 		                                                                                                 NoSuchProviderException, SignatureException
 	{
-		vertxClient.modifyKeys1(newPublicKeys,sign(newPublicKeys),new AsyncResultHandler<>(handler));
+		asyncClient.modifyKeys1(newPublicKeys,sign(newPublicKeys),new
+			                                                          AsyncResultHandler<>(handler));
 	}
 }

@@ -14,18 +14,21 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the modify user agent service
  */
-public class ModifyUserAgent extends Signer
+public class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient>
 {
-	final private com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient vertxClient;
-
 	public ModifyUserAgent(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(signingKey,clientId);
-		vertxClient=new com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient(asyncClientManager);
+		super(asyncClientManager,signingKey,clientId);
+	}
+
+	@Override
+	protected com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	{
+		return new com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient(asyncClientManager);
 	}
 
 	public void modifyUserAgent1(final UserAgent userAgent,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.modifyUserAgent1(userAgent,sign(userAgent),new AsyncResultHandler<>(handler));
+		asyncClient.modifyUserAgent1(userAgent,sign(userAgent),new AsyncResultHandler<>(handler));
 	}
 }

@@ -14,18 +14,21 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the register identity service
  */
-public class RegisterUnconfirmedIdentity extends Signer
+public class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient>
 {
-	final private com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient vertxClient;
-
 	public RegisterUnconfirmedIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(signingKey,clientId);
-		vertxClient=new com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient(asyncClientManager);
+		super(asyncClientManager,signingKey,clientId);
+	}
+
+	@Override
+	protected com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	{
+		return new com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient(asyncClientManager);
 	}
 
 	public void registerUnconfirmedIdentity1(final HashBufferSet uSet,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.registerUnconfirmedIdentity1(uSet,sign(uSet),new AsyncResultHandler<>(handler));
+		asyncClient.registerUnconfirmedIdentity1(uSet,sign(uSet),new AsyncResultHandler<>(handler));
 	}
 }

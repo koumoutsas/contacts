@@ -16,19 +16,22 @@ import java.util.Set;
 /**
  * Client-side implementation of the send contact card service
  */
-public class SendContactCard extends Signer implements NotifiableService
+public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendContactCard.VertxClient> implements NotifiableService
 {
-	final private com.kareebo.contacts.thrift.SendContactCard.VertxClient vertxClient;
-
 	public SendContactCard(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(signingKey,clientId);
-		vertxClient=new com.kareebo.contacts.thrift.SendContactCard.VertxClient(asyncClientManager);
+		super(asyncClientManager,signingKey,clientId);
+	}
+
+	@Override
+	protected com.kareebo.contacts.thrift.SendContactCard.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	{
+		return new com.kareebo.contacts.thrift.SendContactCard.VertxClient(asyncClientManager);
 	}
 
 	public void sendContactCard1(final HashBuffer u,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.sendContactCard1(u,sign(u),new AsyncResultHandler<>(handler));
+		asyncClient.sendContactCard1(u,sign(u),new AsyncResultHandler<>(handler));
 	}
 
 	public void sendContactCard3(final Set<EncryptedBuffer> encryptedBuffers,final ResultHandler<Void> handler) throws InvalidKeyException,
@@ -40,7 +43,7 @@ public class SendContactCard extends Signer implements NotifiableService
 		{
 			encryptedBufferSignedSet.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
 		}
-		vertxClient.sendContactCard3(encryptedBufferSignedSet,new AsyncResultHandler<>(handler));
+		asyncClient.sendContactCard3(encryptedBufferSignedSet,new AsyncResultHandler<>(handler));
 	}
 
 	@Override
@@ -63,12 +66,12 @@ public class SendContactCard extends Signer implements NotifiableService
 	private void sendContactCard2(final long id,final AsyncResultHandler<EncryptionKeys> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		final LongId longId=new LongId(id);
-		vertxClient.sendContactCard2(longId,sign(longId),handler);
+		asyncClient.sendContactCard2(longId,sign(longId),handler);
 	}
 
 	private void sendContactCard4(final long id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		final LongId longId=new LongId(id);
-		vertxClient.sendContactCard4(longId,sign(longId),handler);
+		asyncClient.sendContactCard4(longId,sign(longId),handler);
 	}
 }

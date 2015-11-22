@@ -16,14 +16,17 @@ import java.util.Set;
 /**
  * Client-side implementation of the suggest new contact service
  */
-public class SuggestNewContact extends Signer implements NotifiableService
+public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.SuggestNewContact.VertxClient> implements NotifiableService
 {
-	final private com.kareebo.contacts.thrift.SuggestNewContact.VertxClient vertxClient;
-
 	public SuggestNewContact(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(signingKey,clientId);
-		vertxClient=new com.kareebo.contacts.thrift.SuggestNewContact.VertxClient(asyncClientManager);
+		super(asyncClientManager,signingKey,clientId);
+	}
+
+	@Override
+	protected com.kareebo.contacts.thrift.SuggestNewContact.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	{
+		return new com.kareebo.contacts.thrift.SuggestNewContact.VertxClient(asyncClientManager);
 	}
 
 	public void suggestNewContact2(final Set<EncryptedBuffer> encryptedBuffers,final HashBuffer uB,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
@@ -33,7 +36,7 @@ public class SuggestNewContact extends Signer implements NotifiableService
 		{
 			encryptedBufferSignedSet.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
 		}
-		vertxClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),new AsyncResultHandler<>(handler));
+		asyncClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),new AsyncResultHandler<>(handler));
 	}
 
 	@Override
@@ -56,12 +59,12 @@ public class SuggestNewContact extends Signer implements NotifiableService
 	private void suggestNewContact1(final long id,final AsyncResultHandler<EncryptionKeysWithHashBuffer> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		final LongId longId=new LongId(id);
-		vertxClient.suggestNewContact1(longId,sign(longId),handler);
+		asyncClient.suggestNewContact1(longId,sign(longId),handler);
 	}
 
 	private void suggestNewContact3(final long id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		final LongId longId=new LongId(id);
-		vertxClient.suggestNewContact3(longId,sign(longId),handler);
+		asyncClient.suggestNewContact3(longId,sign(longId),handler);
 	}
 }

@@ -16,28 +16,31 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the register identity service
  */
-public class RegisterIdentity extends Signer
+public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdentity.VertxClient>
 {
-	final private com.kareebo.contacts.thrift.RegisterIdentity.VertxClient vertxClient;
-
 	public RegisterIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(signingKey,clientId);
-		vertxClient=new com.kareebo.contacts.thrift.RegisterIdentity.VertxClient(asyncClientManager);
+		super(asyncClientManager,signingKey,clientId);
+	}
+
+	@Override
+	protected com.kareebo.contacts.thrift.RegisterIdentity.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	{
+		return new com.kareebo.contacts.thrift.RegisterIdentity.VertxClient(asyncClientManager);
 	}
 
 	public void registerIdentity1(final HashBuffer uA,final ResultHandler<RegisterIdentityReply> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.registerIdentity1(uA,sign(uA),new AsyncResultHandler<>(handler));
+		asyncClient.registerIdentity1(uA,sign(uA),new AsyncResultHandler<>(handler));
 	}
 
 	public void registerIdentity2(final long userIdA,final ResultHandler<RegisterIdentityReply> handler)
 	{
-		vertxClient.registerIdentity2(userIdA,new AsyncResultHandler<>(handler));
+		asyncClient.registerIdentity2(userIdA,new AsyncResultHandler<>(handler));
 	}
 
 	public void registerIdentity3(final RegisterIdentityInput registerIdentityInput,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.registerIdentity3(registerIdentityInput,sign(registerIdentityInput),new AsyncResultHandler<>(handler));
+		asyncClient.registerIdentity3(registerIdentityInput,sign(registerIdentityInput),new AsyncResultHandler<>(handler));
 	}
 }

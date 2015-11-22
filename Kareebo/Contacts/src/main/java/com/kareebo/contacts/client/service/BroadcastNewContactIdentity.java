@@ -17,25 +17,29 @@ import java.util.Set;
 /**
  * Client-side implementation of the broadcast new contact identity service
  */
-public class BroadcastNewContactIdentity extends Signer implements NotifiableService
+public class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient> implements
+                                                                                                                              NotifiableService
 {
-	final private com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient vertxClient;
-
 	public BroadcastNewContactIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(signingKey,clientId);
-		vertxClient=new com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient(asyncClientManager);
+		super(asyncClientManager,signingKey,clientId);
+	}
+
+	@Override
+	protected com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	{
+		return new com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient(asyncClientManager);
 	}
 
 	public void broadcastNewContactIdentity1(final LongId userIdB,final ResultHandler<Map<ClientId,EncryptionKey>> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.broadcastNewContactIdentity1(userIdB,sign(userIdB),new AsyncResultHandler<>(handler));
+		asyncClient.broadcastNewContactIdentity1(userIdB,sign(userIdB),new AsyncResultHandler<>(handler));
 	}
 
 	public void broadcastNewContactIdentity2(final EncryptedBufferPairSet encryptedBufferPairs,final ResultHandler<Map<ClientId,
 		                                                                                                                  EncryptionKey>> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.broadcastNewContactIdentity2(encryptedBufferPairs,sign(encryptedBufferPairs),new AsyncResultHandler<>(handler));
+		asyncClient.broadcastNewContactIdentity2(encryptedBufferPairs,sign(encryptedBufferPairs),new AsyncResultHandler<>(handler));
 	}
 
 	public void broadcastNewContactIdentity3(final Set<EncryptedBuffer> encryptedBuffers,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
@@ -45,12 +49,12 @@ public class BroadcastNewContactIdentity extends Signer implements NotifiableSer
 		{
 			set.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
 		}
-		vertxClient.broadcastNewContactIdentity3(set,new AsyncResultHandler<>(handler));
+		asyncClient.broadcastNewContactIdentity3(set,new AsyncResultHandler<>(handler));
 	}
 
 	public void broadcastNewContactIdentity5(final HashBufferPair uCs,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.broadcastNewContactIdentity5(uCs,sign(uCs),new AsyncResultHandler<>(handler));
+		asyncClient.broadcastNewContactIdentity5(uCs,sign(uCs),new AsyncResultHandler<>(handler));
 	}
 
 	@Override
@@ -69,6 +73,6 @@ public class BroadcastNewContactIdentity extends Signer implements NotifiableSer
 	private void broadcastNewContactIdentity4(final long id,final AsyncResultHandler<EncryptedBufferSignedWithVerificationKey> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		final LongId longId=new LongId(id);
-		vertxClient.broadcastNewContactIdentity4(longId,sign(longId),handler);
+		asyncClient.broadcastNewContactIdentity4(longId,sign(longId),handler);
 	}
 }

@@ -14,18 +14,21 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the update server contact book service.
  */
-public class UpdateServerContactBook extends Signer
+public class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient>
 {
-	final private com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient vertxClient;
-
 	public UpdateServerContactBook(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(signingKey,clientId);
-		vertxClient=new com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient(asyncClientManager);
+		super(asyncClientManager,signingKey,clientId);
+	}
+
+	@Override
+	protected com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	{
+		return new com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient(asyncClientManager);
 	}
 
 	public void updateServerContactBook1(final ContactOperationSet contactOperationSet,final ResultHandler<Void> handler) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		vertxClient.updateServerContactBook1(contactOperationSet,sign(contactOperationSet),new AsyncResultHandler<>(handler));
+		asyncClient.updateServerContactBook1(contactOperationSet,sign(contactOperationSet),new AsyncResultHandler<>(handler));
 	}
 }

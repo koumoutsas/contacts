@@ -1,6 +1,6 @@
 package com.kareebo.contacts.base.service;
 
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 
 /**
  * Utility for providing client and server side service implementations with common method names

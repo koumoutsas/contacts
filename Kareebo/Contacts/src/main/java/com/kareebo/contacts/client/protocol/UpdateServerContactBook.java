@@ -1,10 +1,11 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.dataStructures.SigningKey;
-import com.kareebo.contacts.client.jobs.Enqueuer;
+import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.ContactOperationSet;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -31,11 +32,11 @@ class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.Update
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuer enqueuer) throws Exception
+	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
 		if(method.equals(com.kareebo.contacts.base.service.UpdateServerContactBook.method0))
 		{
-			updateServerContactBook1((ContactOperationSet)payload,enqueuer);
+			updateServerContactBook1((ContactOperationSet)payload,finalResultEnqueuer);
 		}
 		else
 		{
@@ -43,7 +44,8 @@ class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.Update
 		}
 	}
 
-	private void updateServerContactBook1(final ContactOperationSet contactOperationSet,final Enqueuer enqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	private void updateServerContactBook1(final ContactOperationSet contactOperationSet,final FinalResultEnqueuer enqueuer) throws InvalidKeyException,
+		                                                                                                                               TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		asyncClient.updateServerContactBook1(contactOperationSet,sign(contactOperationSet),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service.UpdateServerContactBook.method1));
 	}

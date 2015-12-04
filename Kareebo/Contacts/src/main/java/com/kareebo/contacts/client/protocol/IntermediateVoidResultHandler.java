@@ -1,20 +1,20 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.jobs.Enqueuer;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 
 /**
  * Implementation of {@link ResultHandler} for {@link Void} when the result is not final
  */
 class IntermediateVoidResultHandler extends ResultHandler<Void>
 {
-	IntermediateVoidResultHandler(final Enqueuer enqueuer,final ServiceMethod method)
+	IntermediateVoidResultHandler(final ErrorEnqueuer enqueuer,final ServiceMethod method)
 	{
 		super(enqueuer,method);
 	}
 
 	@Override
-	void handleSuccess(final Void result)
+	protected void handleSuccess(final Void result)
 	{
 	}
 }

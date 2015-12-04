@@ -1,10 +1,11 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.dataStructures.SigningKey;
-import com.kareebo.contacts.client.jobs.Enqueuer;
+import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.HashBufferSet;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -31,11 +32,12 @@ class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.Re
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuer enqueuer) throws Exception
+	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
+	FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
 		if(method.equals(com.kareebo.contacts.base.service.RegisterUnconfirmedIdentity.method0))
 		{
-			registerUnconfirmedIdentity1((HashBufferSet)payload,enqueuer);
+			registerUnconfirmedIdentity1((HashBufferSet)payload,finalResultEnqueuer);
 		}
 		else
 		{
@@ -43,7 +45,8 @@ class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.Re
 		}
 	}
 
-	private void registerUnconfirmedIdentity1(final HashBufferSet uSet,final Enqueuer enqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	private void registerUnconfirmedIdentity1(final HashBufferSet uSet,final FinalResultEnqueuer enqueuer) throws InvalidKeyException, TException,
+		                                                                                                              NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		asyncClient.registerUnconfirmedIdentity1(uSet,sign(uSet),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service
 			                                                                                         .RegisterUnconfirmedIdentity.method1));

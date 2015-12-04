@@ -1,6 +1,7 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.junit.Test;
 
@@ -23,13 +24,13 @@ public class ModifyKeysTest
 			protected ServiceMethod getServiceMethod()
 			{
 				return com.kareebo.contacts.base.service.ModifyKeys.method0;
-			}			@Override
+			}
+
+			@Override
 			protected boolean isFinal()
 			{
 				return true;
 			}
-
-
 
 			@Override
 			TBase constructPayload()

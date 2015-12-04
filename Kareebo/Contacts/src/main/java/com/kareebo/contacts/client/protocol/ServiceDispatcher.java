@@ -1,7 +1,7 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.dataStructures.SigningKey;
-import com.kareebo.contacts.client.jobs.Enqueuer;
+import com.kareebo.contacts.client.jobs.Enqueuers;
 import com.kareebo.contacts.thrift.ClientId;
 import org.apache.thrift.async.TAsyncClientManager;
 
@@ -16,9 +16,9 @@ public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceD
 	final private SigningKey signingKey;
 	final private ClientId clientId;
 
-	public ServiceDispatcher(final Enqueuer enqueuer,final TAsyncClientManager clientManager,final SigningKey signingKey,final ClientId clientId)
+	public ServiceDispatcher(final Enqueuers enqueuers,final TAsyncClientManager clientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(enqueuer);
+		super(enqueuers);
 		this.clientManager=clientManager;
 		this.signingKey=signingKey;
 		this.clientId=clientId;

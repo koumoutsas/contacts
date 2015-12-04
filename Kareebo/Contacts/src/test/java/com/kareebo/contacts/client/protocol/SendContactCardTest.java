@@ -1,6 +1,7 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -24,13 +25,13 @@ public class SendContactCardTest
 			protected ServiceMethod getServiceMethod()
 			{
 				return com.kareebo.contacts.base.service.SendContactCard.method0;
-			}			@Override
+			}
+
+			@Override
 			protected ServiceMethod nextServiceMethod()
 			{
 				return null;
 			}
-
-
 		});
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptionKeys>("id")
 		{

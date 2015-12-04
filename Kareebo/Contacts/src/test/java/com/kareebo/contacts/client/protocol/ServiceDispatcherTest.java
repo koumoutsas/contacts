@@ -1,12 +1,15 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.dataStructures.SigningKey;
-import com.kareebo.contacts.client.jobs.Enqueuer;
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
+import com.kareebo.contacts.client.jobs.Enqueuers;
+import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
-import com.kareebo.contacts.thrift.ServiceMethod;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.async.TAsyncClient;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -32,6 +35,7 @@ public class ServiceDispatcherTest
 {
 	final static long notificationIdExpected=0L;
 	final static EnqueuerImplementation enqueuerExpected=new EnqueuerImplementation();
+	final static Enqueuers enqueuers=new Enqueuers(JobType.Protocol,enqueuerExpected,enqueuerExpected);
 	final private static SigningKey signingKeyExpected=new SigningKey(new PrivateKey()
 	{
 		@Override
@@ -100,13 +104,13 @@ public class ServiceDispatcherTest
 	@Test
 	public void testRun() throws Exception
 	{
-		final ServiceDispatcher serviceDispatcher=new ServiceDispatcher(enqueuerExpected,clientManagerExpected,signingKeyExpected,
+		final ServiceDispatcher serviceDispatcher=new ServiceDispatcher(enqueuers,clientManagerExpected,signingKeyExpected,
 			                                                               clientIdExpected);
 		serviceDispatcher.run(valid,notificationIdExpected);
 		final LongId longId=new LongId(notificationIdExpected);
-		assertTrue(enqueuerExpected.job(valid,longId));
+		assertTrue(enqueuerExpected.hasJob(JobType.Protocol,valid,longId));
 		serviceDispatcher.run(valid,longId);
-		assertTrue(enqueuerExpected.job(valid,longId));
+		assertTrue(enqueuerExpected.hasJob(JobType.Protocol,valid,longId));
 		thrown.expect(Service.NoSuchMethod.class);
 		serviceDispatcher.run(invalid,notificationIdExpected);
 	}
@@ -133,11 +137,12 @@ public class ServiceDispatcherTest
 		}
 
 		@Override
-		protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuer enqueuer) throws Exception
+		protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 		{
 			assertEquals(notificationIdExpected,((LongId)payload).getId());
-			assertEquals(enqueuerExpected,enqueuer);
-			enqueuer.processor(method,payload);
+			assertEquals(enqueuerExpected,intermediateResultEnqueuer);
+			assertEquals(enqueuerExpected,finalResultEnqueuer);
+			enqueuerExpected.enqueue(JobType.Protocol,method,payload);
 			if(!method.equals(valid))
 			{
 				throw new NoSuchMethod();

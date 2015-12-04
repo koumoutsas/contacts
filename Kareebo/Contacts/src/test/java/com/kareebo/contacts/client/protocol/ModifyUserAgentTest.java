@@ -1,8 +1,8 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.thrift.PublicKeys;
-import com.kareebo.contacts.thrift.ServiceMethod;
 import com.kareebo.contacts.thrift.UserAgent;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.junit.Test;
 

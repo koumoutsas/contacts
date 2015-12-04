@@ -3,7 +3,7 @@ package com.kareebo.contacts.client.protocol;
 import com.kareebo.contacts.thrift.HashAlgorithm;
 import com.kareebo.contacts.thrift.HashBuffer;
 import com.kareebo.contacts.thrift.HashBufferSet;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.junit.Test;
 

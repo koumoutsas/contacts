@@ -1,64 +1,65 @@
 package com.kareebo.contacts.client.jobs;
 
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.apache.thrift.TBase;
 
-import static org.junit.Assert.fail;
-
-public class EnqueuerImplementation implements Enqueuer
+public class EnqueuerImplementation implements FinalResultEnqueuer, IntermediateResultEnqueuer
 {
-	private Throwable cause;
+	private ErrorCode errorCode;
+	private SuccessCode successCode;
 	private ServiceMethod method;
 	private TBase payload;
+	private JobType jobType;
 
-	public boolean job(final ServiceMethod method,final TBase payload)
+	public boolean hasJob(final JobType type,final ServiceMethod method,final TBase payload)
 	{
-		return cause==null&&method.equals(this.method)&&(this.payload==null?payload==null:this.payload.equals(payload));
+		return type==jobType&&errorCode==null&&method.equals(this.method)&&(this.payload==null?payload==null:this.payload.equals(payload));
 	}
 
-	public boolean error(final ServiceMethod method,final Throwable cause)
+	public boolean isError(final JobType type,final ServiceMethod method,final ErrorCode errorCode)
 	{
-		return payload==null&&this.method.equals(method)&&(this.cause==null?cause==null:this.cause.equals(cause));
+		return type==jobType&&payload==null&&this.method.equals(method)&&(this.errorCode==null?errorCode==null:this.errorCode.equals(errorCode));
 	}
 
-	@Override
-	public void processorError(final ServiceMethod method,final Throwable cause)
+	public boolean isSuccess(final JobType type,final ServiceMethod method,final SuccessCode successCode)
 	{
-		fail();
-	}
-
-	@Override
-	public void protocolError(final ServiceMethod method,final Throwable cause)
-	{
-		this.method=method;
-		this.cause=cause;
-		this.payload=null;
-	}
-
-	@Override
-	public void success(final String service)
-	{
-		this.cause=null;
-		this.method=new ServiceMethod(service,null);
-		this.payload=null;
-	}
-
-	@Override
-	public void processor(final ServiceMethod method,final TBase payload)
-	{
-		this.cause=null;
-		this.method=method;
-		this.payload=payload;
-	}
-
-	@Override
-	public void protocol(final ServiceMethod method,final TBase payload)
-	{
-		fail();
+		return type==jobType&&payload==null&&this.method.equals(method)&&(this.successCode==null?successCode==null:this.successCode.equals
+			                                                                                                                          (successCode));
 	}
 
 	public boolean initialState()
 	{
-		return method==null&&cause==null&&payload==null;
+		return method==null&&errorCode==null&&payload==null&&jobType==null;
+	}
+
+	@Override
+	public void success(final JobType type,final String service,final SuccessCode result)
+	{
+		set(null,result,new ServiceMethod(service,null),null,type);
+	}
+
+	private void set(final ErrorCode errorCode,final SuccessCode successCode,final ServiceMethod serviceMethod,final TBase payload,final
+	JobType jobType)
+	{
+		this.errorCode=errorCode;
+		this.successCode=successCode;
+		method=serviceMethod;
+		this.payload=payload;
+		this.jobType=jobType;
+	}
+
+	@Override
+	public void error(final JobType type,final ServiceMethod method,final ErrorCode error)
+	{
+		set(error,null,method,null,type);
+	}
+
+	@Override
+	public void enqueue(final JobType type,final ServiceMethod method,final TBase payload)
+	{
+		set(null,null,method,payload,type);
 	}
 }

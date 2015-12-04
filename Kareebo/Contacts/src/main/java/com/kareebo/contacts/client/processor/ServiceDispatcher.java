@@ -1,6 +1,6 @@
 package com.kareebo.contacts.client.processor;
 
-import com.kareebo.contacts.client.jobs.Enqueuer;
+import com.kareebo.contacts.client.jobs.Enqueuers;
 import com.kareebo.contacts.client.jobs.Service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -10,9 +10,9 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
 {
-	public ServiceDispatcher(final Enqueuer enqueuer)
+	public ServiceDispatcher(final Enqueuers enqueuers)
 	{
-		super(enqueuer);
+		super(enqueuers);
 	}
 
 	@Override

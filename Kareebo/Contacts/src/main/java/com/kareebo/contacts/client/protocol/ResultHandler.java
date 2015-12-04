@@ -1,20 +1,22 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.jobs.Enqueuer;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
+import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.vertx.java.core.AsyncResult;
 
 /**
- * Implementation of {@link org.vertx.java.core.AsyncResultHandler} using {@link Enqueuer}
+ * Implementation of {@link org.vertx.java.core.AsyncResultHandler} using {@link ErrorEnqueuer}
  */
 abstract class ResultHandler<T> implements org.vertx.java.core.AsyncResultHandler<T>
 {
-	final protected Enqueuer enqueuer;
+	final protected ErrorEnqueuer errorEnqueuer;
 	final protected ServiceMethod method;
 
-	ResultHandler(final Enqueuer enqueuer,final ServiceMethod method)
+	ResultHandler(final ErrorEnqueuer errorEnqueuer,final ServiceMethod method)
 	{
-		this.enqueuer=enqueuer;
+		this.errorEnqueuer=errorEnqueuer;
 		this.method=method;
 	}
 
@@ -23,7 +25,7 @@ abstract class ResultHandler<T> implements org.vertx.java.core.AsyncResultHandle
 	{
 		if(event.failed())
 		{
-			enqueuer.protocolError(method,event.cause());
+			errorEnqueuer.error(JobType.Protocol,method,ErrorCode.Failure);
 		}
 		else
 		{
@@ -31,5 +33,5 @@ abstract class ResultHandler<T> implements org.vertx.java.core.AsyncResultHandle
 		}
 	}
 
-	abstract void handleSuccess(final T result);
+	abstract protected void handleSuccess(final T result);
 }

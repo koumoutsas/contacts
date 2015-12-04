@@ -1,7 +1,9 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.jobs.Enqueuer;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 
 /**
@@ -9,14 +11,17 @@ import org.apache.thrift.TBase;
  */
 class IntermediateResultHandler<T extends TBase> extends ResultHandler<T>
 {
-	IntermediateResultHandler(final Enqueuer enqueuer,final ServiceMethod method)
+	final private IntermediateResultEnqueuer intermediateResultEnqueuer;
+
+	IntermediateResultHandler(final IntermediateResultEnqueuer intermediateResultEnqueuer,final ErrorEnqueuer errorEnqueuer,final ServiceMethod method)
 	{
-		super(enqueuer,method);
+		super(errorEnqueuer,method);
+		this.intermediateResultEnqueuer=intermediateResultEnqueuer;
 	}
 
 	@Override
-	void handleSuccess(final T result)
+	protected void handleSuccess(final T result)
 	{
-		enqueuer.processor(method,result);
+		intermediateResultEnqueuer.enqueue(JobType.Protocol,method,result);
 	}
 }

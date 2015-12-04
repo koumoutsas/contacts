@@ -1,10 +1,11 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.dataStructures.SigningKey;
-import com.kareebo.contacts.client.jobs.Enqueuer;
+import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.PublicKeys;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -31,11 +32,12 @@ class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxCli
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuer enqueuer) throws Exception
+	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,
+	                           final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
 		if(method.equals(com.kareebo.contacts.base.service.ModifyKeys.method0))
 		{
-			modifyKeys1((PublicKeys)payload,enqueuer);
+			modifyKeys1((PublicKeys)payload,finalResultEnqueuer);
 		}
 		else
 		{
@@ -43,9 +45,9 @@ class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxCli
 		}
 	}
 
-	private void modifyKeys1(final PublicKeys newPublicKeys,final Enqueuer enqueuer) throws TException, InvalidKeyException,
-		                                                                                        NoSuchAlgorithmException,
-		                                                                                        NoSuchProviderException, SignatureException
+	private void modifyKeys1(final PublicKeys newPublicKeys,final FinalResultEnqueuer enqueuer) throws TException, InvalidKeyException,
+		                                                                                                   NoSuchAlgorithmException,
+		                                                                                                   NoSuchProviderException, SignatureException
 	{
 		asyncClient.modifyKeys1(newPublicKeys,sign(newPublicKeys),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service
 			                                                                                          .ModifyKeys.method1));

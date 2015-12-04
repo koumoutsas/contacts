@@ -1,29 +1,26 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.jobs.Enqueuer;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 
 /**
  * Implementation of {@link ResultHandler} that notifies for success
  */
 class FinalResultHandler extends ResultHandler<Void>
 {
-	FinalResultHandler(final Enqueuer enqueuer,final ServiceMethod method)
+	final private FinalResultEnqueuer enqueuer;
+
+	FinalResultHandler(final FinalResultEnqueuer enqueuer,final ServiceMethod method)
 	{
 		super(enqueuer,method);
-	}
-
-	/**
-	 * Signal that the result is done. Alias for {@link #handleSuccess(Object)} with parameter null
-	 */
-	void done()
-	{
-		handleSuccess(null);
+		this.enqueuer=enqueuer;
 	}
 
 	@Override
-	void handleSuccess(final Void result)
+	protected void handleSuccess(final Void result)
 	{
-		enqueuer.success(method.getServiceName());
+		enqueuer.success(JobType.Protocol,method.getServiceName(),SuccessCode.Ok);
 	}
 }

@@ -1,7 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.thrift.FailedOperation;
-import com.kareebo.contacts.thrift.Notification;
+import com.kareebo.contacts.thrift.client.jobs.Notification;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;

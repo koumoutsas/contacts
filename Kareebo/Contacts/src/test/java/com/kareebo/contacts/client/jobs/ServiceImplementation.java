@@ -1,6 +1,7 @@
 package com.kareebo.contacts.client.jobs;
 
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 
 /**
@@ -21,11 +22,11 @@ public class ServiceImplementation extends Service
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuer enqueuer) throws Exception
+	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws Exception
 	{
 		if(error==null)
 		{
-			enqueuer.processor(method,payload);
+			enqueuers.intermediateResultEnqueuer(JobType.Protocol).enqueue(JobType.Protocol,method,payload);
 		}
 		else
 		{

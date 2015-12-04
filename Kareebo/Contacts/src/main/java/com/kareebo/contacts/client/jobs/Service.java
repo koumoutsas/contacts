@@ -1,6 +1,6 @@
 package com.kareebo.contacts.client.jobs;
 
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,17 +15,17 @@ abstract public class Service
 	/**
 	 * Run a method based on its name and a payload
 	 *
-	 * @param method   The method to be called
-	 * @param payload  The method payload
-	 * @param enqueuer The resulting job enqueuer
+	 * @param method    The method to be called
+	 * @param payload   The method payload
+	 * @param enqueuers The available job enqueuers
 	 * @throws NoSuchMethod    When the method cannot be found
 	 * @throws ExecutionFailed When the method was invoked, but its execution failed
 	 */
-	void run(final ServiceMethod method,final TBase payload,final Enqueuer enqueuer) throws NoSuchMethod, ExecutionFailed
+	void run(final ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws NoSuchMethod, ExecutionFailed
 	{
 		try
 		{
-			runInternal(method,payload,enqueuer);
+			runInternal(method,payload,enqueuers);
 		}
 		catch(NoSuchMethod e)
 		{
@@ -47,7 +47,7 @@ abstract public class Service
 		}
 	}
 
-	abstract protected void runInternal(ServiceMethod method,TBase payload,Enqueuer enqueuer) throws Exception;
+	abstract protected void runInternal(ServiceMethod method,TBase payload,Enqueuers enqueuers) throws Exception;
 
 	/// Exception thrown when a method cannot be found
 	public static class NoSuchMethod extends Exception

@@ -1,9 +1,12 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.jobs.Enqueuer;
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
+import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.thrift.FailedOperation;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.junit.Test;
 import org.vertx.java.core.AsyncResult;
 
@@ -19,15 +22,18 @@ public class ResultHandlerTest
 	{
 		class MyResultHandler extends ResultHandler<Void>
 		{
-			MyResultHandler(final Enqueuer enqueuer,final ServiceMethod method)
+			final private FinalResultEnqueuer enqueuer;
+
+			MyResultHandler(final FinalResultEnqueuer enqueuer,final ServiceMethod method)
 			{
 				super(enqueuer,method);
+				this.enqueuer=enqueuer;
 			}
 
 			@Override
-			void handleSuccess(final Void result)
+			protected void handleSuccess(final Void result)
 			{
-				enqueuer.success(method.getServiceName());
+				enqueuer.success(JobType.Protocol,method.getServiceName(),SuccessCode.Ok);
 			}
 		}
 		final ServiceMethod method=new ServiceMethod("a","b");
@@ -59,7 +65,7 @@ public class ResultHandlerTest
 				return false;
 			}
 		});
-		assertTrue(enqueuer.job(new ServiceMethod(method.getServiceName(),null),null));
+		assertTrue(enqueuer.isSuccess(JobType.Protocol,new ServiceMethod(method.getServiceName(),null),SuccessCode.Ok));
 		resultHandler.handle(new AsyncResult<Void>()
 		{
 			@Override
@@ -86,6 +92,6 @@ public class ResultHandlerTest
 				return true;
 			}
 		});
-		assertTrue(enqueuer.error(method,new FailedOperation()));
+		assertTrue(enqueuer.isError(JobType.Protocol,method,ErrorCode.Failure));
 	}
 }

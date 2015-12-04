@@ -1,8 +1,8 @@
 package com.kareebo.contacts.client.jobs;
 
 import com.kareebo.contacts.thrift.LongId;
-import com.kareebo.contacts.thrift.ServiceMethod;
 import com.kareebo.contacts.thrift.UserAgent;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -26,7 +26,7 @@ public class ServiceDispatcherTest
 	{
 		final UserAgent userAgent=new UserAgent("a","b");
 		new ServiceDispatcherImplementation(enqueuer).run(method,userAgent);
-		assertTrue(enqueuer.job(method,userAgent));
+		assertTrue(enqueuer.hasJob(ServiceDispatcherImplementation.jobType(),method,userAgent));
 	}
 
 	@Test
@@ -34,7 +34,7 @@ public class ServiceDispatcherTest
 	{
 		final LongId id=new LongId(4);
 		new ServiceDispatcherImplementation(enqueuer).run(method,id.getId());
-		assertTrue(enqueuer.job(method,id));
+		assertTrue(enqueuer.hasJob(ServiceDispatcherImplementation.jobType(),method,id));
 	}
 
 	@Test

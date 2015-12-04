@@ -1,5 +1,7 @@
 package com.kareebo.contacts.client.jobs;
 
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -16,8 +18,13 @@ public class ServiceDispatcherImplementation extends ServiceDispatcher
 
 	public ServiceDispatcherImplementation(final EnqueuerImplementation enqueuer,final Exception error)
 	{
-		super(enqueuer);
+		super(new Enqueuers(jobType(),enqueuer,enqueuer));
 		this.error=error;
+	}
+
+	static JobType jobType()
+	{
+		return JobType.Protocol;
 	}
 
 	@Override

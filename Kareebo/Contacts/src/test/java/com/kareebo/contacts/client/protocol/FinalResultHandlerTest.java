@@ -1,7 +1,9 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -18,8 +20,6 @@ public class FinalResultHandlerTest
 		final EnqueuerImplementation enqueuer=new EnqueuerImplementation();
 		final FinalResultHandler resultHandler=new FinalResultHandler(enqueuer,method);
 		resultHandler.handleSuccess(null);
-		assertTrue(enqueuer.job(new ServiceMethod(method.getServiceName(),null),null));
-		resultHandler.done();
-		assertTrue(enqueuer.job(new ServiceMethod(method.getServiceName(),null),null));
+		assertTrue(enqueuer.isSuccess(JobType.Protocol,new ServiceMethod(method.getServiceName(),null),SuccessCode.Ok));
 	}
 }

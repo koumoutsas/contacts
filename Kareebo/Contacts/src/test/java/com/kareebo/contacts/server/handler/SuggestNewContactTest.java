@@ -12,6 +12,8 @@ import com.kareebo.contacts.thrift.EncryptionAlgorithm;
 import com.kareebo.contacts.thrift.EncryptionKey;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import com.kareebo.contacts.thrift.VerificationKey;
+import com.kareebo.contacts.thrift.client.jobs.Notification;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
 import org.apache.gora.util.GoraException;

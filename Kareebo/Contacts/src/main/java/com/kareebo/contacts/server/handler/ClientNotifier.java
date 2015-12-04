@@ -3,7 +3,7 @@ package com.kareebo.contacts.server.handler;
 import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.PendingNotification;
 import com.kareebo.contacts.thrift.FailedOperation;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.gora.store.DataStore;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
@@ -141,7 +141,7 @@ class ClientNotifier
 		pendingNotificationDataStore.close();
 	}
 
-	private class Notification extends com.kareebo.contacts.thrift.Notification
+	private class Notification extends com.kareebo.contacts.thrift.client.jobs.Notification
 	{
 		///The push notification size limit for iOS 8 and above. Android limits are larger than 2k
 		private static final int sizeLimit=2*1024;

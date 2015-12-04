@@ -1,10 +1,9 @@
 package com.kareebo.contacts.base.service;
 
-import com.kareebo.contacts.thrift.ServiceMethod;
 import org.junit.Test;
 
 /**
- * This test is only for achieving 100% test coverage for the {@link ServiceMethod} providers
+ * This test is only for achieving 100% test coverage for the {@link com.kareebo.contacts.thrift.client.jobs.ServiceMethod} providers
  */
 public class NotifiableServiceDummyTest
 {

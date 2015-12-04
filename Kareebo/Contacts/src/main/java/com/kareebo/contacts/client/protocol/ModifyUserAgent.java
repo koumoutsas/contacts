@@ -1,10 +1,11 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.dataStructures.SigningKey;
-import com.kareebo.contacts.client.jobs.Enqueuer;
+import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
-import com.kareebo.contacts.thrift.ServiceMethod;
 import com.kareebo.contacts.thrift.UserAgent;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -31,11 +32,12 @@ class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgen
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuer enqueuer) throws Exception
+	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,
+	                           final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
 		if(method.equals(com.kareebo.contacts.base.service.ModifyUserAgent.method0))
 		{
-			modifyUserAgent1((UserAgent)payload,enqueuer);
+			modifyUserAgent1((UserAgent)payload,finalResultEnqueuer);
 		}
 		else
 		{
@@ -43,7 +45,7 @@ class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgen
 		}
 	}
 
-	private void modifyUserAgent1(final UserAgent userAgent,final Enqueuer enqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	private void modifyUserAgent1(final UserAgent userAgent,final FinalResultEnqueuer enqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		asyncClient.modifyUserAgent1(userAgent,sign(userAgent),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service
 			                                                                                       .ModifyUserAgent.method1));

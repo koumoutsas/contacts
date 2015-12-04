@@ -1,7 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.thrift.LongId;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TDeserializer;
 import org.junit.Test;
 

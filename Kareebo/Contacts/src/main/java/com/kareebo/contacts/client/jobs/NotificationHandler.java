@@ -1,7 +1,7 @@
 package com.kareebo.contacts.client.jobs;
 
-import com.kareebo.contacts.thrift.Notification;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.Notification;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 

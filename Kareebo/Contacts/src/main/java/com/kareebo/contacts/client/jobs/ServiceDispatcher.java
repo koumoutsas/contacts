@@ -1,7 +1,7 @@
 package com.kareebo.contacts.client.jobs;
 
 import com.kareebo.contacts.thrift.LongId;
-import com.kareebo.contacts.thrift.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +15,11 @@ abstract public class ServiceDispatcher
 {
 	private static final Logger logger=LoggerFactory.getLogger(ServiceDispatcher.class.getName());
 	final private String packageName=getClass().getPackage().getName()+".";
-	final private Enqueuer enqueuer;
+	final private Enqueuers enqueuers;
 
-	public ServiceDispatcher(final Enqueuer enqueuer)
+	public ServiceDispatcher(final Enqueuers enqueuers)
 	{
-		this.enqueuer=enqueuer;
+		this.enqueuers=enqueuers;
 	}
 
 	/**
@@ -46,7 +46,7 @@ abstract public class ServiceDispatcher
 	{
 		try
 		{
-			constructService(Class.forName(packageName+method.getServiceName())).run(method,payload,enqueuer);
+			constructService(Class.forName(packageName+method.getServiceName())).run(method,payload,enqueuers);
 		}
 		catch(ClassNotFoundException|NoSuchMethodException|InstantiationException|IllegalAccessException|InvocationTargetException e)
 		{

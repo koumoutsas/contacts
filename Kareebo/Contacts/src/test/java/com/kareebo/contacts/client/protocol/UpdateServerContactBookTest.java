@@ -1,6 +1,7 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.junit.Test;
 

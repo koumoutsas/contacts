@@ -1,6 +1,7 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;

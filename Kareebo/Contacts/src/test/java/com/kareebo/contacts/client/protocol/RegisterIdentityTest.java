@@ -29,7 +29,7 @@ public class RegisterIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.RegisterIdentity.method0;
+				return RegisterIdentity.method1;
 			}
 		});
 		tests.add(new SimpleTestHarness.TestBase<Long,RegisterIdentityReply>("userIdA")
@@ -37,7 +37,7 @@ public class RegisterIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.RegisterIdentity.method1;
+				return RegisterIdentity.method2;
 			}
 
 			@Override
@@ -64,7 +64,7 @@ public class RegisterIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.RegisterIdentity.method2;
+				return RegisterIdentity.method3;
 			}
 
 			@Override
@@ -85,16 +85,16 @@ public class RegisterIdentityTest
 		tests.add(new SimpleTestHarness.SimpleTestBase<RegisterIdentityInput,Void>("registerIdentityInput")
 		{
 			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(com.kareebo.contacts.base.service.RegisterIdentity.serviceName,"random");
-			}
-
-			@Override
 			protected boolean serviceNotFound()
 			{
 				return true;
+			}			@Override
+			protected ServiceMethod getServiceMethod()
+			{
+				return new ServiceMethod(RegisterIdentity.serviceName,"random");
 			}
+
+
 
 			@Override
 			protected RegisterIdentityInput constructPayload()

@@ -55,7 +55,7 @@ public class ServiceTest
 	{
 		thrown.expect(IllegalArgumentException.class);
 		new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),clientId).run(null,null,new Enqueuers(new HashMap<JobType,
-				                                                                                                                          IntermediateResultEnqueuer>(),null));
+			                                                                                                                          IntermediateResultEnqueuer>(),null));
 	}
 
 	private static class MyAsyncClient extends TAsyncClient

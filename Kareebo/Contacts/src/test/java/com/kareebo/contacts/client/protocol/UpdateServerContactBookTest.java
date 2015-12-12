@@ -25,7 +25,7 @@ public class UpdateServerContactBookTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.UpdateServerContactBook.method0;
+				return UpdateServerContactBook.method1;
 			}
 
 			@Override
@@ -54,23 +54,23 @@ public class UpdateServerContactBookTest
 		tests.add(new SimpleTestHarness.SimpleTestBase<ContactOperationSet,Void>("contactOperationSet")
 		{
 			@Override
-			protected ServiceMethod getServiceMethod()
+			protected boolean serviceNotFound()
 			{
-				return new ServiceMethod(com.kareebo.contacts.base.service.UpdateServerContactBook
-					                         .serviceName,"random");
+				return true;
 			}
 
 			@Override
+			protected ServiceMethod getServiceMethod()
+			{
+				return new ServiceMethod(UpdateServerContactBook
+					                         .serviceName,"random");
+			}			@Override
 			TBase constructPayload()
 			{
 				return null;
 			}
 
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
+
 		});
 		new SimpleTestHarness().test(tests);
 	}

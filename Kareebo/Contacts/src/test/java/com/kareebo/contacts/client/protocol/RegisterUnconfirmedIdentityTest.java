@@ -27,7 +27,7 @@ public class RegisterUnconfirmedIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.RegisterUnconfirmedIdentity.method0;
+				return RegisterUnconfirmedIdentity.method1;
 			}
 
 			@Override
@@ -50,23 +50,23 @@ public class RegisterUnconfirmedIdentityTest
 		tests.add(new SimpleTestHarness.SimpleTestBase<HashBufferSet,Void>("uSet")
 		{
 			@Override
-			protected ServiceMethod getServiceMethod()
+			protected boolean serviceNotFound()
 			{
-				return new ServiceMethod(com.kareebo.contacts.base.service.RegisterUnconfirmedIdentity
-					                         .serviceName,"random");
+				return true;
 			}
 
 			@Override
+			protected ServiceMethod getServiceMethod()
+			{
+				return new ServiceMethod(RegisterUnconfirmedIdentity
+					                         .serviceName,"random");
+			}			@Override
 			TBase constructPayload()
 			{
 				return null;
 			}
 
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
+
 		});
 		new SimpleTestHarness().test(tests);
 	}

@@ -24,7 +24,7 @@ public class SendContactCardTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.SendContactCard.method0;
+				return SendContactCard.method1;
 			}
 
 			@Override
@@ -38,7 +38,7 @@ public class SendContactCardTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.SendContactCard.method1;
+				return SendContactCard.method2;
 			}
 		});
 		tests.add(new SimpleTestHarness.CollectionSimpleTestBase<EncryptedBufferSigned,Void>("encryptedBuffers","encryptedBuffer")
@@ -46,7 +46,7 @@ public class SendContactCardTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.SendContactCard.method2;
+				return SendContactCard.method3;
 			}
 
 			@Override
@@ -73,22 +73,22 @@ public class SendContactCardTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.SendContactCard.method3;
+				return SendContactCard.method4;
 			}
 		});
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(com.kareebo.contacts.base.service.SendContactCard.method3.getServiceName(),"random");
-			}
-
-			@Override
 			protected boolean serviceNotFound()
 			{
 				return true;
+			}			@Override
+			protected ServiceMethod getServiceMethod()
+			{
+				return new ServiceMethod(SendContactCard.serviceName,"random");
 			}
+
+
 		});
 		new SimpleTestHarness().test(tests);
 	}

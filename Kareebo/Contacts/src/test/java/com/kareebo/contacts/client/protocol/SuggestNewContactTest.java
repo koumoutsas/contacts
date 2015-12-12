@@ -24,7 +24,7 @@ public class SuggestNewContactTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.SuggestNewContact.method0;
+				return SuggestNewContact.method1;
 			}
 		});
 		tests.add(new SimpleTestHarness.SimpleTestBase<EncryptedBuffersWithHashBuffer,Void>("uB")
@@ -32,7 +32,7 @@ public class SuggestNewContactTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.SuggestNewContact.method1;
+				return SuggestNewContact.method2;
 			}
 
 			@Override
@@ -58,7 +58,7 @@ public class SuggestNewContactTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.SuggestNewContact.method1;
+				return SuggestNewContact.method2;
 			}
 
 			@Override
@@ -84,22 +84,22 @@ public class SuggestNewContactTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.SuggestNewContact.method2;
+				return SuggestNewContact.method3;
 			}
 		});
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(com.kareebo.contacts.base.service.SuggestNewContact.serviceName,"random");
-			}
-
-			@Override
 			protected boolean serviceNotFound()
 			{
 				return true;
+			}			@Override
+			protected ServiceMethod getServiceMethod()
+			{
+				return new ServiceMethod(SuggestNewContact.serviceName,"random");
 			}
+
+
 		});
 		new SimpleTestHarness().test(tests);
 	}

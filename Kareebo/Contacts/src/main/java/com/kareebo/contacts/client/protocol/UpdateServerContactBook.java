@@ -18,8 +18,11 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the update server contact book service.
  */
-class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient>
+public class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient>
 {
+	public static final String serviceName=UpdateServerContactBook.class.getSimpleName();
+	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+
 	UpdateServerContactBook(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(asyncClientManager,signingKey,clientId);
@@ -34,7 +37,7 @@ class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.Update
 	@Override
 	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
-		if(method.equals(com.kareebo.contacts.base.service.UpdateServerContactBook.method0))
+		if(method.equals(method1))
 		{
 			updateServerContactBook1((ContactOperationSet)payload,finalResultEnqueuer);
 		}
@@ -47,6 +50,6 @@ class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.Update
 	private void updateServerContactBook1(final ContactOperationSet contactOperationSet,final FinalResultEnqueuer enqueuer) throws InvalidKeyException,
 		                                                                                                                               TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		asyncClient.updateServerContactBook1(contactOperationSet,sign(contactOperationSet),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service.UpdateServerContactBook.method1));
+		asyncClient.updateServerContactBook1(contactOperationSet,sign(contactOperationSet),new FinalResultHandler(enqueuer,method1));
 	}
 }

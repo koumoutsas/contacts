@@ -117,7 +117,7 @@ public class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNoti
 				for(EncryptedBufferSigned e : encryptedBuffers)
 				{
 					notifications.put(clientDBAccessor.get(e.getEncryptedBuffer().getClient()).getDeviceToken(),new
-						                                                                                            NotificationObject(com.kareebo.contacts.base.service.SuggestNewContact.method2,new EncryptedBufferSignedWithVerificationKey(e,verificationKey)));
+						                                                                                            NotificationObject(com.kareebo.contacts.client.protocol.SuggestNewContact.method2,new EncryptedBufferSignedWithVerificationKey(e,verificationKey)));
 				}
 				notifyClients(notifications);
 			}

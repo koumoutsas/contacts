@@ -19,8 +19,13 @@ import java.util.Set;
 /**
  * Client-side implementation of the suggest new contact service
  */
-class SuggestNewContact extends Service<com.kareebo.contacts.thrift.SuggestNewContact.VertxClient>
+public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.SuggestNewContact.VertxClient>
 {
+	public static final String serviceName=SuggestNewContact.class.getSimpleName();
+	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
+	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
+
 	SuggestNewContact(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(asyncClientManager,signingKey,clientId);
@@ -36,15 +41,15 @@ class SuggestNewContact extends Service<com.kareebo.contacts.thrift.SuggestNewCo
 	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
 	FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
-		if(method.equals(com.kareebo.contacts.base.service.SuggestNewContact.method0))
+		if(method.equals(method1))
 		{
 			suggestNewContact1((LongId)payload,intermediateResultEnqueuer,finalResultEnqueuer);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.SuggestNewContact.method1))
+		else if(method.equals(method2))
 		{
 			suggestNewContact2((EncryptedBuffersWithHashBuffer)payload,finalResultEnqueuer);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.SuggestNewContact.method2))
+		else if(method.equals(method3))
 		{
 			suggestNewContact3((LongId)payload,intermediateResultEnqueuer,finalResultEnqueuer);
 		}
@@ -58,7 +63,8 @@ class SuggestNewContact extends Service<com.kareebo.contacts.thrift.SuggestNewCo
 	FinalResultEnqueuer finalResultEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException,
 		                                                NoSuchProviderException, SignatureException
 	{
-		asyncClient.suggestNewContact1(id,sign(id),new IntermediateResultHandler<EncryptionKeysWithHashBuffer>(intermediateResultEnqueuer,finalResultEnqueuer,com.kareebo.contacts.base.service.SuggestNewContact.method1));
+		asyncClient.suggestNewContact1(id,sign(id),new IntermediateResultHandler<EncryptionKeysWithHashBuffer>(intermediateResultEnqueuer,
+			                                                                                                      finalResultEnqueuer,com.kareebo.contacts.client.processor.SuggestNewContact.method1));
 	}
 
 	private void suggestNewContact2(final EncryptedBuffersWithHashBuffer encryptedBuffersWithHashBuffer,final FinalResultEnqueuer enqueuer) throws
@@ -71,13 +77,13 @@ class SuggestNewContact extends Service<com.kareebo.contacts.thrift.SuggestNewCo
 		{
 			encryptedBufferSignedSet.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
 		}
-		asyncClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),new IntermediateVoidResultHandler(enqueuer,com.kareebo.contacts.base.service.SuggestNewContact.method2));
+		asyncClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),new IntermediateVoidResultHandler(enqueuer,com.kareebo.contacts.client.processor.SuggestNewContact.method2));
 	}
 
 	private void suggestNewContact3(final LongId id,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
 	FinalResultEnqueuer finalResultEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		asyncClient.suggestNewContact3(id,sign(id),new IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
-			                                           (intermediateResultEnqueuer,finalResultEnqueuer,com.kareebo.contacts.base.service.SuggestNewContact.method3));
+			                                           (intermediateResultEnqueuer,finalResultEnqueuer,method3));
 	}
 }

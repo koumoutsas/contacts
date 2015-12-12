@@ -18,8 +18,11 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the modify keys service
  */
-class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxClient>
+public class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxClient>
 {
+	public static final String serviceName=ModifyKeys.class.getSimpleName();
+	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+
 	ModifyKeys(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(asyncClientManager,signingKey,clientId);
@@ -35,7 +38,7 @@ class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxCli
 	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,
 	                           final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
-		if(method.equals(com.kareebo.contacts.base.service.ModifyKeys.method0))
+		if(method.equals(method1))
 		{
 			modifyKeys1((PublicKeys)payload,finalResultEnqueuer);
 		}
@@ -49,7 +52,6 @@ class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxCli
 		                                                                                                   NoSuchAlgorithmException,
 		                                                                                                   NoSuchProviderException, SignatureException
 	{
-		asyncClient.modifyKeys1(newPublicKeys,sign(newPublicKeys),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service
-			                                                                                          .ModifyKeys.method1));
+		asyncClient.modifyKeys1(newPublicKeys,sign(newPublicKeys),new FinalResultHandler(enqueuer,method1));
 	}
 }

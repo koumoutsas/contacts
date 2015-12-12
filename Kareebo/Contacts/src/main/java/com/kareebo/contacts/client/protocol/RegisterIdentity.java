@@ -17,8 +17,13 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the register identity service
  */
-class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdentity.VertxClient>
+public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdentity.VertxClient>
 {
+	public static final String serviceName=RegisterIdentity.class.getSimpleName();
+	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
+	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
+
 	RegisterIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(asyncClientManager,signingKey,clientId);
@@ -33,15 +38,15 @@ class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdent
 	@Override
 	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
-		if(method.equals(com.kareebo.contacts.base.service.RegisterIdentity.method0))
+		if(method.equals(method1))
 		{
 			registerIdentity1((HashBuffer)payload,intermediateResultEnqueuer,finalResultEnqueuer);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.RegisterIdentity.method1))
+		else if(method.equals(method2))
 		{
 			registerIdentity2(((LongId)payload).getId(),intermediateResultEnqueuer,finalResultEnqueuer);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.RegisterIdentity.method2))
+		else if(method.equals(method3))
 		{
 			registerIdentity3((RegisterIdentityInput)payload,finalResultEnqueuer);
 		}
@@ -54,22 +59,21 @@ class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdent
 	private void registerIdentity1(final HashBuffer uA,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException,
 		                                                                                                                                                                     NoSuchProviderException, SignatureException
 	{
-		asyncClient.registerIdentity1(uA,sign(uA),new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,finalResultEnqueuer,com.kareebo.contacts.base
-			                                                                                                                                              .service.RegisterIdentity.method1));
+		asyncClient.registerIdentity1(uA,sign(uA),new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,
+			                                                                                              finalResultEnqueuer,
+			                                                                                              com.kareebo.contacts
+				                                                                                              .client.processor.RegisterIdentity.method1));
 	}
 
 	private void registerIdentity2(final long userIdA,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer)
 	{
-		asyncClient.registerIdentity2(userIdA,new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,finalResultEnqueuer,com.kareebo
-			                                                                                                                                          .contacts.base
-			                                                                                                                                          .service
-			                                                                                                                                          .RegisterIdentity.method2));
+		asyncClient.registerIdentity2(userIdA,new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,finalResultEnqueuer,com.kareebo.contacts
+			                                                                                                                                          .client.processor.RegisterIdentity.method2));
 	}
 
 	private void registerIdentity3(final RegisterIdentityInput registerIdentityInput,final FinalResultEnqueuer enqueuer) throws InvalidKeyException,
 		                                                                                                                            TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		asyncClient.registerIdentity3(registerIdentityInput,sign(registerIdentityInput),new FinalResultHandler(enqueuer,com.kareebo.contacts.base
-			                                                                                                                .service.RegisterIdentity.method3));
+		asyncClient.registerIdentity3(registerIdentityInput,sign(registerIdentityInput),new FinalResultHandler(enqueuer,method3));
 	}
 }

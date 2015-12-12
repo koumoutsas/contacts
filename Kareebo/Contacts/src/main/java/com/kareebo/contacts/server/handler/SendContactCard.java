@@ -68,7 +68,7 @@ public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifi
 				{
 					deviceTokens.add(clientB.getDeviceToken());
 				}
-				notifyClients(deviceTokens,new NotificationObject(com.kareebo.contacts.base.service.SendContactCard.method1,
+				notifyClients(deviceTokens,new NotificationObject(com.kareebo.contacts.client.protocol.SendContactCard.method1,
 					                                                 encryptionKeys));
 			}
 		});
@@ -94,8 +94,9 @@ public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifi
 				{
 					try
 					{
-						notifyClient(clientDBAccessor.get(encryptedBuffer.getClient()).getDeviceToken(),new NotificationObject(com.kareebo.contacts.base.service.SendContactCard.method3,
-							                                                                                                      new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
+						notifyClient(clientDBAccessor.get(encryptedBuffer.getClient()).getDeviceToken(),new
+							                                                                                NotificationObject(com.kareebo.contacts.client.protocol.SendContactCard.method3,
+								                                                                                                  new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
 					}
 					catch(NoSuchAlgorithmException e)
 					{

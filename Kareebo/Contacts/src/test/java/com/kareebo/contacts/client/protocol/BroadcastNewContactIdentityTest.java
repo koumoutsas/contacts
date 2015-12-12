@@ -21,7 +21,7 @@ public class BroadcastNewContactIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method0;
+				return BroadcastNewContactIdentity.method1;
 			}
 		});
 		tests.add(new SimpleTestHarness.SimpleTestBase<EncryptedBufferPairSet,Map<ClientId,EncryptionKey>>("encryptedBufferPairs")
@@ -29,7 +29,7 @@ public class BroadcastNewContactIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method1;
+				return BroadcastNewContactIdentity.method2;
 			}
 
 			@Override
@@ -72,7 +72,7 @@ public class BroadcastNewContactIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method2;
+				return BroadcastNewContactIdentity.method3;
 			}
 		});
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
@@ -80,7 +80,7 @@ public class BroadcastNewContactIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3;
+				return BroadcastNewContactIdentity.method4;
 			}
 		});
 		tests.add(new SimpleTestHarness.SimpleTestBase<HashBufferPair,Void>("uCs")
@@ -88,7 +88,7 @@ public class BroadcastNewContactIdentityTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method4;
+				return BroadcastNewContactIdentity.method5;
 			}
 
 			@Override
@@ -108,16 +108,16 @@ public class BroadcastNewContactIdentityTest
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.serviceName,"random");
-			}
-
-			@Override
 			protected boolean serviceNotFound()
 			{
 				return true;
+			}			@Override
+			protected ServiceMethod getServiceMethod()
+			{
+				return new ServiceMethod(BroadcastNewContactIdentity.serviceName,"random");
 			}
+
+
 		});
 		new SimpleTestHarness().test(tests);
 	}

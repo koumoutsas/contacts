@@ -73,6 +73,11 @@ class SimpleTestHarness
 			}
 		}
 
+		protected boolean serviceNotFound()
+		{
+			return false;
+		}
+
 		private void test(final boolean success) throws com.kareebo.contacts.client.jobs.Service.ExecutionFailed, com.kareebo.contacts.client.jobs.ServiceDispatcher.NoSuchService, com.kareebo.contacts.client.jobs.Service.NoSuchMethod
 		{
 			final ServiceMethod method=getServiceMethod();
@@ -103,37 +108,20 @@ class SimpleTestHarness
 			}
 			else
 			{
-				assertTrue(enqueuer.isError(JobType.Protocol,calculateNextMethod(),ErrorCode.Failure));
+				assertTrue(enqueuer.isError(JobType.Protocol,getServiceMethod(),ErrorCode.Failure));
 			}
 		}
 
 		abstract protected ServiceMethod getServiceMethod();
 
-		protected boolean serviceNotFound()
-		{
-			return false;
-		}
-
 		abstract MyClientManager<T,E> clientManager(final boolean success);
 
 		abstract TBase constructPayload();
 
-		private ServiceMethod calculateNextMethod()
-		{
-			final ServiceMethod method=getServiceMethod();
-			final String serviceName=method.getServiceName();
-			final ServiceMethod ret=new ServiceMethod(serviceName,null);
-			final String function=method.getMethodName();
-			final int serviceNameLength=serviceName.length();
-			final int index=Integer.parseInt(function.substring(serviceNameLength))+1;
-			ret.setMethodName(function.substring(0,serviceNameLength)+index);
-			return ret;
-		}
-
 		/// Override this method to return null if the result handler is {@link IntermediateVoidResultHandler}
 		protected ServiceMethod nextServiceMethod()
 		{
-			return calculateNextMethod();
+			return getServiceMethod();
 		}
 
 		protected boolean isFinal()

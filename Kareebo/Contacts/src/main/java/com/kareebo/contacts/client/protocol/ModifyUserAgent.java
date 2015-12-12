@@ -18,8 +18,11 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the modify user agent service
  */
-class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient>
+public class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient>
 {
+	public static final String serviceName=ModifyUserAgent.class.getSimpleName();
+	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+
 	ModifyUserAgent(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(asyncClientManager,signingKey,clientId);
@@ -35,7 +38,7 @@ class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgen
 	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,
 	                           final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
-		if(method.equals(com.kareebo.contacts.base.service.ModifyUserAgent.method0))
+		if(method.equals(method1))
 		{
 			modifyUserAgent1((UserAgent)payload,finalResultEnqueuer);
 		}
@@ -47,7 +50,6 @@ class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgen
 
 	private void modifyUserAgent1(final UserAgent userAgent,final FinalResultEnqueuer enqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		asyncClient.modifyUserAgent1(userAgent,sign(userAgent),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service
-			                                                                                       .ModifyUserAgent.method1));
+		asyncClient.modifyUserAgent1(userAgent,sign(userAgent),new FinalResultHandler(enqueuer,method1));
 	}
 }

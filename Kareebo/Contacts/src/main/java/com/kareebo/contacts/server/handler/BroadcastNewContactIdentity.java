@@ -130,8 +130,10 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 						final Client clientB=clientDBAccessor.get(clientIdB);
 						try
 						{
-							notifyClient(clientB.getDeviceToken(),new NotificationObject(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3,new EncryptedBufferSignedWithVerificationKey
-								                                                                                                                                   (encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
+							notifyClient(clientB.getDeviceToken(),new NotificationObject(com.kareebo.contacts.client
+								                                                             .protocol
+								                                                             .BroadcastNewContactIdentity.method4,new EncryptedBufferSignedWithVerificationKey
+									                                                                                                  (encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
 						}
 						catch(NoSuchAlgorithmException e)
 						{

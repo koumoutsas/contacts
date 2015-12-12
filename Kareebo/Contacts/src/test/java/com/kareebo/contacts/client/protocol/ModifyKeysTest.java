@@ -23,7 +23,7 @@ public class ModifyKeysTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.ModifyKeys.method0;
+				return com.kareebo.contacts.client.protocol.ModifyKeys.method1;
 			}
 
 			@Override
@@ -45,7 +45,7 @@ public class ModifyKeysTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return new ServiceMethod(com.kareebo.contacts.base.service.ModifyKeys
+				return new ServiceMethod(com.kareebo.contacts.client.protocol.ModifyKeys
 					                         .serviceName,"random");
 			}
 

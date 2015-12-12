@@ -8,16 +8,20 @@ import org.apache.thrift.TBase;
 /**
  * Client-processor-side implementation of the register identity service
  */
-class RegisterIdentity extends com.kareebo.contacts.client.jobs.Service
+public class RegisterIdentity extends com.kareebo.contacts.client.jobs.Service
 {
+	public static final String serviceName=RegisterIdentity.class.getSimpleName();
+	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
+
 	@Override
 	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws Exception
 	{
-		if(method.equals(com.kareebo.contacts.base.service.RegisterIdentity.method1))
+		if(method.equals(method1))
 		{
 			registerIdentity1((RegisterIdentityReply)payload,enqueuers);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.RegisterIdentity.method2))
+		else if(method.equals(method2))
 		{
 			registerIdentity2((RegisterIdentityReply)payload,enqueuers);
 		}

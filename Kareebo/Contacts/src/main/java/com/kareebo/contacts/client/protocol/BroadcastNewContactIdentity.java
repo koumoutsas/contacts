@@ -20,8 +20,15 @@ import java.util.Set;
 /**
  * Client-side implementation of the broadcast new contact identity service
  */
-class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient>
+public class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient>
 {
+	public static final String serviceName=BroadcastNewContactIdentity.class.getSimpleName();
+	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
+	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
+	public final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
+	public final static ServiceMethod method5=new ServiceMethod(serviceName,"5");
+
 	BroadcastNewContactIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(asyncClientManager,signingKey,clientId);
@@ -36,23 +43,23 @@ class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.thrift.Br
 	@Override
 	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
-		if(method.equals(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method0))
+		if(method.equals(method1))
 		{
 			broadcastNewContactIdentity1((LongId)payload,intermediateResultEnqueuer,finalResultEnqueuer);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method1))
+		else if(method.equals(method2))
 		{
 			broadcastNewContactIdentity2((EncryptedBufferPairSet)payload,intermediateResultEnqueuer,finalResultEnqueuer);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method2))
+		else if(method.equals(method3))
 		{
 			broadcastNewContactIdentity3((SetEncryptedBuffer)payload,finalResultEnqueuer);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3))
+		else if(method.equals(method4))
 		{
 			broadcastNewContactIdentity4((LongId)payload,intermediateResultEnqueuer,finalResultEnqueuer);
 		}
-		else if(method.equals(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method4))
+		else if(method.equals(method5))
 		{
 			broadcastNewContactIdentity5((HashBufferPair)payload,finalResultEnqueuer);
 		}
@@ -64,14 +71,16 @@ class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.thrift.Br
 
 	private void broadcastNewContactIdentity1(final LongId userIdB,final IntermediateResultEnqueuer intermediateResultEnqueuer,final ErrorEnqueuer errorEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		asyncClient.broadcastNewContactIdentity1(userIdB,sign(userIdB),new IntermediateResultHandler<MapClientIdEncryptionKey>(intermediateResultEnqueuer,errorEnqueuer,com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method1));
+		asyncClient.broadcastNewContactIdentity1(userIdB,sign(userIdB),new IntermediateResultHandler<MapClientIdEncryptionKey>(intermediateResultEnqueuer,errorEnqueuer,com.kareebo.contacts.client
+			                                                                                                                                                                .processor.BroadcastNewContactIdentity.method1));
 	}
 
 	private void broadcastNewContactIdentity2(final EncryptedBufferPairSet encryptedBufferPairs,final IntermediateResultEnqueuer
 		                                                                                            intermediateResultEnqueuer,final ErrorEnqueuer errorEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		asyncClient.broadcastNewContactIdentity2(encryptedBufferPairs,sign(encryptedBufferPairs),new
-			                                                                                         IntermediateResultHandler<MapClientIdEncryptionKey>(intermediateResultEnqueuer,errorEnqueuer,com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method2));
+			                                                                                         IntermediateResultHandler<MapClientIdEncryptionKey>(intermediateResultEnqueuer,errorEnqueuer,com.kareebo.contacts.client
+				                                                                                                                                                                                      .processor.BroadcastNewContactIdentity.method2));
 	}
 
 	private void broadcastNewContactIdentity3(final SetEncryptedBuffer encryptedBuffers,final ErrorEnqueuer errorEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
@@ -82,24 +91,21 @@ class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.thrift.Br
 		{
 			set.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
 		}
-		asyncClient.broadcastNewContactIdentity3(set,new IntermediateVoidResultHandler(errorEnqueuer,com.kareebo
-			                                                                                             .contacts.base.service
-			                                                                                             .BroadcastNewContactIdentity.method3));
+		asyncClient.broadcastNewContactIdentity3(set,new IntermediateVoidResultHandler(errorEnqueuer,com.kareebo.contacts.client
+			                                                                                             .processor.BroadcastNewContactIdentity.method3));
 	}
 
 	private void broadcastNewContactIdentity4(final LongId id,final IntermediateResultEnqueuer
 		                                                          intermediateResultEnqueuer,final ErrorEnqueuer errorEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		asyncClient.broadcastNewContactIdentity4(id,sign(id),new IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
-			                                                     (intermediateResultEnqueuer,errorEnqueuer,com.kareebo.contacts.base.service
-				                                                                                               .BroadcastNewContactIdentity.method4));
+			                                                     (intermediateResultEnqueuer,errorEnqueuer,com.kareebo.contacts.client
+				                                                                                               .processor.BroadcastNewContactIdentity.method4));
 	}
 
 	private void broadcastNewContactIdentity5(final HashBufferPair uCs,final FinalResultEnqueuer enqueuer) throws InvalidKeyException, TException,
 		                                                                                                              NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		asyncClient.broadcastNewContactIdentity5(uCs,sign(uCs),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service
-			                                                                                       .BroadcastNewContactIdentity
-			                                                                                       .method5));
+		asyncClient.broadcastNewContactIdentity5(uCs,sign(uCs),new FinalResultHandler(enqueuer,method5));
 	}
 }

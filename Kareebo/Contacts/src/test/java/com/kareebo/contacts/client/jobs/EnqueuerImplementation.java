@@ -27,7 +27,7 @@ public class EnqueuerImplementation implements FinalResultEnqueuer, Intermediate
 	public boolean isSuccess(final JobType type,final ServiceMethod method,final SuccessCode successCode)
 	{
 		return type==jobType&&payload==null&&this.method.equals(method)&&(this.successCode==null?successCode==null:this.successCode.equals
-			                                                                                                                          (successCode));
+			                                                                                                                            (successCode));
 	}
 
 	public boolean initialState()

@@ -447,7 +447,9 @@ public class BroadcastNewContactIdentityTest
 				encryptedBufferSignedWithVerificationKey.setVerificationKey(new com.kareebo.contacts.thrift.VerificationKey(b,
 					                                                                                                           com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1
 				));
-				clientNotifier.put(deviceToken,new NotificationObject(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3,encryptedBufferSignedWithVerificationKey));
+				clientNotifier.put(deviceToken,new NotificationObject(com.kareebo.contacts.client.protocol.BroadcastNewContactIdentity
+					                                                      .method4,
+					                                                     encryptedBufferSignedWithVerificationKey));
 			}
 		}
 		new Base4().run();
@@ -471,7 +473,8 @@ public class BroadcastNewContactIdentityTest
 					final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey=new
 						                                                                                        EncryptedBufferSignedWithVerificationKey();
 					final Notification notification=notifierBackend.get(i);
-					assertEquals(com.kareebo.contacts.base.service.BroadcastNewContactIdentity.method3,notification.getMethod());
+					assertEquals(com.kareebo.contacts.client.protocol.BroadcastNewContactIdentity.method4,notification.getMethod
+						                                                                                                   ());
 					clientNotifier.get(encryptedBufferSignedWithVerificationKey,notification.getId());
 					final EncryptedBufferSignedWithVerificationKey expected=new EncryptedBufferSignedWithVerificationKey(encryptedBuffersMap.get(i),
 						                                                                                                    TypeConverter.convert(verificationKey));

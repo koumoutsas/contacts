@@ -22,6 +22,13 @@ public class EnqueuersTest
 		assertEquals(enqueuerImplementation,new Enqueuers(null,enqueuerImplementation).finalResultEnqueuer());
 	}
 
+	@Test
+	public void testIntermediateResultEnqueuer() throws Exception
+	{
+		testInternal(new Enqueuers(constructMap(),null));
+		testInternal(new Enqueuers(JobType.ExternalService,enqueuerImplementation,null));
+	}
+
 	private void testInternal(final Enqueuers enqueuers)
 	{
 		assertEquals(enqueuerImplementation,enqueuers.intermediateResultEnqueuer(JobType.ExternalService));
@@ -35,12 +42,5 @@ public class EnqueuersTest
 		map.put(JobType.ExternalService,enqueuerImplementation);
 		map.put(JobType.Processor,null);
 		return map;
-	}
-
-	@Test
-	public void testIntermediateResultEnqueuer() throws Exception
-	{
-		testInternal(new Enqueuers(constructMap(),null));
-		testInternal(new Enqueuers(JobType.ExternalService,enqueuerImplementation,null));
 	}
 }

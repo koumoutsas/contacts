@@ -23,7 +23,7 @@ public class ModifyUserAgentTest
 			@Override
 			protected ServiceMethod getServiceMethod()
 			{
-				return com.kareebo.contacts.base.service.ModifyUserAgent.method0;
+				return com.kareebo.contacts.client.protocol.ModifyUserAgent.method1;
 			}
 
 			@Override
@@ -41,23 +41,23 @@ public class ModifyUserAgentTest
 		tests.add(new SimpleTestHarness.SimpleTestBase<PublicKeys,Void>("userAgent")
 		{
 			@Override
-			protected ServiceMethod getServiceMethod()
+			protected boolean serviceNotFound()
 			{
-				return new ServiceMethod(com.kareebo.contacts.base.service.ModifyUserAgent
-					                         .serviceName,"random");
+				return true;
 			}
 
 			@Override
+			protected ServiceMethod getServiceMethod()
+			{
+				return new ServiceMethod(com.kareebo.contacts.client.protocol.ModifyUserAgent
+					                         .serviceName,"random");
+			}			@Override
 			TBase constructPayload()
 			{
 				return null;
 			}
 
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
+
 		});
 		new SimpleTestHarness().test(tests);
 	}

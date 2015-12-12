@@ -18,8 +18,11 @@ import java.security.SignatureException;
 /**
  * Client-side implementation of the register unconfirmed identity service
  */
-class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient>
+public class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient>
 {
+	public static final String serviceName=RegisterUnconfirmedIdentity.class.getSimpleName();
+	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+
 	RegisterUnconfirmedIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(asyncClientManager,signingKey,clientId);
@@ -35,7 +38,7 @@ class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.Re
 	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
 	FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
-		if(method.equals(com.kareebo.contacts.base.service.RegisterUnconfirmedIdentity.method0))
+		if(method.equals(method1))
 		{
 			registerUnconfirmedIdentity1((HashBufferSet)payload,finalResultEnqueuer);
 		}
@@ -48,7 +51,6 @@ class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.Re
 	private void registerUnconfirmedIdentity1(final HashBufferSet uSet,final FinalResultEnqueuer enqueuer) throws InvalidKeyException, TException,
 		                                                                                                              NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
-		asyncClient.registerUnconfirmedIdentity1(uSet,sign(uSet),new FinalResultHandler(enqueuer,com.kareebo.contacts.base.service
-			                                                                                         .RegisterUnconfirmedIdentity.method1));
+		asyncClient.registerUnconfirmedIdentity1(uSet,sign(uSet),new FinalResultHandler(enqueuer,method1));
 	}
 }

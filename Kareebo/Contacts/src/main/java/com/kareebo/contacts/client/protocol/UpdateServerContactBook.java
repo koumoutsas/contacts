@@ -5,14 +5,7 @@ import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.ContactOperationSet;
-import org.apache.thrift.TBase;
-import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
-
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 
 /**
  * Client-side implementation of the update server contact book service.
@@ -21,6 +14,7 @@ public class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift
 {
 	public static final String serviceName=UpdateServerContactBook.class.getSimpleName();
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+	private final static ServiceMethod[] methodNames={method1};
 
 	UpdateServerContactBook(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
@@ -34,21 +28,23 @@ public class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift
 	}
 
 	@Override
-	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{
-		if(method.equals(method1))
-		{
-			updateServerContactBook1((ContactOperationSet)payload,finalResultEnqueuer);
-		}
-		else
-		{
-			throw new NoSuchMethod();
-		}
+		return methodNames;
 	}
 
-	private void updateServerContactBook1(final ContactOperationSet contactOperationSet,final FinalResultEnqueuer enqueuer) throws InvalidKeyException,
-		                                                                                                                               TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	@Override
+	protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 	{
-		asyncClient.updateServerContactBook1(contactOperationSet,sign(contactOperationSet),new FinalResultHandler(enqueuer,method1));
+		return new com.kareebo.contacts.client.jobs.Service.Functor[]{
+			new Functor<ContactOperationSet>()
+			{
+				@Override
+				protected void runInternal(final com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient asyncClient,final ContactOperationSet payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				{
+					asyncClient.updateServerContactBook1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,
+						                                                                                 method1));
+				}
+			}};
 	}
 }

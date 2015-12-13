@@ -2,7 +2,6 @@ package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-import org.apache.thrift.TBase;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -29,12 +28,6 @@ public class UpdateServerContactBookTest
 			}
 
 			@Override
-			protected boolean isFinal()
-			{
-				return true;
-			}
-
-			@Override
 			protected ContactOperationSet constructPayload()
 			{
 				final ClientId clientId=new ClientId(9,9);
@@ -50,26 +43,11 @@ public class UpdateServerContactBookTest
 						                                                                                                                                  clientId)));
 				return new ContactOperationSet(contactOperations);
 			}
-		});
-		tests.add(new SimpleTestHarness.SimpleTestBase<ContactOperationSet,Void>("contactOperationSet")
-		{
+
 			@Override
-			protected boolean serviceNotFound()
+			protected boolean isFinal()
 			{
 				return true;
-			}
-
-			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(UpdateServerContactBook
-					                         .serviceName,"random");
-			}
-
-			@Override
-			TBase constructPayload()
-			{
-				return null;
 			}
 		});
 		new SimpleTestHarness().test(tests);

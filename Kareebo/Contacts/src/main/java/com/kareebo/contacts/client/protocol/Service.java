@@ -7,7 +7,6 @@ import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClient;
@@ -28,7 +27,7 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 	/// A {@link Signer} for signing payloads
 	final private Signer signer;
 
-	Service(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	protected Service(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		signer=new Signer(signingKey,clientId);
 		asyncClient=construct(asyncClientManager);
@@ -42,21 +41,28 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 	 */
 	abstract protected T construct(TAsyncClientManager asyncClientManager);
 
-	@Override
-	protected void runInternal(final ServiceMethod method,TBase payload,final Enqueuers enqueuers) throws Exception
-	{
-		final IntermediateResultEnqueuer intermediateResultEnqueuer=enqueuers.intermediateResultEnqueuer(JobType.Protocol);
-		if(intermediateResultEnqueuer==null)
-		{
-			throw new IllegalArgumentException("No enqueuer for the job type");
-		}
-		runInternal(method,payload,intermediateResultEnqueuer,enqueuers.finalResultEnqueuer());
-	}
-
-	abstract protected void runInternal(ServiceMethod method,TBase payload,IntermediateResultEnqueuer intermediateResultEnqueuer,FinalResultEnqueuer finalResultEnqueuer) throws Exception;
-
 	protected SignatureBuffer sign(final TBase object) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		return signer.sign(object);
+	}
+
+	protected abstract class Functor<S extends TBase> implements com.kareebo.contacts.client.jobs.Service.Functor
+	{
+		@Override
+		public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
+		{
+			final IntermediateResultEnqueuer intermediateResultEnqueuer=enqueuers.intermediateResultEnqueuer(JobType.Protocol);
+			if(intermediateResultEnqueuer==null)
+			{
+				throw new IllegalArgumentException("No enqueuer for the job type");
+			}
+			// The cast error exception is caught in com.kareebo.contacts.client.jobs.Service#run
+			//noinspection unchecked
+			runInternal(asyncClient,(S)payload,intermediateResultEnqueuer,enqueuers.finalResultEnqueuer());
+		}
+
+		abstract protected void runInternal(T asyncClient,S payload,IntermediateResultEnqueuer intermediateResultEnqueuer,
+		                                    FinalResultEnqueuer
+			                                    finalResultEnqueuer) throws Exception;
 	}
 }

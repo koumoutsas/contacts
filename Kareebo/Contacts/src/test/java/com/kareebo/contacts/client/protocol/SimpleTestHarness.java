@@ -53,29 +53,8 @@ class SimpleTestHarness
 
 		public void run() throws com.kareebo.contacts.client.jobs.ServiceDispatcher.NoSuchService, com.kareebo.contacts.client.jobs.Service.NoSuchMethod, com.kareebo.contacts.client.jobs.Service.ExecutionFailed
 		{
-			if(serviceNotFound())
-			{
-				boolean thrown=false;
-				try
-				{
-					test(true);
-				}
-				catch(Service.NoSuchMethod ignored)
-				{
-					thrown=true;
-				}
-				assertTrue(thrown);
-			}
-			else
-			{
-				test(true);
-				test(false);
-			}
-		}
-
-		protected boolean serviceNotFound()
-		{
-			return false;
+			test(true);
+			test(false);
 		}
 
 		private void test(final boolean success) throws com.kareebo.contacts.client.jobs.Service.ExecutionFailed, com.kareebo.contacts.client.jobs.ServiceDispatcher.NoSuchService, com.kareebo.contacts.client.jobs.Service.NoSuchMethod

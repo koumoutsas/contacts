@@ -1,9 +1,7 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.thrift.PublicKeys;
 import com.kareebo.contacts.thrift.UserAgent;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-import org.apache.thrift.TBase;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -36,27 +34,6 @@ public class ModifyUserAgentTest
 			protected boolean isFinal()
 			{
 				return true;
-			}
-		});
-		tests.add(new SimpleTestHarness.SimpleTestBase<PublicKeys,Void>("userAgent")
-		{
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
-
-			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(com.kareebo.contacts.client.protocol.ModifyUserAgent
-					                         .serviceName,"random");
-			}
-
-			@Override
-			TBase constructPayload()
-			{
-				return null;
 			}
 		});
 		new SimpleTestHarness().test(tests);

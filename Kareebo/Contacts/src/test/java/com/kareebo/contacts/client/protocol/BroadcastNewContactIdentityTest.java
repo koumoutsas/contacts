@@ -105,20 +105,6 @@ public class BroadcastNewContactIdentityTest
 				return true;
 			}
 		});
-		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
-		{
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
-
-			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(BroadcastNewContactIdentity.serviceName,"random");
-			}
-		});
 		new SimpleTestHarness().test(tests);
 	}
 }

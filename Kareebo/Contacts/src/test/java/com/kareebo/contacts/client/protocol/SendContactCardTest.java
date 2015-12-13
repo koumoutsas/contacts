@@ -76,20 +76,6 @@ public class SendContactCardTest
 				return SendContactCard.method4;
 			}
 		});
-		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
-		{
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
-
-			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(SendContactCard.serviceName,"random");
-			}
-		});
 		new SimpleTestHarness().test(tests);
 	}
 }

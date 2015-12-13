@@ -5,12 +5,44 @@ import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Interface for all services
  */
 abstract public class Service
 {
 	private static final Logger logger=LoggerFactory.getLogger(Service.class.getName());
+	/// The set of methods indexed by method name
+	private final Map<String,Functor> methods;
+
+	protected Service()
+	{
+		final ServiceMethod[] methodNames=methodNames();
+		final int numberOfMethods=methodNames.length;
+		final Functor[] functors=functors();
+		final int numberOFunctors=functors.length;
+		if(numberOfMethods!=numberOFunctors)
+		{
+			throw new IllegalArgumentException("Unequal number of names ("+numberOfMethods+") and methods ("+numberOFunctors+')');
+		}
+		methods=new HashMap<>(numberOfMethods);
+		for(int i=0;i<numberOfMethods;++i)
+		{
+			final String name=methodNames[i].getMethodName();
+			if(methods.put(name,functors[i])!=null)
+			{
+				throw new IllegalArgumentException("Method name "+name+" defined twice");
+			}
+		}
+	}
+
+	/// Get the method names
+	abstract protected ServiceMethod[] methodNames();
+
+	/// Get the functors for {@link #methodNames}
+	abstract protected Functor[] functors();
 
 	/**
 	 * Run a method based on its name and a payload
@@ -25,7 +57,12 @@ abstract public class Service
 	{
 		try
 		{
-			runInternal(method,payload,enqueuers);
+			final Functor f=methods.get(method.getMethodName());
+			if(f==null)
+			{
+				throw new NoSuchMethod();
+			}
+			f.run(payload,enqueuers);
 		}
 		catch(NoSuchMethod e)
 		{
@@ -47,7 +84,11 @@ abstract public class Service
 		}
 	}
 
-	abstract protected void runInternal(ServiceMethod method,TBase payload,Enqueuers enqueuers) throws Exception;
+	/// Functor interface for service methods
+	protected interface Functor
+	{
+		void run(TBase payload,Enqueuers enqueuers) throws Exception;
+	}
 
 	/// Exception thrown when a method cannot be found
 	public static class NoSuchMethod extends Exception

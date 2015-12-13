@@ -1,10 +1,5 @@
 package com.kareebo.contacts.client.processor;
 
-import com.kareebo.contacts.client.jobs.Enqueuers;
-import com.kareebo.contacts.thrift.EncryptedBufferSignedWithVerificationKey;
-import com.kareebo.contacts.thrift.EncryptionKeys;
-import org.apache.thrift.TBase;
-
 /**
  * Client-processor-side implementation of the send contact card service
  */
@@ -17,28 +12,14 @@ public class SendContactCard extends com.kareebo.contacts.client.jobs.Service
 	public final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
 
 	@Override
-	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws Exception
+	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{
-		if(method.equals(method2))
-		{
-			sendContactCard2((EncryptionKeys)payload,enqueuers);
-		}
-		else if(method.equals(method4))
-		{
-			sendContactCard4((EncryptedBufferSignedWithVerificationKey)payload,enqueuers);
-		}
-		else
-		{
-			throw new NoSuchMethod();
-		}
+		return new com.kareebo.contacts.thrift.client.jobs.ServiceMethod[0];
 	}
 
-	private void sendContactCard2(final EncryptionKeys encryptionKeys,final Enqueuers enqueuers)
+	@Override
+	protected Functor[] functors()
 	{
-	}
-
-	private void sendContactCard4(final EncryptedBufferSignedWithVerificationKey encryptedBufferSignedWithVerificationKey,final Enqueuers
-		                                                                                                                      enqueuers)
-	{
+		return new Functor[0];
 	}
 }

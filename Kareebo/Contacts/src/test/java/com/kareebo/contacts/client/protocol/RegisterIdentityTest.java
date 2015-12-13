@@ -82,26 +82,6 @@ public class RegisterIdentityTest
 					                                                                                                      VerificationKey(buffer,SignatureAlgorithm.Fake)),new HashBuffer(buffer,HashAlgorithm.SHA256),9,new HashSet<HashBuffer>(),new HashBuffer(buffer,HashAlgorithm.Fake),new UserAgent("a","b"),10);
 			}
 		});
-		tests.add(new SimpleTestHarness.SimpleTestBase<RegisterIdentityInput,Void>("registerIdentityInput")
-		{
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
-
-			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(RegisterIdentity.serviceName,"random");
-			}
-
-			@Override
-			protected RegisterIdentityInput constructPayload()
-			{
-				return null;
-			}
-		});
 		new SimpleTestHarness().test(tests);
 	}
 }

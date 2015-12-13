@@ -4,7 +4,6 @@ import com.kareebo.contacts.thrift.HashAlgorithm;
 import com.kareebo.contacts.thrift.HashBuffer;
 import com.kareebo.contacts.thrift.HashBufferSet;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-import org.apache.thrift.TBase;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -45,27 +44,6 @@ public class RegisterUnconfirmedIdentityTest
 			protected boolean isFinal()
 			{
 				return true;
-			}
-		});
-		tests.add(new SimpleTestHarness.SimpleTestBase<HashBufferSet,Void>("uSet")
-		{
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
-
-			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(RegisterUnconfirmedIdentity
-					                         .serviceName,"random");
-			}
-
-			@Override
-			TBase constructPayload()
-			{
-				return null;
 			}
 		});
 		new SimpleTestHarness().test(tests);

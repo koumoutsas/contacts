@@ -3,7 +3,6 @@ package com.kareebo.contacts.client.jobs;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.Notification;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TSerializer;
 import org.junit.Test;
 
@@ -20,9 +19,8 @@ public class NotificationHandlerTest
 	@Test
 	public void testHandle() throws Exception
 	{
-		final ServiceMethod method=new ServiceMethod(ServiceImplementation.class.getSimpleName(),"");
 		final long id=0;
-		notificationHandler.handle(new TSerializer().serialize(new Notification(method,id)));
-		assertTrue(enqueuer.hasJob(JobType.Protocol,method,new LongId(id)));
+		notificationHandler.handle(new TSerializer().serialize(new Notification(ServiceImplementation.method,id)));
+		assertTrue(enqueuer.hasJob(JobType.Protocol,ServiceImplementation.method,new LongId(id)));
 	}
 }

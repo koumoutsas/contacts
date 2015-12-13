@@ -95,9 +95,7 @@ public class ServiceDispatcherTest
 			return null;
 		}
 	});
-	final private static String serviceName=ServiceImplementation.class.getName().substring(ServiceImplementation.class.getPackage().getName().length()+1);
-	final private static ServiceMethod valid=new ServiceMethod(serviceName,"a");
-	final private static ServiceMethod invalid=new ServiceMethod(serviceName,"b");
+	final private static ServiceMethod invalid=new ServiceMethod(ServiceImplementation.method1.getServiceName(),"b");
 	@Rule
 	public ExpectedException thrown=ExpectedException.none();
 
@@ -106,11 +104,11 @@ public class ServiceDispatcherTest
 	{
 		final ServiceDispatcher serviceDispatcher=new ServiceDispatcher(enqueuers,clientManagerExpected,signingKeyExpected,
 			                                                               clientIdExpected);
-		serviceDispatcher.run(valid,notificationIdExpected);
+		serviceDispatcher.run(ServiceImplementation.method1,notificationIdExpected);
 		final LongId longId=new LongId(notificationIdExpected);
-		assertTrue(enqueuerExpected.hasJob(JobType.Protocol,valid,longId));
-		serviceDispatcher.run(valid,longId);
-		assertTrue(enqueuerExpected.hasJob(JobType.Protocol,valid,longId));
+		assertTrue(enqueuerExpected.hasJob(JobType.Protocol,ServiceImplementation.method1,longId));
+		serviceDispatcher.run(ServiceImplementation.method1,longId);
+		assertTrue(enqueuerExpected.hasJob(JobType.Protocol,ServiceImplementation.method1,longId));
 		thrown.expect(Service.NoSuchMethod.class);
 		serviceDispatcher.run(invalid,notificationIdExpected);
 	}
@@ -125,6 +123,8 @@ public class ServiceDispatcherTest
 
 	public static class ServiceImplementation extends Service<MyAsyncClient>
 	{
+		final static ServiceMethod method1=new ServiceMethod(ServiceImplementation.class.getName().substring(ServiceImplementation.class.getPackage().getName().length()+1),"1");
+
 		ServiceImplementation(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 		{
 			super(asyncClientManager,signingKey,clientId);
@@ -137,16 +137,29 @@ public class ServiceDispatcherTest
 		}
 
 		@Override
-		protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+		protected ServiceMethod[] methodNames()
 		{
-			assertEquals(notificationIdExpected,((LongId)payload).getId());
-			assertEquals(enqueuerExpected,intermediateResultEnqueuer);
-			assertEquals(enqueuerExpected,finalResultEnqueuer);
-			enqueuerExpected.enqueue(JobType.Protocol,method,payload);
-			if(!method.equals(valid))
+			return new ServiceMethod[]{method1};
+		}
+
+		@Override
+		protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
+		{
+			return new com.kareebo.contacts.client.jobs.Service.Functor[]{new Functor<TBase>()
 			{
-				throw new NoSuchMethod();
-			}
+				@Override
+				protected void runInternal(final MyAsyncClient asyncClient,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				{
+					assertEquals(notificationIdExpected,((LongId)payload).getId());
+					assertEquals(enqueuerExpected,intermediateResultEnqueuer);
+					assertEquals(enqueuerExpected,finalResultEnqueuer);
+					enqueuerExpected.enqueue(JobType.Protocol,method1,payload);
+					if(!method1.equals(ServiceImplementation.method1))
+					{
+						throw new NoSuchMethod();
+					}
+				}
+			}};
 		}
 	}
 }

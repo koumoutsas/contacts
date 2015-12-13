@@ -27,39 +27,18 @@ public class ModifyKeysTest
 			}
 
 			@Override
-			protected boolean isFinal()
-			{
-				return true;
-			}
-
-			@Override
 			TBase constructPayload()
 			{
 				final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
 				buffer.mark();
 				return new PublicKeys(new EncryptionKey(buffer,EncryptionAlgorithm.RSA2048),new VerificationKey(buffer,SignatureAlgorithm.Fake));
 			}
-		});
-		tests.add(new SimpleTestHarness.SimpleTestBase<PublicKeys,Void>("newPublicKeys")
-		{
+
 			@Override
-			protected boolean serviceNotFound()
+			protected boolean isFinal()
 			{
 				return true;
 			}
-
-			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return new ServiceMethod(com.kareebo.contacts.client.protocol.ModifyKeys
-					                         .serviceName,"random");
-			}			@Override
-			TBase constructPayload()
-			{
-				return null;
-			}
-
-
 		});
 		new SimpleTestHarness().test(tests);
 	}

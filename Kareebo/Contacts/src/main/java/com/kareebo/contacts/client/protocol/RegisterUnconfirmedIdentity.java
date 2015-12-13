@@ -5,14 +5,7 @@ import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.HashBufferSet;
-import org.apache.thrift.TBase;
-import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
-
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 
 /**
  * Client-side implementation of the register unconfirmed identity service
@@ -21,6 +14,7 @@ public class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.th
 {
 	public static final String serviceName=RegisterUnconfirmedIdentity.class.getSimpleName();
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
+	private final static ServiceMethod[] methodNames={method1};
 
 	RegisterUnconfirmedIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
@@ -34,22 +28,22 @@ public class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.th
 	}
 
 	@Override
-	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
-	FinalResultEnqueuer finalResultEnqueuer) throws Exception
+	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{
-		if(method.equals(method1))
-		{
-			registerUnconfirmedIdentity1((HashBufferSet)payload,finalResultEnqueuer);
-		}
-		else
-		{
-			throw new NoSuchMethod();
-		}
+		return methodNames;
 	}
 
-	private void registerUnconfirmedIdentity1(final HashBufferSet uSet,final FinalResultEnqueuer enqueuer) throws InvalidKeyException, TException,
-		                                                                                                              NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	@Override
+	protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 	{
-		asyncClient.registerUnconfirmedIdentity1(uSet,sign(uSet),new FinalResultHandler(enqueuer,method1));
+		return new com.kareebo.contacts.client.jobs.Service.Functor[]{
+			new Functor<HashBufferSet>()
+			{
+				@Override
+				protected void runInternal(final com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient asyncClient,final HashBufferSet payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				{
+					asyncClient.registerUnconfirmedIdentity1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,method1));
+				}
+			}};
 	}
 }

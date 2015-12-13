@@ -9,6 +9,7 @@ import org.apache.thrift.TBase;
  */
 public class ServiceImplementation extends Service
 {
+	final public static ServiceMethod method=new ServiceMethod(ServiceImplementation.class.getSimpleName(),"1");
 	final private Exception error;
 
 	ServiceImplementation()
@@ -22,15 +23,28 @@ public class ServiceImplementation extends Service
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws Exception
+	protected ServiceMethod[] methodNames()
 	{
-		if(error==null)
+		return new ServiceMethod[]{method};
+	}
+
+	@Override
+	protected Functor[] functors()
+	{
+		return new Functor[]{new Functor()
 		{
-			enqueuers.intermediateResultEnqueuer(JobType.Protocol).enqueue(JobType.Protocol,method,payload);
-		}
-		else
-		{
-			throw error;
-		}
+			@Override
+			public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
+			{
+				if(error==null)
+				{
+					enqueuers.intermediateResultEnqueuer(JobType.Protocol).enqueue(JobType.Protocol,method,payload);
+				}
+				else
+				{
+					throw error;
+				}
+			}
+		}};
 	}
 }

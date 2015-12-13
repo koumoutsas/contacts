@@ -54,8 +54,8 @@ public class ServiceTest
 	public void testIllegalJobType() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),clientId).run(null,null,new Enqueuers(new HashMap<JobType,
-			                                                                                                                          IntermediateResultEnqueuer>(),null));
+		new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),clientId).run(null,new Enqueuers(new HashMap<JobType,
+			                                                                                                                     IntermediateResultEnqueuer>(),null));
 	}
 
 	private static class MyAsyncClient extends TAsyncClient
@@ -80,13 +80,21 @@ public class ServiceTest
 		}
 
 		@Override
-		protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+		protected ServiceMethod[] methodNames()
 		{
+			return new ServiceMethod[]{new ServiceMethod(this.getClass().getSimpleName(),"1")};
 		}
 
-		void run(final ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws Exception
+		@Override
+		protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 		{
-			runInternal(method,payload,enqueuers);
+			return new com.kareebo.contacts.client.jobs.Service.Functor[]{new Functor<TBase>()
+			{
+				@Override
+				protected void runInternal(final MyAsyncClient asyncClient,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				{
+				}
+			}};
 		}
 
 		SignatureBuffer getSignature(final TBase object) throws NoSuchProviderException, TException, NoSuchAlgorithmException,
@@ -94,6 +102,17 @@ public class ServiceTest
 			                                                        SignatureException, InvalidAlgorithmParameterException
 		{
 			return sign(object);
+		}
+
+		void run(final TBase payload,final Enqueuers enqueuers) throws Exception
+		{
+			new Functor<TBase>()
+			{
+				@Override
+				protected void runInternal(final MyAsyncClient asyncClient,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				{
+				}
+			}.run(payload,enqueuers);
 		}
 	}
 }

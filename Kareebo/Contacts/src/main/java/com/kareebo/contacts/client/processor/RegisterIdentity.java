@@ -1,7 +1,6 @@
 package com.kareebo.contacts.client.processor;
 
 import com.kareebo.contacts.client.jobs.Enqueuers;
-import com.kareebo.contacts.thrift.RegisterIdentityReply;
 import org.apache.thrift.TBase;
 
 /**
@@ -12,29 +11,30 @@ public class RegisterIdentity extends com.kareebo.contacts.client.jobs.Service
 	public static final String serviceName=RegisterIdentity.class.getSimpleName();
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
 	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
+	private static final ServiceMethod[] methods={method1,method2};
 
 	@Override
-	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws Exception
+	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{
-		if(method.equals(method1))
-		{
-			registerIdentity1((RegisterIdentityReply)payload,enqueuers);
-		}
-		else if(method.equals(method2))
-		{
-			registerIdentity2((RegisterIdentityReply)payload,enqueuers);
-		}
-		else
-		{
-			throw new NoSuchMethod();
-		}
+		return methods;
 	}
 
-	private void registerIdentity1(final RegisterIdentityReply registerIdentityReply,final Enqueuers enqueuers)
+	@Override
+	protected Functor[] functors()
 	{
-	}
-
-	private void registerIdentity2(final RegisterIdentityReply registerIdentityReply,final Enqueuers enqueuers)
-	{
+		return new Functor[]{
+			new Functor()
+			{
+				@Override
+				public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
+				{
+				}
+			},new Functor()
+		{
+			@Override
+			public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
+			{
+			}
+		}};
 	}
 }

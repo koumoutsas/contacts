@@ -64,13 +64,13 @@ public class UpdateServerContactBookTest
 			{
 				return new ServiceMethod(UpdateServerContactBook
 					                         .serviceName,"random");
-			}			@Override
+			}
+
+			@Override
 			TBase constructPayload()
 			{
 				return null;
 			}
-
-
 		});
 		new SimpleTestHarness().test(tests);
 	}

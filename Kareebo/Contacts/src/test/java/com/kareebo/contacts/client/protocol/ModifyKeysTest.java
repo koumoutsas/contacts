@@ -43,23 +43,23 @@ public class ModifyKeysTest
 		tests.add(new SimpleTestHarness.SimpleTestBase<PublicKeys,Void>("newPublicKeys")
 		{
 			@Override
+			protected boolean serviceNotFound()
+			{
+				return true;
+			}
+
+			@Override
 			protected ServiceMethod getServiceMethod()
 			{
 				return new ServiceMethod(com.kareebo.contacts.client.protocol.ModifyKeys
 					                         .serviceName,"random");
-			}
-
-			@Override
+			}			@Override
 			TBase constructPayload()
 			{
 				return null;
 			}
 
-			@Override
-			protected boolean serviceNotFound()
-			{
-				return true;
-			}
+
 		});
 		new SimpleTestHarness().test(tests);
 	}

@@ -2,7 +2,6 @@ package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 
 /**

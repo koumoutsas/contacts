@@ -13,8 +13,9 @@ public class Enqueuers
 
 	/**
 	 * Create an {@link Enqueuers} object from a map of {@link IntermediateResultEnqueuer} and a {@link FinalResultEnqueuer}
+	 *
 	 * @param intermediateResultEnqueuers The map from {@link JobType} to {@link IntermediateResultEnqueuer}
-	 * @param finalResultEnqueuer The {@link FinalResultEnqueuer}
+	 * @param finalResultEnqueuer         The {@link FinalResultEnqueuer}
 	 */
 	public Enqueuers(final Map<JobType,IntermediateResultEnqueuer> intermediateResultEnqueuers,final FinalResultEnqueuer finalResultEnqueuer)
 	{
@@ -24,9 +25,10 @@ public class Enqueuers
 
 	/**
 	 * Shortcut constructor with a single {@link IntermediateResultEnqueuer}
-	 * @param jobType The {@link JobType}
+	 *
+	 * @param jobType                    The {@link JobType}
 	 * @param intermediateResultEnqueuer The {@link IntermediateResultEnqueuer}
-	 * @param finalResultEnqueuer The {@link FinalResultEnqueuer}
+	 * @param finalResultEnqueuer        The {@link FinalResultEnqueuer}
 	 */
 	public Enqueuers(final JobType jobType,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer)
 	{
@@ -37,6 +39,7 @@ public class Enqueuers
 
 	/**
 	 * Get the {@link FinalResultEnqueuer}
+	 *
 	 * @return The {@link FinalResultEnqueuer}
 	 */
 	public FinalResultEnqueuer finalResultEnqueuer()
@@ -46,6 +49,7 @@ public class Enqueuers
 
 	/**
 	 * Get the {@link IntermediateResultEnqueuer} for a {@link JobType}
+	 *
 	 * @param jobType The {@link JobType}
 	 * @return The {@link IntermediateResultEnqueuer}, null if there is no mapping
 	 */

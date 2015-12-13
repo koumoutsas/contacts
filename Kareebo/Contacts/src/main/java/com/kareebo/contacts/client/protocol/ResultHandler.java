@@ -3,7 +3,6 @@ package com.kareebo.contacts.client.protocol;
 import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
 import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.vertx.java.core.AsyncResult;
 
 /**

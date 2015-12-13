@@ -5,7 +5,6 @@ import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.HashBufferSet;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -35,7 +34,7 @@ public class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.th
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
+	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
 	FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
 		if(method.equals(method1))

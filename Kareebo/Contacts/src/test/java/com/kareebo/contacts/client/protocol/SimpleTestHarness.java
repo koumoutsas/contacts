@@ -102,7 +102,7 @@ class SimpleTestHarness
 					}
 					else
 					{
-						assertTrue(enqueuer.hasJob(JobType.Protocol,nextMethod,null));
+						assertTrue(enqueuer.hasJob(JobType.Processor,nextMethod,null));
 					}
 				}
 			}

@@ -4,7 +4,6 @@ import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.*;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -36,7 +35,7 @@ public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.Regist
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
 		if(method.equals(method1))
 		{
@@ -60,15 +59,15 @@ public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.Regist
 		                                                                                                                                                                     NoSuchProviderException, SignatureException
 	{
 		asyncClient.registerIdentity1(uA,sign(uA),new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,
-			                                                                                              finalResultEnqueuer,
-			                                                                                              com.kareebo.contacts
-				                                                                                              .client.processor.RegisterIdentity.method1));
+			                                                                                              com.kareebo.contacts.client.processor.RegisterIdentity.method1,
+			                                                                                              finalResultEnqueuer,method1
+		));
 	}
 
 	private void registerIdentity2(final long userIdA,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer)
 	{
-		asyncClient.registerIdentity2(userIdA,new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,finalResultEnqueuer,com.kareebo.contacts
-			                                                                                                                                          .client.processor.RegisterIdentity.method2));
+		asyncClient.registerIdentity2(userIdA,new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,com.kareebo.contacts
+			                                                                                                                      .client.processor.RegisterIdentity.method2,finalResultEnqueuer,method2));
 	}
 
 	private void registerIdentity3(final RegisterIdentityInput registerIdentityInput,final FinalResultEnqueuer enqueuer) throws InvalidKeyException,

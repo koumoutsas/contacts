@@ -1,7 +1,6 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

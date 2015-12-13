@@ -4,7 +4,6 @@ import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.*;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -39,7 +38,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
 		if(method.equals(method1))
 		{
@@ -67,15 +66,14 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 		                                                                                            NoSuchAlgorithmException,
 		                                                                                            NoSuchProviderException, SignatureException
 	{
-		asyncClient.sendContactCard1(u,sign(u),new IntermediateVoidResultHandler(enqueuer,com.kareebo.contacts.client.processor.SendContactCard
-			                                                                                  .method1));
+		asyncClient.sendContactCard1(u,sign(u),new IntermediateVoidResultHandler(enqueuer,method1));
 	}
 
 	private void sendContactCard2(final LongId id,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException,
 		                                                                                                                                                                NoSuchProviderException, SignatureException
 	{
-		asyncClient.sendContactCard2(id,sign(id),new IntermediateResultHandler<EncryptionKeys>(intermediateResultEnqueuer,finalResultEnqueuer,com.kareebo.contacts.client.processor
-			                                                                                                                                      .SendContactCard.method2));
+		asyncClient.sendContactCard2(id,sign(id),new IntermediateResultHandler<EncryptionKeys>(intermediateResultEnqueuer,com.kareebo.contacts.client.processor
+			                                                                                                                  .SendContactCard.method2,finalResultEnqueuer,method2));
 	}
 
 	private void sendContactCard3(final SetEncryptedBuffer encryptedBuffers,final FinalResultEnqueuer enqueuer) throws InvalidKeyException,
@@ -88,13 +86,14 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 		{
 			encryptedBufferSignedSet.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
 		}
-		asyncClient.sendContactCard3(encryptedBufferSignedSet,new IntermediateVoidResultHandler(enqueuer,com.kareebo.contacts.client.processor.SendContactCard.method3));
+		asyncClient.sendContactCard3(encryptedBufferSignedSet,new IntermediateVoidResultHandler(enqueuer,method3));
 	}
 
 	private void sendContactCard4(final LongId id,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException,
 		                                                                                                                                                                NoSuchProviderException, SignatureException
 	{
 		asyncClient.sendContactCard4(id,sign(id),new IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
-			                                         (intermediateResultEnqueuer,finalResultEnqueuer,com.kareebo.contacts.client.processor.SendContactCard.method4));
+			                                         (intermediateResultEnqueuer,com.kareebo.contacts.client.processor.SendContactCard
+				                                                                     .method4,finalResultEnqueuer,method4));
 	}
 }

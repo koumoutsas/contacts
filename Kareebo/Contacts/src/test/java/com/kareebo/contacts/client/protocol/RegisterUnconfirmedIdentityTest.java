@@ -60,13 +60,13 @@ public class RegisterUnconfirmedIdentityTest
 			{
 				return new ServiceMethod(RegisterUnconfirmedIdentity
 					                         .serviceName,"random");
-			}			@Override
+			}
+
+			@Override
 			TBase constructPayload()
 			{
 				return null;
 			}
-
-
 		});
 		new SimpleTestHarness().test(tests);
 	}

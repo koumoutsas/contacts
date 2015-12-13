@@ -93,13 +93,13 @@ public class SuggestNewContactTest
 			protected boolean serviceNotFound()
 			{
 				return true;
-			}			@Override
+			}
+
+			@Override
 			protected ServiceMethod getServiceMethod()
 			{
 				return new ServiceMethod(SuggestNewContact.serviceName,"random");
 			}
-
-
 		});
 		new SimpleTestHarness().test(tests);
 	}

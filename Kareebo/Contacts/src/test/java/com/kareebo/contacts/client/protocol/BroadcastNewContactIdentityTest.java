@@ -111,13 +111,13 @@ public class BroadcastNewContactIdentityTest
 			protected boolean serviceNotFound()
 			{
 				return true;
-			}			@Override
+			}
+
+			@Override
 			protected ServiceMethod getServiceMethod()
 			{
 				return new ServiceMethod(BroadcastNewContactIdentity.serviceName,"random");
 			}
-
-
 		});
 		new SimpleTestHarness().test(tests);
 	}

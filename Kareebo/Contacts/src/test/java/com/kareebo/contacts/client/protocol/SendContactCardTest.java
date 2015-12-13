@@ -82,13 +82,13 @@ public class SendContactCardTest
 			protected boolean serviceNotFound()
 			{
 				return true;
-			}			@Override
+			}
+
+			@Override
 			protected ServiceMethod getServiceMethod()
 			{
 				return new ServiceMethod(SendContactCard.serviceName,"random");
 			}
-
-
 		});
 		new SimpleTestHarness().test(tests);
 	}

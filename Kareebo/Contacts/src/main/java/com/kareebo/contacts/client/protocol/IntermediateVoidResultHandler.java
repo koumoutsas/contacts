@@ -1,7 +1,6 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 
 /**
  * Implementation of {@link ResultHandler} for {@link Void} when the result is not final

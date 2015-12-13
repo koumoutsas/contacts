@@ -4,7 +4,6 @@ import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.*;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -38,7 +37,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 	}
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
+	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
 	FinalResultEnqueuer finalResultEnqueuer) throws Exception
 	{
 		if(method.equals(method1))
@@ -64,7 +63,9 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 		                                                NoSuchProviderException, SignatureException
 	{
 		asyncClient.suggestNewContact1(id,sign(id),new IntermediateResultHandler<EncryptionKeysWithHashBuffer>(intermediateResultEnqueuer,
-			                                                                                                      finalResultEnqueuer,com.kareebo.contacts.client.processor.SuggestNewContact.method1));
+			                                                                                                      com.kareebo
+				                                                                                                      .contacts.client.processor.SuggestNewContact.method1,
+				                                                                                                      finalResultEnqueuer,method1));
 	}
 
 	private void suggestNewContact2(final EncryptedBuffersWithHashBuffer encryptedBuffersWithHashBuffer,final FinalResultEnqueuer enqueuer) throws
@@ -77,13 +78,14 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 		{
 			encryptedBufferSignedSet.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
 		}
-		asyncClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),new IntermediateVoidResultHandler(enqueuer,com.kareebo.contacts.client.processor.SuggestNewContact.method2));
+		asyncClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),new IntermediateVoidResultHandler(enqueuer,method2));
 	}
 
 	private void suggestNewContact3(final LongId id,final IntermediateResultEnqueuer intermediateResultEnqueuer,final
 	FinalResultEnqueuer finalResultEnqueuer) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{
 		asyncClient.suggestNewContact3(id,sign(id),new IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
-			                                           (intermediateResultEnqueuer,finalResultEnqueuer,method3));
+			                                           (intermediateResultEnqueuer,com.kareebo.contacts.client.processor
+				                                                                       .SuggestNewContact.method3,finalResultEnqueuer,method3));
 	}
 }

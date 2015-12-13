@@ -3,7 +3,6 @@ package com.kareebo.contacts.client.processor;
 import com.kareebo.contacts.client.jobs.Enqueuers;
 import com.kareebo.contacts.thrift.EncryptedBufferSignedWithVerificationKey;
 import com.kareebo.contacts.thrift.MapClientIdEncryptionKey;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 
 /**
@@ -18,7 +17,7 @@ public class BroadcastNewContactIdentity extends com.kareebo.contacts.client.job
 	public final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
 
 	@Override
-	protected void runInternal(final ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws Exception
+	protected void runInternal(final com.kareebo.contacts.thrift.client.jobs.ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws Exception
 	{
 		if(method.equals(method1))
 		{

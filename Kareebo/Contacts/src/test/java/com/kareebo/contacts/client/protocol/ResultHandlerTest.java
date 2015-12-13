@@ -5,7 +5,6 @@ import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.junit.Test;
 import org.vertx.java.core.AsyncResult;

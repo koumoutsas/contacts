@@ -88,13 +88,13 @@ public class RegisterIdentityTest
 			protected boolean serviceNotFound()
 			{
 				return true;
-			}			@Override
+			}
+
+			@Override
 			protected ServiceMethod getServiceMethod()
 			{
 				return new ServiceMethod(RegisterIdentity.serviceName,"random");
 			}
-
-
 
 			@Override
 			protected RegisterIdentityInput constructPayload()

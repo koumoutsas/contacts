@@ -51,13 +51,13 @@ public class ModifyUserAgentTest
 			{
 				return new ServiceMethod(com.kareebo.contacts.client.protocol.ModifyUserAgent
 					                         .serviceName,"random");
-			}			@Override
+			}
+
+			@Override
 			TBase constructPayload()
 			{
 				return null;
 			}
-
-
 		});
 		new SimpleTestHarness().test(tests);
 	}

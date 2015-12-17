@@ -8,8 +8,10 @@ import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import com.kareebo.contacts.thrift.SignatureBuffer;
+import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClient;
@@ -58,6 +60,34 @@ public class ServiceTest
 			                                                                                                                     IntermediateResultEnqueuer>(),null));
 	}
 
+	@Test
+	public void test() throws Exception
+	{
+		final LongId expected=new LongId(0);
+		final ServiceImplementation serviceImplementation=new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),
+			                                                                           clientId);
+		serviceImplementation.run(expected,new Enqueuers(JobType
+			                                                                                                                                                                                          .Processor,new IntermediateResultEnqueuer()
+		{
+			@Override
+			public void enqueue(final JobType type,final ServiceMethod method,final TBase payload)
+			{
+			}
+		},new FinalResultEnqueuer()
+		{
+			@Override
+			public void success(final JobType type,final String service,final SuccessCode result)
+			{
+			}
+
+			@Override
+			public void error(final JobType type,final ServiceMethod method,final ErrorCode error)
+			{
+			}
+		}));
+		assertTrue(expected==serviceImplementation.lastPayload);
+	}
+
 	private static class MyAsyncClient extends TAsyncClient
 	{
 		public MyAsyncClient(final TAsyncClientManager clientManager)
@@ -68,6 +98,8 @@ public class ServiceTest
 
 	private static class ServiceImplementation extends Service<MyAsyncClient>
 	{
+		TBase lastPayload;
+
 		ServiceImplementation(final SigningKey signingKey,final ClientId clientId)
 		{
 			super(null,signingKey,clientId);
@@ -111,6 +143,7 @@ public class ServiceTest
 				@Override
 				protected void runInternal(final MyAsyncClient asyncClient,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
+					lastPayload=payload;
 				}
 			}.run(payload,enqueuers);
 		}

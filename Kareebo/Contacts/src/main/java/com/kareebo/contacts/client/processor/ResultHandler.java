@@ -1,4 +1,4 @@
-package com.kareebo.contacts.client.protocol;
+package com.kareebo.contacts.client.processor;
 
 import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
 import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
@@ -12,6 +12,6 @@ abstract class ResultHandler<T> extends com.kareebo.contacts.thrift.client.jobs.
 {
 	ResultHandler(final ErrorEnqueuer errorEnqueuer,final ServiceMethod method)
 	{
-		super(errorEnqueuer,method,JobType.Protocol);
+		super(errorEnqueuer,method,JobType.Processor);
 	}
 }

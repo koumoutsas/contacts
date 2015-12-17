@@ -51,10 +51,10 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 		@Override
 		public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
 		{
-			final IntermediateResultEnqueuer intermediateResultEnqueuer=enqueuers.intermediateResultEnqueuer(JobType.Protocol);
+			final IntermediateResultEnqueuer intermediateResultEnqueuer=enqueuers.intermediateResultEnqueuer(JobType.Processor);
 			if(intermediateResultEnqueuer==null)
 			{
-				throw new IllegalArgumentException("No enqueuer for the job type");
+				throw new IllegalArgumentException("No enqueuer for the processor job type");
 			}
 			// The cast error exception is caught in com.kareebo.contacts.client.jobs.Service#run
 			//noinspection unchecked

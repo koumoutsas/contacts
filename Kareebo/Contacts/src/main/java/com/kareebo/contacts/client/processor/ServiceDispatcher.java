@@ -10,14 +10,17 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
 {
-	public ServiceDispatcher(final Enqueuers enqueuers)
+	final private PersistedObjectRetriever persistedObjectRetriever;
+
+	public ServiceDispatcher(final PersistedObjectRetriever persistedObjectRetriever,final Enqueuers enqueuers)
 	{
 		super(enqueuers);
+		this.persistedObjectRetriever=persistedObjectRetriever;
 	}
 
 	@Override
 	public Service constructService(final Class<?> theClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
 	{
-		return (Service)theClass.getDeclaredConstructor().newInstance();
+		return (Service)theClass.getDeclaredConstructor(PersistedObjectRetriever.class).newInstance(persistedObjectRetriever);
 	}
 }

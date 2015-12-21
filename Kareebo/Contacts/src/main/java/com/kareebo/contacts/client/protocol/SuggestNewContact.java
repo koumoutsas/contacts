@@ -50,7 +50,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 						                                                     (intermediateResultEnqueuer,
 							                                                     com.kareebo
 								                                                     .contacts.client.processor.SuggestNewContact.method1,
-								                                                     finalResultEnqueuer,method1));
+							                                                     finalResultEnqueuer,method1));
 				}
 			},
 			new Functor<EncryptedBuffersWithHashBuffer>()

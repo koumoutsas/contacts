@@ -1,5 +1,11 @@
 package com.kareebo.contacts.client.processor;
 
+import com.kareebo.contacts.client.jobs.Enqueuers;
+import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import org.apache.thrift.TBase;
+
 abstract class Service extends com.kareebo.contacts.client.jobs.Service
 {
 	final private PersistedObjectRetriever persistedObjectRetriever;
@@ -8,7 +14,7 @@ abstract class Service extends com.kareebo.contacts.client.jobs.Service
 	{
 		this.persistedObjectRetriever=persistedObjectRetriever;
 	}
-	
+
 	protected abstract class Functor<S extends TBase> implements com.kareebo.contacts.client.jobs.Service.Functor
 	{
 		@Override

@@ -3,18 +3,41 @@ package com.kareebo.contacts.client.processor;
 /// Interface to the client persistent storage
 public interface PersistentStorage
 {
-	/// Definitions of keys - TODO Move this to thrift
-	public static final String PrivateKeys="PrivateKeys";
-
 	/**
 	 * Get a byte buffer for a key
+	 *
 	 * @param key The storage key
-	 * @return The bute buffer that is mapped to the key. Deserialization is performed by the caller of the method
+	 * @return The byte buffer that is mapped to the key. Deserialization is performed by the caller of the method
 	 * @throws NoSuchKey If the key cannot be found
-	*/
+	 */
 	byte[] get(String key) throws NoSuchKey;
-	
-	static public NoSuchKey extends Exception
+
+	/**
+	 * Put a value to storage
+	 *
+	 * @param key   The key for the value
+	 * @param value The value
+	 */
+	void put(final String key,byte[] value);
+
+	/**
+	 * Remove a key from storage
+	 *
+	 * @param key The key
+	 * @throws NoSuchKey If the key cannot be found
+	 */
+	void remove(final String key) throws NoSuchKey;
+
+	/// Start a transaction
+	void start();
+
+	/// Commit a transaction
+	void commit();
+
+	/// Rollback a transaction
+	void rollback();
+
+	class NoSuchKey extends Exception
 	{
 	}
 }

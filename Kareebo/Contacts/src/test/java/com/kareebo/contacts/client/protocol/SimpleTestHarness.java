@@ -3,7 +3,6 @@ package com.kareebo.contacts.client.protocol;
 import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
 import com.kareebo.contacts.client.jobs.Enqueuers;
-import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
@@ -17,9 +16,7 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -60,9 +57,7 @@ class SimpleTestHarness
 		private void test(final boolean success) throws com.kareebo.contacts.client.jobs.Service.ExecutionFailed, com.kareebo.contacts.client.jobs.ServiceDispatcher.NoSuchService, com.kareebo.contacts.client.jobs.Service.NoSuchMethod
 		{
 			final ServiceMethod method=getServiceMethod();
-			final Map<JobType,IntermediateResultEnqueuer> enqueuerMap=new HashMap<>(1);
-			enqueuerMap.put(JobType.Protocol,enqueuer);
-			new ServiceDispatcher(new Enqueuers(enqueuerMap,enqueuer),clientManager(success),new SigningKey(keyPair.getPrivate(),algorithm),
+			new ServiceDispatcher(new Enqueuers(JobType.Processor,enqueuer,enqueuer),clientManager(success),new SigningKey(keyPair.getPrivate(),algorithm),
 				                     clientId).run
 					                               (method,
 						                               constructPayload());

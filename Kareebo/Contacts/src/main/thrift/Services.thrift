@@ -1,30 +1,13 @@
 namespace java com.kareebo.contacts.thrift
 
+include "DataStructures.thrift"
+
 typedef i64 Id
-typedef binary ByteArray
 
 struct UserAgent
 {
 	1:string platform,
 	2:string version,
-}
-
-enum HashAlgorithm
-{
-	SHA256=1,
-	Fake=2,
-}
-
-struct HashBuffer
-{
-	1:ByteArray buffer,
-	2:HashAlgorithm algorithm,
-}
-
-enum SignatureAlgorithm
-{
-	SHA256withECDSAprime239v1=1,
-	Fake=2,
 }
 
 struct ClientId
@@ -35,34 +18,28 @@ struct ClientId
 
 struct SignatureBuffer
 {
-	1:ByteArray buffer,
-	2:SignatureAlgorithm algorithm,
+	1:DataStructures.ByteArray buffer,
+	2:DataStructures.SignatureAlgorithm algorithm,
 	3:ClientId client,
-}
-
-enum EncryptionAlgorithm
-{
-	RSA2048=1,
-	Fake=2,
 }
 
 struct EncryptedBuffer
 {
-	1:ByteArray buffer,
-	2:EncryptionAlgorithm algorithm,
+	1:DataStructures.ByteArray buffer,
+	2:DataStructures.EncryptionAlgorithm algorithm,
 	3:ClientId client,
 }
 
 struct EncryptionKey
 {
-	1:ByteArray buffer,
-	2:EncryptionAlgorithm algorithm,
+	1:DataStructures.ByteArray buffer,
+	2:DataStructures.EncryptionAlgorithm algorithm,
 }
 
 struct VerificationKey
 {
-	1:ByteArray buffer,
-	2:SignatureAlgorithm algorithm,
+	1:DataStructures.ByteArray buffer,
+	2:DataStructures.SignatureAlgorithm algorithm,
 }
 
 struct PublicKeys
@@ -81,7 +58,7 @@ enum ContactOperationType
 
 struct ContactOperation
 {
-	1:HashBuffer contact,
+	1:DataStructures.HashBuffer contact,
 	2:ContactOperationType type,
 	3:EncryptedBuffer comparisonIdentity,
 }
@@ -132,7 +109,7 @@ struct EncryptionKeys
 struct EncryptionKeysWithHashBuffer
 {
 	1:EncryptionKeys encryptionKeys,
-	2:HashBuffer u,
+	2:DataStructures.HashBuffer u,
 }
 
 exception FailedOperation
@@ -142,10 +119,10 @@ exception FailedOperation
 struct RegisterIdentityInput
 {
 	1:PublicKeys publicKeys,
-	2:HashBuffer uA,
+	2:DataStructures.HashBuffer uA,
 	3:Id userIdA,
-	4:set<HashBuffer> uSet,
-	5:HashBuffer uJ,
+	4:set<DataStructures.HashBuffer> uSet,
+	5:DataStructures.HashBuffer uJ,
 	6:UserAgent userAgent,
 	7:i64 deviceToken,
 }
@@ -153,7 +130,7 @@ struct RegisterIdentityInput
 service RegisterIdentity
 {
 	// Steps 10-14
-	RegisterIdentityReply registerIdentity1(1:HashBuffer uA,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	RegisterIdentityReply registerIdentity1(1:DataStructures.HashBuffer uA,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Steps 19-22
 	RegisterIdentityReply registerIdentity2(1:Id userIdA) throws (1:FailedOperation failedOperation),
@@ -164,7 +141,7 @@ service RegisterIdentity
 
 struct HashBufferSet
 {
-	1:set<HashBuffer> hashBuffers,
+	1:set<DataStructures.HashBuffer> hashBuffers,
 }
 
 service RegisterUnconfirmedIdentity
@@ -175,8 +152,8 @@ service RegisterUnconfirmedIdentity
 
 struct HashBufferPair
 {
-	1:HashBuffer UC,
-	2:HashBuffer UPrimeC,
+	1:DataStructures.HashBuffer UC,
+	2:DataStructures.HashBuffer UPrimeC,
 }
 
 struct EncryptedBufferPairSet
@@ -236,7 +213,7 @@ service UpdateServerContactBook
 service SendContactCard
 {
 	// Steps 5-7
-	void sendContactCard1(1:HashBuffer u,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	void sendContactCard1(1:DataStructures.HashBuffer u,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Step 9
 	EncryptionKeys sendContactCard2(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
@@ -252,7 +229,7 @@ service SendContactCard
 struct EncryptedBuffersWithHashBuffer
 {
 	1:set<EncryptedBuffer> buffers,
-	2:HashBuffer uB,
+	2:DataStructures.HashBuffer uB,
 }
 
 service SuggestNewContact
@@ -261,7 +238,7 @@ service SuggestNewContact
 	EncryptionKeysWithHashBuffer suggestNewContact1(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Steps 2.e-2.f
-	void suggestNewContact2(1:set<EncryptedBufferSigned> encryptedBuffers,2:HashBuffer uB,3:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
+	void suggestNewContact2(1:set<EncryptedBufferSigned> encryptedBuffers,2:DataStructures.HashBuffer uB,3:SignatureBuffer signature) throws (1:FailedOperation failedOperation),
 
 	// Step 3
 	EncryptedBufferSignedWithVerificationKey suggestNewContact3(1:LongId id,2:SignatureBuffer signature) throws (1:FailedOperation

@@ -162,7 +162,7 @@ public class SuggestNewContactTest
 				suggestNewContact.suggestNewContact2(new HashSet<>(Collections.singletonList(new EncryptedBufferSigned(new EncryptedBuffer
 					                                                                                                       (buffer,
 						                                                                                                       EncryptionAlgorithm.RSA2048,clientId),
-						                                                                                                      new
+					                                                                                                      new
 						                                                                                                      SignatureBuffer(buffer,SignatureAlgorithm.SHA256withECDSAprime239v1,clientId)))),uB,
 					sign(uB,clientId),future);
 				assertTrue(future.failed());

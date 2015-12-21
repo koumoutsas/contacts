@@ -1,4 +1,4 @@
-package com.kareebo.contacts.client.protocol;
+package com.kareebo.contacts.client.processor;
 
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
 import com.kareebo.contacts.client.jobs.ErrorEnqueuer;

@@ -35,7 +35,7 @@ public class ServiceDispatcherTest
 {
 	final static long notificationIdExpected=0L;
 	final static EnqueuerImplementation enqueuerExpected=new EnqueuerImplementation();
-	final static Enqueuers enqueuers=new Enqueuers(JobType.Protocol,enqueuerExpected,enqueuerExpected);
+	final static Enqueuers enqueuers=new Enqueuers(JobType.Processor,enqueuerExpected,enqueuerExpected);
 	final private static SigningKey signingKeyExpected=new SigningKey(new PrivateKey()
 	{
 		@Override
@@ -106,9 +106,9 @@ public class ServiceDispatcherTest
 			                                                               clientIdExpected);
 		serviceDispatcher.run(ServiceImplementation.method1,notificationIdExpected);
 		final LongId longId=new LongId(notificationIdExpected);
-		assertTrue(enqueuerExpected.hasJob(JobType.Protocol,ServiceImplementation.method1,longId));
+		assertTrue(enqueuerExpected.hasJob(JobType.Processor,ServiceImplementation.method1,longId));
 		serviceDispatcher.run(ServiceImplementation.method1,longId);
-		assertTrue(enqueuerExpected.hasJob(JobType.Protocol,ServiceImplementation.method1,longId));
+		assertTrue(enqueuerExpected.hasJob(JobType.Processor,ServiceImplementation.method1,longId));
 		thrown.expect(Service.NoSuchMethod.class);
 		serviceDispatcher.run(invalid,notificationIdExpected);
 	}
@@ -153,7 +153,7 @@ public class ServiceDispatcherTest
 					assertEquals(notificationIdExpected,((LongId)payload).getId());
 					assertEquals(enqueuerExpected,intermediateResultEnqueuer);
 					assertEquals(enqueuerExpected,finalResultEnqueuer);
-					enqueuerExpected.enqueue(JobType.Protocol,method1,payload);
+					enqueuerExpected.enqueue(JobType.Processor,method1,payload);
 					if(!method1.equals(ServiceImplementation.method1))
 					{
 						throw new NoSuchMethod();

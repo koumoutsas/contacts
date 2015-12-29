@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.jobs;
 
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +29,8 @@ public class ServiceDispatcherImplementation extends ServiceDispatcher
 	}
 
 	@Override
-	public Service constructService(final Class<?> theClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
+	public Service constructService(final Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException,
+		                                                                                      InvocationTargetException, InstantiationException
 	{
 		if(error instanceof IllegalAccessException)
 		{

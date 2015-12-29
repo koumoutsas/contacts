@@ -8,6 +8,7 @@ import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
@@ -107,7 +108,7 @@ public class ServiceDispatcherTest
 		serviceDispatcher.run(ServiceImplementation.method1,notificationIdExpected);
 		final LongId longId=new LongId(notificationIdExpected);
 		assertTrue(enqueuerExpected.hasJob(JobType.Processor,ServiceImplementation.method1,longId));
-		serviceDispatcher.run(ServiceImplementation.method1,longId);
+		serviceDispatcher.run(ServiceImplementation.method1,longId,null);
 		assertTrue(enqueuerExpected.hasJob(JobType.Processor,ServiceImplementation.method1,longId));
 		thrown.expect(Service.NoSuchMethod.class);
 		serviceDispatcher.run(invalid,notificationIdExpected);
@@ -125,9 +126,10 @@ public class ServiceDispatcherTest
 	{
 		final static ServiceMethod method1=new ServiceMethod(ServiceImplementation.class.getName().substring(ServiceImplementation.class.getPackage().getName().length()+1),"1");
 
-		ServiceImplementation(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+		ServiceImplementation(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId
+			                                                                                                                     clientId)
 		{
-			super(asyncClientManager,signingKey,clientId);
+			super(context,asyncClientManager,signingKey,clientId);
 		}
 
 		@Override
@@ -153,7 +155,7 @@ public class ServiceDispatcherTest
 					assertEquals(notificationIdExpected,((LongId)payload).getId());
 					assertEquals(enqueuerExpected,intermediateResultEnqueuer);
 					assertEquals(enqueuerExpected,finalResultEnqueuer);
-					enqueuerExpected.enqueue(JobType.Processor,method1,payload);
+					enqueuerExpected.enqueue(JobType.Processor,method1,context,payload);
 					if(!method1.equals(ServiceImplementation.method1))
 					{
 						throw new NoSuchMethod();

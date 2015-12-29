@@ -15,8 +15,7 @@ public class RandomHashPad
 	 */
 	public RandomHashPad()
 	{
-		final SecureRandom random=new SecureRandom();
-		random.nextBytes(bytes);
+		new SecureRandom().nextBytes(bytes);
 	}
 
 	/**

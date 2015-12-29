@@ -8,10 +8,8 @@ import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import com.kareebo.contacts.thrift.SignatureBuffer;
-import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
-import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.*;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClient;
@@ -67,10 +65,10 @@ public class ServiceTest
 		final ServiceImplementation serviceImplementation=new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),
 			                                                                           clientId);
 		serviceImplementation.run(expected,new Enqueuers(JobType
-			                                                                                                                                                                                          .Processor,new IntermediateResultEnqueuer()
+			                                                 .Processor,new IntermediateResultEnqueuer()
 		{
 			@Override
-			public void enqueue(final JobType type,final ServiceMethod method,final TBase payload)
+			public void enqueue(final JobType type,final ServiceMethod method,final Context context,final TBase payload)
 			{
 			}
 		},new FinalResultEnqueuer()
@@ -102,7 +100,7 @@ public class ServiceTest
 
 		ServiceImplementation(final SigningKey signingKey,final ClientId clientId)
 		{
-			super(null,signingKey,clientId);
+			super(null,null,signingKey,clientId);
 		}
 
 		@Override

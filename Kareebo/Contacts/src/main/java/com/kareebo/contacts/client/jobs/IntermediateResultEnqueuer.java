@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.jobs;
 
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
@@ -12,7 +13,8 @@ public interface IntermediateResultEnqueuer
 	 *
 	 * @param type    The job type
 	 * @param method  The service method that caused the error
+	 * @param context The service context
 	 * @param payload The payload of the operation
 	 */
-	void enqueue(JobType type,ServiceMethod method,TBase payload);
+	void enqueue(JobType type,ServiceMethod method,Context context,TBase payload);
 }

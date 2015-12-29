@@ -24,7 +24,7 @@ public class ServiceDispatcherTest
 	public void testRun() throws Exception
 	{
 		final UserAgent userAgent=new UserAgent("a","b");
-		new ServiceDispatcherImplementation(enqueuer).run(ServiceImplementation.method,userAgent);
+		new ServiceDispatcherImplementation(enqueuer).run(ServiceImplementation.method,userAgent,null);
 		assertTrue(enqueuer.hasJob(ServiceDispatcherImplementation.jobType(),ServiceImplementation.method,userAgent));
 	}
 
@@ -40,34 +40,34 @@ public class ServiceDispatcherTest
 	public void testClassNotFoundException() throws Exception
 	{
 		thrown.expect(ServiceDispatcher.NoSuchService.class);
-		new ServiceDispatcherImplementation(enqueuer).run(new ServiceMethod("",""),null);
+		new ServiceDispatcherImplementation(enqueuer).run(new ServiceMethod("",""),null,null);
 	}
 
 	@Test
 	public void testNoSuchMethodException() throws Exception
 	{
 		thrown.expect(Service.NoSuchMethod.class);
-		new ServiceDispatcherImplementation(enqueuer).run(new ServiceMethod(ServiceImplementation.method.getServiceName(),""),null);
+		new ServiceDispatcherImplementation(enqueuer).run(new ServiceMethod(ServiceImplementation.method.getServiceName(),""),null,null);
 	}
 
 	@Test
 	public void testInstantiationException() throws Exception
 	{
 		thrown.expect(ServiceDispatcher.NoSuchService.class);
-		new ServiceDispatcherImplementation(enqueuer,new InstantiationException()).run(ServiceImplementation.method,null);
+		new ServiceDispatcherImplementation(enqueuer,new InstantiationException()).run(ServiceImplementation.method,null,null);
 	}
 
 	@Test
 	public void testIllegalAccessException() throws Exception
 	{
 		thrown.expect(ServiceDispatcher.NoSuchService.class);
-		new ServiceDispatcherImplementation(enqueuer,new IllegalAccessException()).run(ServiceImplementation.method,null);
+		new ServiceDispatcherImplementation(enqueuer,new IllegalAccessException()).run(ServiceImplementation.method,null,null);
 	}
 
 	@Test
 	public void testInvocationTargetException() throws Exception
 	{
 		thrown.expect(ServiceDispatcher.NoSuchService.class);
-		new ServiceDispatcherImplementation(enqueuer,new InvocationTargetException(null)).run(ServiceImplementation.method,null);
+		new ServiceDispatcherImplementation(enqueuer,new InvocationTargetException(null)).run(ServiceImplementation.method,null,null);
 	}
 }

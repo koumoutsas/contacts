@@ -1,4 +1,4 @@
-package com.kareebo.contacts.client.processor;
+package com.kareebo.contacts.client.persistentStorage;
 
 import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
@@ -6,7 +6,7 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 
 /// Wrapper around {@link PersistentStorage} that deserializes to {@link TBase}
-class PersistedObjectRetriever
+public class PersistedObjectRetriever
 {
 	final private PersistentStorage persistentStorage;
 
@@ -15,7 +15,7 @@ class PersistedObjectRetriever
 	 *
 	 * @param persistentStorage The {@link PersistentStorage}
 	 */
-	PersistedObjectRetriever(final PersistentStorage persistentStorage)
+	public PersistedObjectRetriever(final PersistentStorage persistentStorage)
 	{
 		this.persistentStorage=persistentStorage;
 	}
@@ -28,7 +28,7 @@ class PersistedObjectRetriever
 	 * @throws PersistentStorage.NoSuchKey When {@param key} cannot be found
 	 * @throws TException                  When deserialization to {@param object}fails
 	 */
-	void get(final TBase object,final String key) throws PersistentStorage.NoSuchKey, TException
+	public void get(final TBase object,final String key) throws PersistentStorage.NoSuchKey, TException
 	{
 		new TDeserializer().deserialize(object,persistentStorage.get(key));
 	}
@@ -40,7 +40,7 @@ class PersistedObjectRetriever
 	 * @param value The object
 	 * @throws TException When serialization of {@param value} fails
 	 */
-	void put(final String key,final TBase value) throws TException
+	public void put(final String key,final TBase value) throws TException
 	{
 		persistentStorage.put(key,new TSerializer().serialize(value));
 	}

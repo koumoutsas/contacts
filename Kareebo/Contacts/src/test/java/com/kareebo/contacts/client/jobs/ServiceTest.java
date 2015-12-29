@@ -53,7 +53,7 @@ public class ServiceTest
 	public void testMismatchedFunctors() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new Service()
+		new Service(null)
 		{
 			@Override
 			protected ServiceMethod[] methodNames()
@@ -85,7 +85,7 @@ public class ServiceTest
 	public void testDuplicateMethods() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new Service()
+		new Service(null)
 		{
 			@Override
 			protected ServiceMethod[] methodNames()

@@ -1,4 +1,4 @@
-package com.kareebo.contacts.client.processor;
+package com.kareebo.contacts.client.persistentStorage;
 
 /// Interface to the client persistent storage
 public interface PersistentStorage

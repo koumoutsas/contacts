@@ -4,6 +4,7 @@ import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
 /**
@@ -17,9 +18,9 @@ public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.Regist
 	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
 	private final static ServiceMethod[] methods={method1,method2,method3};
 
-	RegisterIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	RegisterIdentity(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(asyncClientManager,signingKey,clientId);
+		super(context,asyncClientManager,signingKey,clientId);
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.Regist
 					asyncClient.registerIdentity1(payload,sign
 						                                      (payload),new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,
 							                                                                                                    com.kareebo.contacts.client.processor.RegisterIdentity.method1,
-							                                                                                                    finalResultEnqueuer,method1
+							                                                                                                    finalResultEnqueuer,method1,context
 					));
 				}
 			},
@@ -58,7 +59,7 @@ public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.Regist
 					asyncClient.registerIdentity2(payload
 						                              .getId(),new
 							                                       IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,com.kareebo.contacts
-								                                                                                                                   .client.processor.RegisterIdentity.method2,finalResultEnqueuer,method2));
+								                                                                                                                   .client.processor.RegisterIdentity.method2,finalResultEnqueuer,method2,context));
 				}
 			},
 			new Functor<RegisterIdentityInput>()

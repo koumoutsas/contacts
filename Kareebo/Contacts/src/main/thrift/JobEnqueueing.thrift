@@ -11,7 +11,7 @@ struct ServiceMethod
 struct Notification
 {
 	1:ServiceMethod method,
-	3:i64 id,
+	2:i64 id,
 }
 
 enum SuccessCode
@@ -30,3 +30,10 @@ enum JobType
 	Processor=2,
 	ExternalService=3,
 }
+
+struct Context
+{
+	1:i64 id,
+}
+
+const string StorageKey="Context"

@@ -10,6 +10,11 @@ public class SuggestNewContact extends com.kareebo.contacts.client.jobs.Service
 	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
 	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
 
+	protected SuggestNewContact()
+	{
+		super(null);
+	}
+
 	@Override
 	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{

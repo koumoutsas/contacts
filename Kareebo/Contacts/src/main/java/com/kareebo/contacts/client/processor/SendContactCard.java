@@ -11,6 +11,11 @@ public class SendContactCard extends com.kareebo.contacts.client.jobs.Service
 	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
 	public final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
 
+	protected SendContactCard()
+	{
+		super(null);
+	}
+
 	@Override
 	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{

@@ -60,7 +60,7 @@ class SimpleTestHarness
 			new ServiceDispatcher(new Enqueuers(JobType.Processor,enqueuer,enqueuer),clientManager(success),new SigningKey(keyPair.getPrivate(),algorithm),
 				                     clientId).run
 					                               (method,
-						                               constructPayload());
+						                               constructPayload(),null);
 			final ServiceMethod nextMethod=nextServiceMethod();
 			if(success)
 			{

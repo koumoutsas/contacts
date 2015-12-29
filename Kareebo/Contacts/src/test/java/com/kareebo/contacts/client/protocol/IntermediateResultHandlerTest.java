@@ -19,7 +19,7 @@ public class IntermediateResultHandlerTest
 		final com.kareebo.contacts.client.processor.ServiceMethod processorMethod=new com.kareebo.contacts.client.processor.ServiceMethod
 			                                                                          ("c","d");
 		final EnqueuerImplementation enqueuer=new EnqueuerImplementation();
-		final IntermediateResultHandler<LongId> resultHandler=new IntermediateResultHandler<>(enqueuer,processorMethod,enqueuer,method);
+		final IntermediateResultHandler<LongId> resultHandler=new IntermediateResultHandler<>(enqueuer,processorMethod,enqueuer,method,null);
 		final LongId expected=new LongId(9);
 		resultHandler.handleSuccess(expected);
 		assertTrue(enqueuer.hasJob(JobType.Processor,processorMethod,expected));

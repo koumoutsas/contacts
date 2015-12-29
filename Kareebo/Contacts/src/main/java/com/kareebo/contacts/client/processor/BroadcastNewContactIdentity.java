@@ -12,6 +12,11 @@ public class BroadcastNewContactIdentity extends com.kareebo.contacts.client.job
 	public final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
 	private static final ServiceMethod[] methods={method1,method2,method3,method4};
 
+	protected BroadcastNewContactIdentity()
+	{
+		super(null);
+	}
+
 	@Override
 	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{

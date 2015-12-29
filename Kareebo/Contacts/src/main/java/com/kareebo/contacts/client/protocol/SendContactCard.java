@@ -4,6 +4,7 @@ import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
 import java.util.HashSet;
@@ -21,9 +22,9 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 	public final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
 	private final static ServiceMethod[] methods={method1,method2,method3,method4};
 
-	SendContactCard(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	SendContactCard(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(asyncClientManager,signingKey,clientId);
+		super(context,asyncClientManager,signingKey,clientId);
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 					       protected void runInternal(final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,final LongId payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 					       {
 						       asyncClient.sendContactCard2(payload,sign(payload),new IntermediateResultHandler<EncryptionKeys>(intermediateResultEnqueuer,com.kareebo.contacts.client.processor
-							                                                                                                                                   .SendContactCard.method2,finalResultEnqueuer,method2));
+							                                                                                                                                   .SendContactCard.method2,finalResultEnqueuer,method2,context));
 					       }
 				       },
 				       new Functor<SetEncryptedBuffer>()
@@ -81,7 +82,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 					       {
 						       asyncClient.sendContactCard4(payload,sign(payload),new IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
 							                                                          (intermediateResultEnqueuer,com.kareebo.contacts.client.processor.SendContactCard
-								                                                                                      .method4,finalResultEnqueuer,method4));
+								                                                                                      .method4,finalResultEnqueuer,method4,context));
 					       }
 				       }
 			       };

@@ -4,6 +4,7 @@ import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
 import java.util.HashSet;
@@ -20,9 +21,9 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
 	private final static ServiceMethod[] methods={method1,method2,method3};
 
-	SuggestNewContact(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	SuggestNewContact(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(asyncClientManager,signingKey,clientId);
+		super(context,asyncClientManager,signingKey,clientId);
 	}
 
 	@Override
@@ -50,7 +51,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 						                                                     (intermediateResultEnqueuer,
 							                                                     com.kareebo
 								                                                     .contacts.client.processor.SuggestNewContact.method1,
-							                                                     finalResultEnqueuer,method1));
+							                                                     finalResultEnqueuer,method1,context));
 				}
 			},
 			new Functor<EncryptedBuffersWithHashBuffer>()
@@ -75,7 +76,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 				{
 					asyncClient.suggestNewContact3(payload,sign(payload),new IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
 						                                                     (intermediateResultEnqueuer,com.kareebo.contacts.client.processor
-							                                                                                 .SuggestNewContact.method3,finalResultEnqueuer,method3));
+							                                                                                 .SuggestNewContact.method3,finalResultEnqueuer,method3,context));
 				}
 			}
 		};

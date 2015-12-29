@@ -5,6 +5,7 @@ import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.UserAgent;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
 /**
@@ -16,9 +17,9 @@ public class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyU
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
 	private final static ServiceMethod[] methods={method1};
 
-	ModifyUserAgent(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	ModifyUserAgent(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(asyncClientManager,signingKey,clientId);
+		super(context,asyncClientManager,signingKey,clientId);
 	}
 
 	@Override

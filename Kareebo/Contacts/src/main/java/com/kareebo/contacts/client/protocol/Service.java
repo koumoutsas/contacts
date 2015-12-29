@@ -6,6 +6,7 @@ import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.SignatureBuffer;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
@@ -27,8 +28,9 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 	/// A {@link Signer} for signing payloads
 	final private Signer signer;
 
-	protected Service(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	protected Service(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
+		super(context);
 		signer=new Signer(signingKey,clientId);
 		asyncClient=construct(asyncClientManager);
 	}

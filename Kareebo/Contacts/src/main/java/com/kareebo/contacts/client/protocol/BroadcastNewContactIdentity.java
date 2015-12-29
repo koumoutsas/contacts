@@ -4,6 +4,7 @@ import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
 import java.util.HashSet;
@@ -22,9 +23,9 @@ public class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.th
 	public final static ServiceMethod method5=new ServiceMethod(serviceName,"5");
 	private final static ServiceMethod[] methods={method1,method2,method3,method4,method5};
 
-	BroadcastNewContactIdentity(final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	BroadcastNewContactIdentity(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
 	{
-		super(asyncClientManager,signingKey,clientId);
+		super(context,asyncClientManager,signingKey,clientId);
 	}
 
 	@Override
@@ -50,7 +51,7 @@ public class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.th
 				{
 					asyncClient.broadcastNewContactIdentity1(payload,sign(payload),new IntermediateResultHandler<MapClientIdEncryptionKey>
 						                                                               (intermediateResultEnqueuer,com.kareebo.contacts.client
-							                                                                                           .processor.BroadcastNewContactIdentity.method1,finalResultEnqueuer,method1));
+							                                                                                           .processor.BroadcastNewContactIdentity.method1,finalResultEnqueuer,method1,context));
 				}
 			},
 			new Functor<EncryptedBufferPairSet>()
@@ -59,7 +60,7 @@ public class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.th
 				protected void runInternal(final com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient asyncClient,final EncryptedBufferPairSet payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.broadcastNewContactIdentity2(payload,sign(payload),new IntermediateResultHandler<MapClientIdEncryptionKey>(intermediateResultEnqueuer,com.kareebo.contacts.client
-						                                                                                                                                                  .processor.BroadcastNewContactIdentity.method2,finalResultEnqueuer,method2));
+						                                                                                                                                                  .processor.BroadcastNewContactIdentity.method2,finalResultEnqueuer,method2,context));
 				}
 			},
 			new Functor<SetEncryptedBuffer>()
@@ -85,7 +86,7 @@ public class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.th
 						                                                               IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
 						                                                               (intermediateResultEnqueuer,com.kareebo.contacts.client
 							                                                                                           .processor
-							                                                                                           .BroadcastNewContactIdentity.method4,finalResultEnqueuer,method4));
+							                                                                                           .BroadcastNewContactIdentity.method4,finalResultEnqueuer,method4,context));
 				}
 			},
 			new Functor<HashBufferPair>()

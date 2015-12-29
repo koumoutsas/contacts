@@ -3,6 +3,7 @@ package com.kareebo.contacts.client.protocol;
 import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.Enqueuers;
 import com.kareebo.contacts.thrift.ClientId;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,9 +26,11 @@ public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceD
 	}
 
 	@Override
-	public Service constructService(final Class<?> theClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
+	public Service constructService(final Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException,
+		                                                                                      InvocationTargetException, InstantiationException
 	{
-		return (Service)theClass.getDeclaredConstructor(TAsyncClientManager.class,SigningKey.class,ClientId.class).newInstance(clientManager,signingKey,
-			clientId);
+		return (Service)theClass.getDeclaredConstructor(Context.class,TAsyncClientManager.class,SigningKey.class,ClientId.class).newInstance
+			                                                                                                                         (context,clientManager,signingKey,
+				                                                                                                                         clientId);
 	}
 }

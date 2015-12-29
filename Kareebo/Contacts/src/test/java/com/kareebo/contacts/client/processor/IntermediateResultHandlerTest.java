@@ -20,7 +20,7 @@ public class IntermediateResultHandlerTest
 		final ServiceMethod method=new ServiceMethod
 			                           ("c","d");
 		final EnqueuerImplementation enqueuer=new EnqueuerImplementation();
-		final IntermediateResultHandler<LongId> resultHandler=new IntermediateResultHandler<>(enqueuer,protocolMethod,enqueuer,method);
+		final IntermediateResultHandler<LongId> resultHandler=new IntermediateResultHandler<>(enqueuer,protocolMethod,enqueuer,method,null);
 		final LongId expected=new LongId(9);
 		resultHandler.handleSuccess(expected);
 		assertTrue(enqueuer.hasJob(JobType.Protocol,protocolMethod,expected));

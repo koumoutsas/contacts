@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.jobs;
 
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.slf4j.Logger;
@@ -14,11 +15,14 @@ import java.util.Map;
 abstract public class Service
 {
 	private static final Logger logger=LoggerFactory.getLogger(Service.class.getName());
+	/// The service context
+	protected final Context context;
 	/// The set of methods indexed by method name
 	private final Map<String,Functor> methods;
 
-	protected Service()
+	protected Service(final Context context)
 	{
+		this.context=context;
 		final ServiceMethod[] methodNames=methodNames();
 		final int numberOfMethods=methodNames.length;
 		final Functor[] functors=functors();

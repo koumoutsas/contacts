@@ -1,9 +1,6 @@
 package com.kareebo.contacts.client.jobs;
 
-import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
-import com.kareebo.contacts.thrift.client.jobs.JobType;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
+import com.kareebo.contacts.thrift.client.jobs.*;
 import org.apache.thrift.TBase;
 
 public class EnqueuerImplementation implements FinalResultEnqueuer, IntermediateResultEnqueuer
@@ -58,7 +55,7 @@ public class EnqueuerImplementation implements FinalResultEnqueuer, Intermediate
 	}
 
 	@Override
-	public void enqueue(final JobType type,final ServiceMethod method,final TBase payload)
+	public void enqueue(final JobType type,final ServiceMethod method,Context context,final TBase payload)
 	{
 		set(null,null,method,payload,type);
 	}

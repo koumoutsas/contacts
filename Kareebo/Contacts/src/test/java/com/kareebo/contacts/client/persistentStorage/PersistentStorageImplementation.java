@@ -1,4 +1,4 @@
-package com.kareebo.contacts.client.processor;
+package com.kareebo.contacts.client.persistentStorage;
 
 import java.util.HashMap;
 import java.util.Map;

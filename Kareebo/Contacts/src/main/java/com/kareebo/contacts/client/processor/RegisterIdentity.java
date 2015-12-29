@@ -13,6 +13,11 @@ public class RegisterIdentity extends com.kareebo.contacts.client.jobs.Service
 	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
 	private static final ServiceMethod[] methods={method1,method2};
 
+	protected RegisterIdentity()
+	{
+		super(null);
+	}
+
 	@Override
 	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{

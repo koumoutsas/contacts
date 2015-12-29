@@ -19,6 +19,7 @@ public class ServiceImplementation extends Service
 
 	ServiceImplementation(final Exception error)
 	{
+		super(null);
 		this.error=error;
 	}
 
@@ -38,7 +39,7 @@ public class ServiceImplementation extends Service
 			{
 				if(error==null)
 				{
-					enqueuers.intermediateResultEnqueuer(JobType.Protocol).enqueue(JobType.Protocol,method,payload);
+					enqueuers.intermediateResultEnqueuer(JobType.Protocol).enqueue(JobType.Protocol,method,null,payload);
 				}
 				else
 				{

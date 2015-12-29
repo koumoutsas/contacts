@@ -1,4 +1,4 @@
-package com.kareebo.contacts.client.processor;
+package com.kareebo.contacts.client.persistentStorage;
 
 import com.kareebo.contacts.thrift.LongId;
 import org.apache.thrift.TDeserializer;

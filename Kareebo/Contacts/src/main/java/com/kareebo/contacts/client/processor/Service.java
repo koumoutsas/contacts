@@ -3,6 +3,8 @@ package com.kareebo.contacts.client.processor;
 import com.kareebo.contacts.client.jobs.Enqueuers;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.client.persistentStorage.PersistedObjectRetriever;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import org.apache.thrift.TBase;
 
@@ -10,8 +12,9 @@ abstract class Service extends com.kareebo.contacts.client.jobs.Service
 {
 	final private PersistedObjectRetriever persistedObjectRetriever;
 
-	Service(final PersistedObjectRetriever persistedObjectRetriever)
+	Service(final Context context,final PersistedObjectRetriever persistedObjectRetriever)
 	{
+		super(context);
 		this.persistedObjectRetriever=persistedObjectRetriever;
 	}
 

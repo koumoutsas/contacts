@@ -2,10 +2,8 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.*;
-import com.kareebo.contacts.server.gora.EncryptedBuffer;
 import com.kareebo.contacts.server.gora.EncryptionAlgorithm;
 import com.kareebo.contacts.server.gora.EncryptionKey;
-import com.kareebo.contacts.server.gora.HashBuffer;
 import com.kareebo.contacts.server.gora.PublicKeys;
 import com.kareebo.contacts.server.gora.UserAgent;
 import com.kareebo.contacts.server.gora.VerificationKey;
@@ -50,12 +48,12 @@ public class SendContactCardTest
 		abstract class Base1 extends Base
 		{
 			protected final Future<Void> future=new DefaultFutureResult<>();
-			final protected ClientId clientId10=new ClientId(1,0);
-			final protected ClientId clientId11=new ClientId(1,1);
-			final protected ClientId clientId01=new ClientId(0,1);
+			final ClientId clientId10=new ClientId(1,0);
+			final ClientId clientId11=new ClientId(1,1);
+			final ClientId clientId01=new ClientId(0,1);
 			final com.kareebo.contacts.thrift.EncryptionKey e0;
 			final com.kareebo.contacts.thrift.EncryptionKey e1;
-			final com.kareebo.contacts.thrift.HashBuffer u=new com.kareebo.contacts.thrift.HashBuffer();
+			private final com.kareebo.contacts.thrift.HashBuffer u=new com.kareebo.contacts.thrift.HashBuffer();
 
 			Base1() throws GoraException, NoSuchAlgorithmException
 			{
@@ -80,15 +78,15 @@ public class SendContactCardTest
 				clients1.put(TypeConverter.convert(clientId10.getClient()),client10);
 				clients1.put(TypeConverter.convert(clientId11.getClient()),client11);
 				user1.setClients(clients1);
-				user1.setIdentities(new ArrayList<HashBuffer>());
-				user1.setSentRequests(new ArrayList<HashBuffer>());
+				user1.setIdentities(new ArrayList<>());
+				user1.setSentRequests(new ArrayList<>());
 				user1.setId(clientId10.getUser());
 				userDatastore.put(clientId.getUser(),user0);
 				userDatastore.put(clientId10.getUser(),user1);
 				final HashIdentity hashIdentity=new HashIdentity();
 				hashIdentity.setHash(b0);
 				final HashIdentityValue hashIdentityValue=new HashIdentityValue();
-				hashIdentityValue.setConfirmers(new ArrayList<Long>());
+				hashIdentityValue.setConfirmers(new ArrayList<>());
 				hashIdentityValue.setId(clientId10.getUser());
 				hashIdentity.setHashIdentity(hashIdentityValue);
 				u.setAlgorithm(HashAlgorithm.SHA256);
@@ -96,6 +94,7 @@ public class SendContactCardTest
 				identityDataStore.put(b0,hashIdentity);
 			}
 
+			@SuppressWarnings("WeakerAccess")
 			void run() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
 				sendContactCard.sendContactCard1(u,sign(u,clientId),future);
@@ -159,7 +158,7 @@ public class SendContactCardTest
 			@Override
 			TBase construct()
 			{
-				return new EncryptionKeys(0,new HashMap<Long,com.kareebo.contacts.thrift.EncryptionKey>());
+				return new EncryptionKeys(0,new HashMap<>());
 			}
 
 			@Override
@@ -181,12 +180,12 @@ public class SendContactCardTest
 		abstract class Base3 extends Base
 		{
 			protected final Future<Void> future=new DefaultFutureResult<>();
-			final Set<EncryptedBufferSigned> encryptedBufferSignedSet=new HashSet<>(2);
 			final EncryptedBufferSignedWithVerificationKey e0;
 			final EncryptedBufferSignedWithVerificationKey e1;
+			private final Set<EncryptedBufferSigned> encryptedBufferSignedSet=new HashSet<>(2);
 			private final Long userId=clientId.getUser()+1;
-			protected final ClientId clientId0=new ClientId(userId,0);
-			protected final ClientId clientId1=new ClientId(userId,1);
+			final ClientId clientId0=new ClientId(userId,0);
+			final ClientId clientId1=new ClientId(userId,1);
 
 			Base3() throws GoraException, TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
@@ -195,8 +194,8 @@ public class SendContactCardTest
 				final ByteBuffer b=ByteBuffer.wrap("".getBytes());
 				b.mark();
 				user.setBlind(b);
-				user.setIdentities(new ArrayList<HashBuffer>());
-				user.setSentRequests(new ArrayList<HashBuffer>());
+				user.setIdentities(new ArrayList<>());
+				user.setSentRequests(new ArrayList<>());
 				final Map<CharSequence,Client> clients=new HashMap<>(2);
 				final VerificationKey verificationKey=new VerificationKey();
 				verificationKey.setAlgorithm(com.kareebo.contacts.server.gora.SignatureAlgorithm.Fake);
@@ -219,6 +218,7 @@ public class SendContactCardTest
 				e1=new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned1,TypeConverter.convert(this.verificationKey));
 			}
 
+			@SuppressWarnings("WeakerAccess")
 			void run() throws TException
 			{
 				sendContactCard.sendContactCard3(encryptedBufferSignedSet,future);
@@ -354,13 +354,13 @@ public class SendContactCardTest
 
 	private class Base extends Signer
 	{
-		final protected Notifier notifier;
-		final protected ClientNotifier clientNotifier;
 		final protected ClientId clientId=new ClientId(0,0);
-		final protected DataStore<Long,PendingNotification> pendingNotificationDataStore;
-		final protected DataStore<ByteBuffer,HashIdentity> identityDataStore;
-		protected final DataStore<Long,User> userDatastore;
-		protected SendContactCard sendContactCard;
+		final Notifier notifier;
+		final ClientNotifier clientNotifier;
+		final DataStore<Long,PendingNotification> pendingNotificationDataStore;
+		final DataStore<ByteBuffer,HashIdentity> identityDataStore;
+		final DataStore<Long,User> userDatastore;
+		SendContactCard sendContactCard;
 
 		Base() throws GoraException
 		{
@@ -377,8 +377,8 @@ public class SendContactCardTest
 			b.mark();
 			user.setBlind(b);
 			user.setId(clientId.getUser());
-			user.setIdentities(new ArrayList<HashBuffer>());
-			user.setSentRequests(new ArrayList<HashBuffer>());
+			user.setIdentities(new ArrayList<>());
+			user.setSentRequests(new ArrayList<>());
 			final Map<CharSequence,Client> clients=new HashMap<>(1);
 			clients.put(TypeConverter.convert(clientId.getClient()),createClient(clientId,verificationKey));
 			user.setClients(clients);
@@ -388,7 +388,7 @@ public class SendContactCardTest
 		Client createClient(final ClientId clientId,final VerificationKey verificationKey)
 		{
 			final Client client=new Client();
-			client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+			client.setComparisonIdentities(new ArrayList<>());
 			client.setDeviceToken(clientId.getClient());
 			final PublicKeys publicKeys=new PublicKeys();
 			publicKeys.setVerification(verificationKey);

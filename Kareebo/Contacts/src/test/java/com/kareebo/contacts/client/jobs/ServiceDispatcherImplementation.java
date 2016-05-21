@@ -8,16 +8,16 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Implementation of {@link ServiceDispatcher} for tests
  */
-public class ServiceDispatcherImplementation extends ServiceDispatcher
+class ServiceDispatcherImplementation extends ServiceDispatcher
 {
 	final private Exception error;
 
-	public ServiceDispatcherImplementation(final EnqueuerImplementation enqueuer)
+	ServiceDispatcherImplementation(final EnqueuerImplementation enqueuer)
 	{
 		this(enqueuer,null);
 	}
 
-	public ServiceDispatcherImplementation(final EnqueuerImplementation enqueuer,final Exception error)
+	ServiceDispatcherImplementation(final EnqueuerImplementation enqueuer,final Exception error)
 	{
 		super(new Enqueuers(jobType(),enqueuer,enqueuer));
 		this.error=error;

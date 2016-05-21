@@ -11,7 +11,7 @@ import org.apache.thrift.async.TAsyncClientManager;
 /**
  * Client-side implementation of the modify keys service
  */
-public class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxClient>
+class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxClient>
 {
 	public static final String serviceName=ModifyKeys.class.getSimpleName();
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");

@@ -19,7 +19,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
 	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
 	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
-	public final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
+	final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
 	private final static ServiceMethod[] methods={method1,method2,method3,method4};
 
 	SendContactCard(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
@@ -57,8 +57,8 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 					       @Override
 					       protected void runInternal(final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,final LongId payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 					       {
-						       asyncClient.sendContactCard2(payload,sign(payload),new IntermediateResultHandler<EncryptionKeys>(intermediateResultEnqueuer,com.kareebo.contacts.client.processor
-							                                                                                                                                   .SendContactCard.method2,finalResultEnqueuer,method2,context));
+						       asyncClient.sendContactCard2(payload,sign(payload),new IntermediateResultHandler<>(intermediateResultEnqueuer,com.kareebo.contacts.client.processor
+							                                                                                                                     .SendContactCard.method2,finalResultEnqueuer,method2,context));
 					       }
 				       },
 				       new Functor<SetEncryptedBuffer>()
@@ -80,7 +80,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 					       @Override
 					       protected void runInternal(final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,final LongId payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 					       {
-						       asyncClient.sendContactCard4(payload,sign(payload),new IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
+						       asyncClient.sendContactCard4(payload,sign(payload),new IntermediateResultHandler<>
 							                                                          (intermediateResultEnqueuer,com.kareebo.contacts.client.processor.SendContactCard
 								                                                                                      .method4,finalResultEnqueuer,method4,context));
 					       }

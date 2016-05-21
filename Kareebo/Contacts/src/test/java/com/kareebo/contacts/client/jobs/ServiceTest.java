@@ -3,7 +3,6 @@ package com.kareebo.contacts.client.jobs;
 import com.kareebo.contacts.thrift.UserAgent;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-import org.apache.thrift.TBase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -64,18 +63,8 @@ public class ServiceTest
 			@Override
 			protected Functor[] functors()
 			{
-				return new Functor[]{new Functor()
-				{
-					@Override
-					public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
-					{
-					}
-				},new Functor()
-				{
-					@Override
-					public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
-					{
-					}
+				return new Functor[]{(payload,enqueuers1)->{
+				},(payload,enqueuers1)->{
 				}};
 			}
 		};
@@ -96,18 +85,8 @@ public class ServiceTest
 			@Override
 			protected Functor[] functors()
 			{
-				return new Functor[]{new Functor()
-				{
-					@Override
-					public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
-					{
-					}
-				},new Functor()
-				{
-					@Override
-					public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
-					{
-					}
+				return new Functor[]{(payload,enqueuers1)->{
+				},(payload,enqueuers1)->{
 				}};
 			}
 		};

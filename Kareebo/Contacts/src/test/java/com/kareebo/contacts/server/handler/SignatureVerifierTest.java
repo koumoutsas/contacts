@@ -180,17 +180,12 @@ public class SignatureVerifierTest extends SignatureVerifierTestBase
 
 		void verify(final TBase plaintext,final SignatureBuffer signature,final Future<Void> future)
 		{
-			verify(plaintext,signature,new Reply<>(future),new After()
-			{
-				@Override
-				public void run(final User user,final Client client) throws FailedOperation
+			verify(plaintext,signature,new Reply<>(future),(user,client)->{
+				if(shouldThrow)
 				{
-					if(shouldThrow)
-					{
-						throw new FailedOperation();
-					}
-					client.setUserAgent(emptyUserAgent);
+					throw new FailedOperation();
 				}
+				client.setUserAgent(emptyUserAgent);
 			});
 		}
 	}

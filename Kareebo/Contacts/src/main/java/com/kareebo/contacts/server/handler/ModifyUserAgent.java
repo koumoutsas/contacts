@@ -1,9 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
-import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
-import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import com.kareebo.contacts.thrift.UserAgent;
 import org.apache.gora.store.DataStore;
@@ -27,14 +25,9 @@ public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.co
 	@Override
 	public void modifyUserAgent1(final UserAgent userAgent,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(userAgent,signature,new Reply<>(future),new After()
-		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
-			{
-				client.setUserAgent(TypeConverter.convert(userAgent));
-				clientDBAccessor.put(client);
-			}
+		verify(userAgent,signature,new Reply<>(future),(user,client)->{
+			client.setUserAgent(TypeConverter.convert(userAgent));
+			clientDBAccessor.put(client);
 		});
 	}
 }

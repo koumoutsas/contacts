@@ -14,7 +14,7 @@ class KeyPair
 {
 	private final java.security.KeyPair keyPair;
 
-	public KeyPair() throws InvalidAlgorithmParameterException, NoSuchProviderException, NoSuchAlgorithmException
+	KeyPair() throws InvalidAlgorithmParameterException, NoSuchProviderException, NoSuchAlgorithmException
 	{
 		Security.addProvider(new BouncyCastleProvider());
 		final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");

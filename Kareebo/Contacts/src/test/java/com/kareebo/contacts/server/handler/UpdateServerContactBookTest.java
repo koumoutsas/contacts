@@ -17,6 +17,7 @@ import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -356,13 +357,7 @@ public class UpdateServerContactBookTest
 		{
 			setupOperations();
 			setupIdentityDatastore();
-			for(ContactOperationType t : operations)
-			{
-				if(!contactOperations.add(createContactOperation(t)))
-				{
-					fail("Contact operation already added");
-				}
-			}
+			operations.stream().filter(t->!contactOperations.add(createContactOperation(t))).forEach(t->fail("Contact operation already added"));
 			adjustContactOperations();
 			return new ContactOperationSet(contactOperations);
 		}
@@ -420,7 +415,7 @@ public class UpdateServerContactBookTest
 			hashIdentity.setHash(key);
 			final HashIdentityValue value=new HashIdentityValue();
 			value.setId(user);
-			value.setConfirmers(new ArrayList<Long>());
+			value.setConfirmers(new ArrayList<>());
 			hashIdentity.setHashIdentity(value);
 			identityDataStore.put(key,hashIdentity);
 		}
@@ -527,10 +522,7 @@ public class UpdateServerContactBookTest
 			public void addEdges(final Long from,final HashSet<Long> to)
 			{
 				isClosed=false;
-				for(Long e : to)
-				{
-					edges.add(new Edge(from,e));
-				}
+				edges.addAll(to.stream().map(e->new Edge(from,e)).collect(Collectors.toList()));
 			}
 
 			@Override

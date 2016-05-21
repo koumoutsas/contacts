@@ -6,8 +6,10 @@ import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.client.persistentStorage.PersistedObjectRetriever;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorageImplementation;
 import com.kareebo.contacts.thrift.LongId;
-import com.kareebo.contacts.thrift.client.jobs.*;
+import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.apache.thrift.TBase;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,8 +31,7 @@ public class ServiceTest
 	public void testIllegalJobType() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new ServiceImplementation(new PersistedObjectRetriever(new PersistentStorageImplementation())).run(null,new Enqueuers(new HashMap<JobType,
-			                                                                                                                                 IntermediateResultEnqueuer>()
+		new ServiceImplementation(new PersistedObjectRetriever(new PersistentStorageImplementation())).run(null,new Enqueuers(new HashMap<>()
 			                                                                                                                     ,null));
 	}
 
@@ -40,12 +41,7 @@ public class ServiceTest
 		final LongId expected=new LongId(8);
 		final PersistedObjectRetriever persistedObjectRetriever=new PersistedObjectRetriever(new PersistentStorageImplementation());
 		new ServiceImplementation(persistedObjectRetriever).run(expected,new Enqueuers(JobType
-			                                                                               .Protocol,new IntermediateResultEnqueuer()
-		{
-			@Override
-			public void enqueue(final JobType type,final ServiceMethod method,final Context context,final TBase payload)
-			{
-			}
+			                                                                               .Protocol,(type,method,context,payload)->{
 		},new FinalResultEnqueuer()
 		{
 			@Override

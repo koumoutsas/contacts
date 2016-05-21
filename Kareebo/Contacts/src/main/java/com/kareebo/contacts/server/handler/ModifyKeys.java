@@ -1,7 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
-import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.PublicKeys;
@@ -37,21 +36,17 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	public void modifyKeys1(final PublicKeys newPublicKeys,final SignatureBuffer signature,final Future<Void>
 		                                                                                       future)
 	{
-		verify(newPublicKeys,signature,new Reply<>(future),new After()
+		verify(newPublicKeys,signature,new Reply<>(future),(user,client)->
 		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
+			try
 			{
-				try
-				{
-					client.setKeys(TypeConverter.convert(newPublicKeys));
-					clientDBAccessor.put(client);
-				}
-				catch(NoSuchAlgorithmException e)
-				{
-					logger.error("Invalid algorithm",e);
-					throw new FailedOperation();
-				}
+				client.setKeys(TypeConverter.convert(newPublicKeys));
+				clientDBAccessor.put(client);
+			}
+			catch(NoSuchAlgorithmException e)
+			{
+				logger.error("Invalid algorithm",e);
+				throw new FailedOperation();
 			}
 		});
 	}

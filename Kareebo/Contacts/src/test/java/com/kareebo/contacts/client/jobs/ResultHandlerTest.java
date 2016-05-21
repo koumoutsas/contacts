@@ -22,7 +22,7 @@ public class ResultHandlerTest
 		{
 			final private FinalResultEnqueuer enqueuer;
 
-			MyResultHandler(final FinalResultEnqueuer enqueuer,final ServiceMethod method)
+			private MyResultHandler(final FinalResultEnqueuer enqueuer,final ServiceMethod method)
 			{
 				super(enqueuer,method,JobType.Protocol);
 				this.enqueuer=enqueuer;

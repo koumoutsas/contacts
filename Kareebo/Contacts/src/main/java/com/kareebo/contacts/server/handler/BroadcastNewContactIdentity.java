@@ -20,8 +20,8 @@ import java.util.*;
 /**
  * Server-side service implementation of the broadcast new contact identity operation
  */
-public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndNotifier implements com.kareebo.contacts.thrift
-	                                                                                                          .BroadcastNewContactIdentity.AsyncIface
+class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndNotifier implements com.kareebo.contacts.thrift
+	                                                                                                   .BroadcastNewContactIdentity.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(BroadcastNewContactIdentity.class.getName());
 
@@ -43,29 +43,25 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	{
 		final MapClientIdEncryptionKey reply=new MapClientIdEncryptionKey();
 		final Map<ClientId,EncryptionKey> replyMap=new HashMap<>();
-		verify(userIdB,signature,new Reply<>(future,reply),new After()
+		verify(userIdB,signature,new Reply<>(future,reply),(user,client)->
 		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
+			final long userId=userIdB.getId();
+			final Map<CharSequence,Client> clients=clientDBAccessor.get(userId).getClients();
+			for(final Map.Entry<CharSequence,Client> entry : clients.entrySet())
 			{
-				final long userId=userIdB.getId();
-				final Map<CharSequence,Client> clients=clientDBAccessor.get(userId).getClients();
-				for(final Map.Entry<CharSequence,Client> entry : clients.entrySet())
+				try
 				{
-					try
-					{
-						replyMap.put(new ClientId(userId,TypeConverter.convert(entry.getKey())),TypeConverter.convert(entry
-							                                                                                              .getValue().getKeys()
-							                                                                                              .getEncryption()));
-					}
-					catch(NoSuchAlgorithmException e)
-					{
-						logger.error("Invalid algorithm retrieved from the datastore",e);
-						throw new FailedOperation();
-					}
+					replyMap.put(new ClientId(userId,TypeConverter.convert(entry.getKey())),TypeConverter.convert(entry
+						                                                                                              .getValue().getKeys()
+						                                                                                              .getEncryption()));
 				}
-				reply.setKeyMap(replyMap);
+				catch(NoSuchAlgorithmException e)
+				{
+					logger.error("Invalid algorithm retrieved from the datastore",e);
+					throw new FailedOperation();
+				}
 			}
+			reply.setKeyMap(replyMap);
 		});
 	}
 
@@ -76,40 +72,36 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 		final Set<EncryptedBufferPair> encryptedBufferPairsSet=encryptedBufferPairs.getEncryptedBufferPairs();
 		final MapClientIdEncryptionKey reply=new MapClientIdEncryptionKey();
 		final Map<ClientId,EncryptionKey> replyMap=new HashMap<>(encryptedBufferPairsSet.size());
-		verify(encryptedBufferPairs,signature,new Reply<>(future,reply),new After()
+		verify(encryptedBufferPairs,signature,new Reply<>(future,reply),(user,client)->
 		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
+			for(final EncryptedBufferPair e : encryptedBufferPairsSet)
 			{
-				for(final EncryptedBufferPair e : encryptedBufferPairsSet)
+				final byte[] I=e.getI().getBuffer();
+				final byte[] IR=e.getIR().getBuffer();
+				final ClientId clientIdB=e.getI().getClient();
+				try
 				{
-					final byte[] I=e.getI().getBuffer();
-					final byte[] IR=e.getIR().getBuffer();
-					final ClientId clientIdB=e.getI().getClient();
-					try
+					final Client clientB=clientDBAccessor.get(clientIdB);
+					final List<com.kareebo.contacts.server.gora.EncryptedBuffer> comparisonIdentities=clientB.getComparisonIdentities();
+					for(final com.kareebo.contacts.server.gora.EncryptedBuffer c : comparisonIdentities)
 					{
-						final Client clientB=clientDBAccessor.get(clientIdB);
-						final List<com.kareebo.contacts.server.gora.EncryptedBuffer> comparisonIdentities=clientB.getComparisonIdentities();
-						for(final com.kareebo.contacts.server.gora.EncryptedBuffer c : comparisonIdentities)
+						if(Arrays.equals(IR,Utils.xor(com.kareebo.contacts.base.Utils.getBytes(c.getBuffer()),I)))
 						{
-							if(Arrays.equals(IR,Utils.xor(com.kareebo.contacts.base.Utils.getBytes(c.getBuffer()),I)))
-							{
-								replyMap.put(clientIdB,TypeConverter.convert(clientB.getKeys().getEncryption()));
-								break;
-							}
+							replyMap.put(clientIdB,TypeConverter.convert(clientB.getKeys().getEncryption()));
+							break;
 						}
 					}
-					catch(FailedOperation exception)
-					{
-						logger.error("Unable to find client "+clientIdB);
-					}
-					catch(NoSuchAlgorithmException exception)
-					{
-						logger.error("Invalid algorithm found for "+clientIdB,exception);
-					}
 				}
-				reply.setKeyMap(replyMap);
+				catch(FailedOperation exception)
+				{
+					logger.error("Unable to find client "+clientIdB);
+				}
+				catch(NoSuchAlgorithmException exception)
+				{
+					logger.error("Invalid algorithm found for "+clientIdB,exception);
+				}
 			}
+			reply.setKeyMap(replyMap);
 		});
 	}
 
@@ -121,25 +113,21 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 			final DefaultFutureResult<Void> result=new DefaultFutureResult<>();
 			final EncryptedBuffer encryptedBuffer=encryptedBufferSigned.getEncryptedBuffer();
 			verify(encryptedBuffer,encryptedBufferSigned.getSignature(),
-				new Reply<>(result),new After()
+				new Reply<>(result),(user,client)->
 				{
-					@Override
-					public void run(final User user,final Client client) throws FailedOperation
+					final ClientId clientIdB=encryptedBuffer.getClient();
+					final Client clientB=clientDBAccessor.get(clientIdB);
+					try
 					{
-						final ClientId clientIdB=encryptedBuffer.getClient();
-						final Client clientB=clientDBAccessor.get(clientIdB);
-						try
-						{
-							notifyClient(clientB.getDeviceToken(),new NotificationObject(com.kareebo.contacts.client
-								                                                             .protocol
-								                                                             .BroadcastNewContactIdentity.method4,new EncryptedBufferSignedWithVerificationKey
-									                                                                                                  (encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
-						}
-						catch(NoSuchAlgorithmException e)
-						{
-							logger.error("Unknown algorithm",e);
-							throw new FailedOperation();
-						}
+						notifyClient(clientB.getDeviceToken(),new NotificationObject(com.kareebo.contacts.client
+							                                                             .protocol
+							                                                             .BroadcastNewContactIdentity.method4,new EncryptedBufferSignedWithVerificationKey
+								                                                                                                  (encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
+					}
+					catch(NoSuchAlgorithmException e)
+					{
+						logger.error("Unknown algorithm",e);
+						throw new FailedOperation();
 					}
 				});
 			if(result.failed())
@@ -160,33 +148,49 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 	@Override
 	public void broadcastNewContactIdentity5(final HashBufferPair uCs,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(uCs,signature,new Reply<>(future),new After()
+		verify(uCs,signature,new Reply<>(future),(user,client)->
 		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
+			final HashBuffer uC=uCs.getUC();
+			final ByteBuffer keyUC=uC.bufferForBuffer();
+			final HashIdentityValue value1=get(keyUC);
+			if(value1==null)
 			{
-				final HashBuffer uC=uCs.getUC();
-				final ByteBuffer keyUC=uC.bufferForBuffer();
-				final HashIdentityValue value1=get(keyUC);
-				if(value1==null)
-				{
-					logger.error("Identity "+uC+" not found");
-					throw new FailedOperation();
-				}
-				final HashBuffer uPrimeC=uCs.getUPrimeC();
-				final ByteBuffer keyUPrimeC=uPrimeC.bufferForBuffer();
-				final HashIdentityValue value2=get(keyUPrimeC);
-				if(value2==null)
-				{
-					logger.error("Identity "+uPrimeC+" not found");
-					throw new FailedOperation();
-				}
-				final List<Long> confirmers1=value1.getConfirmers();
-				final List<Long> confirmers2=value2.getConfirmers();
-				HashIdentityValue valueBig;
-				List<Long> confirmersSmall, confirmersBig;
-				ByteBuffer keySmall, keyBig;
-				if(confirmers1.size()<confirmers2.size())
+				logger.error("Identity "+uC+" not found");
+				throw new FailedOperation();
+			}
+			final HashBuffer uPrimeC=uCs.getUPrimeC();
+			final ByteBuffer keyUPrimeC=uPrimeC.bufferForBuffer();
+			final HashIdentityValue value2=get(keyUPrimeC);
+			if(value2==null)
+			{
+				logger.error("Identity "+uPrimeC+" not found");
+				throw new FailedOperation();
+			}
+			final List<Long> confirmers1=value1.getConfirmers();
+			final List<Long> confirmers2=value2.getConfirmers();
+			HashIdentityValue valueBig;
+			List<Long> confirmersSmall, confirmersBig;
+			ByteBuffer keySmall, keyBig;
+			if(confirmers1.size()<confirmers2.size())
+			{
+				valueBig=value2;
+				confirmersSmall=confirmers1;
+				confirmersBig=confirmers2;
+				keySmall=keyUC;
+				keyBig=keyUPrimeC;
+			}
+			else if(confirmers2.size()<confirmers1.size())
+			{
+				valueBig=value1;
+				confirmersSmall=confirmers2;
+				confirmersBig=confirmers1;
+				keySmall=keyUPrimeC;
+				keyBig=keyUC;
+			}
+			else
+			{
+				final int comparison=keyUC.compareTo(keyUPrimeC);
+				if(comparison<0)
 				{
 					valueBig=value2;
 					confirmersSmall=confirmers1;
@@ -194,7 +198,7 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 					keySmall=keyUC;
 					keyBig=keyUPrimeC;
 				}
-				else if(confirmers2.size()<confirmers1.size())
+				else if(comparison>0)
 				{
 					valueBig=value1;
 					confirmersSmall=confirmers2;
@@ -204,34 +208,14 @@ public class BroadcastNewContactIdentity extends SignatureVerifierWithIdentitySt
 				}
 				else
 				{
-					final int comparison=keyUC.compareTo(keyUPrimeC);
-					if(comparison<0)
-					{
-						valueBig=value2;
-						confirmersSmall=confirmers1;
-						confirmersBig=confirmers2;
-						keySmall=keyUC;
-						keyBig=keyUPrimeC;
-					}
-					else if(comparison>0)
-					{
-						valueBig=value1;
-						confirmersSmall=confirmers2;
-						confirmersBig=confirmers1;
-						keySmall=keyUPrimeC;
-						keyBig=keyUC;
-					}
-					else
-					{
-						logger.error("Both identities are the same: "+keyUC.toString());
-						throw new FailedOperation();
-					}
+					logger.error("Both identities are the same: "+keyUC.toString());
+					throw new FailedOperation();
 				}
-				confirmersBig.addAll(confirmersSmall);
-				valueBig.setConfirmers(new ArrayList<>(new HashSet<>(confirmersBig)));
-				put(keyBig,valueBig);
-				aliasTo(keySmall,keyBig);
 			}
+			confirmersBig.addAll(confirmersSmall);
+			valueBig.setConfirmers(new ArrayList<>(new HashSet<>(confirmersBig)));
+			put(keyBig,valueBig);
+			aliasTo(keySmall,keyBig);
 		});
 	}
 }

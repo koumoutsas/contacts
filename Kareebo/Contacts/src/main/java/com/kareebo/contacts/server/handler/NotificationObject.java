@@ -14,7 +14,7 @@ class NotificationObject
 {
 	final TBase object;
 	final private ServiceMethod method;
-	ByteBuffer payload;
+	private ByteBuffer payload;
 
 	NotificationObject(final ServiceMethod method,final TBase object)
 	{

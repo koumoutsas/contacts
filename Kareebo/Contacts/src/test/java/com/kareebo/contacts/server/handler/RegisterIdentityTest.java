@@ -2,7 +2,6 @@ package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.server.gora.*;
-import com.kareebo.contacts.server.gora.EncryptedBuffer;
 import com.kareebo.contacts.server.gora.EncryptionAlgorithm;
 import com.kareebo.contacts.server.gora.EncryptionKey;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
@@ -57,7 +56,7 @@ public class RegisterIdentityTest
 				final HashIdentityValue value=new HashIdentityValue();
 				newUserId=clientIdValid.getUser()+1;
 				value.setId(newUserId);
-				value.setConfirmers(new ArrayList<Long>());
+				value.setConfirmers(new ArrayList<>());
 				final HashIdentity identity=new HashIdentity();
 				final ByteBuffer key=uA.bufferForBuffer();
 				identity.setHash(key);
@@ -68,9 +67,9 @@ public class RegisterIdentityTest
 				final ByteBuffer b=ByteBuffer.wrap("".getBytes());
 				b.mark();
 				newUser.setBlind(b);
-				newUser.setClients(new HashMap<CharSequence,Client>());
-				newUser.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-				newUser.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+				newUser.setClients(new HashMap<>());
+				newUser.setIdentities(new ArrayList<>());
+				newUser.setSentRequests(new ArrayList<>());
 				dataStore.put(newUserId,newUser);
 			}
 		}.run();
@@ -97,7 +96,7 @@ public class RegisterIdentityTest
 				final HashIdentityValue value=new HashIdentityValue();
 				newUserId=clientIdValid.getUser()+1;
 				value.setId(newUserId);
-				value.setConfirmers(new ArrayList<Long>());
+				value.setConfirmers(new ArrayList<>());
 				final HashIdentity identity=new HashIdentity();
 				final ByteBuffer key=uA.bufferForBuffer();
 				identity.setHash(key);
@@ -116,9 +115,9 @@ public class RegisterIdentityTest
 		final ByteBuffer b=ByteBuffer.wrap("a".getBytes());
 		b.mark();
 		newUser.setBlind(b);
-		newUser.setClients(new HashMap<CharSequence,Client>());
-		newUser.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-		newUser.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+		newUser.setClients(new HashMap<>());
+		newUser.setIdentities(new ArrayList<>());
+		newUser.setSentRequests(new ArrayList<>());
 		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(newUserId,newUser);
 		final Future<RegisterIdentityReply> result=new DefaultFutureResult<>();
@@ -148,8 +147,8 @@ public class RegisterIdentityTest
 			}
 		}
 		newUser.setClients(new MyMap());
-		newUser.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-		newUser.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+		newUser.setIdentities(new ArrayList<>());
+		newUser.setSentRequests(new ArrayList<>());
 		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(newUserId,newUser);
 		final Future<RegisterIdentityReply> result=new DefaultFutureResult<>();
@@ -258,7 +257,7 @@ public class RegisterIdentityTest
 				final User userObject=new User();
 				userObject.setBlind(a);
 				final Client clientObject=new Client();
-				clientObject.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+				clientObject.setComparisonIdentities(new ArrayList<>());
 				final com.kareebo.contacts.server.gora.PublicKeys publicKeys1=new com.kareebo.contacts.server.gora.PublicKeys();
 				final EncryptionKey encryptionKey=new EncryptionKey();
 				encryptionKey.setAlgorithm(EncryptionAlgorithm.Fake);
@@ -277,8 +276,8 @@ public class RegisterIdentityTest
 				clients.put(TypeConverter.convert(client),clientObject);
 				userObject.setClients(clients);
 				userObject.setId(user);
-				userObject.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-				userObject.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+				userObject.setIdentities(new ArrayList<>());
+				userObject.setSentRequests(new ArrayList<>());
 				userDataStore.put(user,userObject);
 			}
 		}.run();
@@ -315,7 +314,7 @@ public class RegisterIdentityTest
 				final User userObject=new User();
 				userObject.setBlind(a);
 				final Client clientObject=new Client();
-				clientObject.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+				clientObject.setComparisonIdentities(new ArrayList<>());
 				final com.kareebo.contacts.server.gora.PublicKeys publicKeys1=new com.kareebo.contacts.server.gora.PublicKeys();
 				final EncryptionKey encryptionKey=new EncryptionKey();
 				encryptionKey.setAlgorithm(EncryptionAlgorithm.Fake);
@@ -334,8 +333,8 @@ public class RegisterIdentityTest
 				clients.put(TypeConverter.convert(client),clientObject);
 				userObject.setClients(clients);
 				userObject.setId(user);
-				userObject.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-				userObject.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+				userObject.setIdentities(new ArrayList<>());
+				userObject.setSentRequests(new ArrayList<>());
 				userDataStore.put(user,userObject);
 			}
 		}.run();
@@ -373,7 +372,7 @@ public class RegisterIdentityTest
 				final User userObject=new User();
 				userObject.setBlind(a);
 				final Client clientObject=new Client();
-				clientObject.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+				clientObject.setComparisonIdentities(new ArrayList<>());
 				final com.kareebo.contacts.server.gora.PublicKeys publicKeys1=new com.kareebo.contacts.server.gora.PublicKeys();
 				final EncryptionKey encryptionKey=new EncryptionKey();
 				encryptionKey.setAlgorithm(EncryptionAlgorithm.Fake);
@@ -392,8 +391,8 @@ public class RegisterIdentityTest
 				clients.put(TypeConverter.convert(client),clientObject);
 				userObject.setClients(clients);
 				userObject.setId(user);
-				userObject.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-				userObject.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+				userObject.setIdentities(new ArrayList<>());
+				userObject.setSentRequests(new ArrayList<>());
 				userDataStore.put(user,userObject);
 			}
 		}.run();
@@ -539,7 +538,7 @@ public class RegisterIdentityTest
 			final User userObject=new User();
 			userObject.setBlind(a);
 			final Client clientObject=new Client();
-			clientObject.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+			clientObject.setComparisonIdentities(new ArrayList<>());
 			final com.kareebo.contacts.server.gora.PublicKeys publicKeys1=new com.kareebo.contacts.server.gora.PublicKeys();
 			final EncryptionKey encryptionKey=new EncryptionKey();
 			encryptionKey.setAlgorithm(EncryptionAlgorithm.Fake);
@@ -558,8 +557,8 @@ public class RegisterIdentityTest
 			clients.put(TypeConverter.convert(client),clientObject);
 			userObject.setClients(clients);
 			userObject.setId(user);
-			userObject.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-			userObject.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+			userObject.setIdentities(new ArrayList<>());
+			userObject.setSentRequests(new ArrayList<>());
 			userDataStore.put(user,userObject);
 		}
 	}

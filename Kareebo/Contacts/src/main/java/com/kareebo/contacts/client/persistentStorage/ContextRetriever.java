@@ -10,7 +10,7 @@ import java.security.SecureRandom;
 /**
  * Specialization of {@link PersistedObjectRetriever} for {@link Context}
  */
-public class ContextRetriever
+class ContextRetriever
 {
 	private final PersistedObjectRetriever persistedObjectRetriever;
 
@@ -19,7 +19,7 @@ public class ContextRetriever
 	 *
 	 * @param persistentStorage The {@link PersistentStorage}
 	 */
-	public ContextRetriever(final PersistentStorage persistentStorage)
+	ContextRetriever(final PersistentStorage persistentStorage)
 	{
 		persistedObjectRetriever=new PersistedObjectRetriever(persistentStorage);
 	}

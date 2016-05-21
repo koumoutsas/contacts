@@ -55,7 +55,7 @@ public class SuggestNewContactTest
 				final HashIdentity identity=new HashIdentity();
 				identity.setHash(buffer);
 				final HashIdentityValue hashIdentity=new HashIdentityValue();
-				hashIdentity.setConfirmers(new ArrayList<Long>());
+				hashIdentity.setConfirmers(new ArrayList<>());
 				hashIdentity.setId(clientId0.getUser());
 				identity.setHashIdentity(hashIdentity);
 				identityDataStore.put(buffer,identity);
@@ -94,7 +94,7 @@ public class SuggestNewContactTest
 				final HashIdentity identity=new HashIdentity();
 				identity.setHash(buffer);
 				final HashIdentityValue hashIdentity=new HashIdentityValue();
-				hashIdentity.setConfirmers(new ArrayList<Long>());
+				hashIdentity.setConfirmers(new ArrayList<>());
 				hashIdentity.setId(clientId0.getUser());
 				identity.setHashIdentity(hashIdentity);
 				identityDataStore.put(buffer,identity);
@@ -242,12 +242,12 @@ public class SuggestNewContactTest
 		}.run();
 	}
 
-	abstract class BaseFull extends Base
+	private abstract class BaseFull extends Base
 	{
-		protected final Long deviceToken0=deviceToken+1;
-		protected final Long deviceToken1=deviceToken+2;
-		protected ClientId clientId0;
-		protected ClientId clientId1;
+		final Long deviceToken0=deviceToken+1;
+		final Long deviceToken1=deviceToken+2;
+		ClientId clientId0;
+		ClientId clientId1;
 
 		BaseFull() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, GoraException
 		{
@@ -272,10 +272,10 @@ public class SuggestNewContactTest
 			user.setId(userId1);
 			final Map<CharSequence,Client> clients=new HashMap<>(2);
 			final Client client0=new Client();
-			client0.setComparisonIdentities(new ArrayList<com.kareebo.contacts.server.gora.EncryptedBuffer>());
+			client0.setComparisonIdentities(new ArrayList<>());
 			client0.setDeviceToken(deviceToken0);
 			final Client client1=new Client();
-			client1.setComparisonIdentities(new ArrayList<com.kareebo.contacts.server.gora.EncryptedBuffer>());
+			client1.setComparisonIdentities(new ArrayList<>());
 			client1.setDeviceToken(deviceToken1);
 			final PublicKeys publicKeys=new PublicKeys();
 			final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
@@ -294,8 +294,8 @@ public class SuggestNewContactTest
 			clients.put(TypeConverter.convert(clientId0.getClient()),client0);
 			clients.put(TypeConverter.convert(clientId1.getClient()),client1);
 			user.setClients(clients);
-			user.setIdentities(new ArrayList<HashBuffer>());
-			user.setSentRequests(new ArrayList<HashBuffer>());
+			user.setIdentities(new ArrayList<>());
+			user.setSentRequests(new ArrayList<>());
 			userDataStore.put(user.getId(),user);
 		}
 
@@ -333,7 +333,7 @@ public class SuggestNewContactTest
 			user.setId(clientId.getUser());
 			final Map<CharSequence,Client> clients=new HashMap<>(1);
 			final Client client=new Client();
-			client.setComparisonIdentities(new ArrayList<com.kareebo.contacts.server.gora.EncryptedBuffer>());
+			client.setComparisonIdentities(new ArrayList<>());
 			client.setDeviceToken(deviceToken);
 			final PublicKeys publicKeys=new PublicKeys();
 			final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
@@ -349,8 +349,8 @@ public class SuggestNewContactTest
 			client.setUserAgent(userAgent);
 			clients.put(TypeConverter.convert(clientId.getClient()),client);
 			user.setClients(clients);
-			user.setIdentities(new ArrayList<HashBuffer>());
-			user.setSentRequests(new ArrayList<HashBuffer>());
+			user.setIdentities(new ArrayList<>());
+			user.setSentRequests(new ArrayList<>());
 			userDataStore.put(user.getId(),user);
 		}
 	}

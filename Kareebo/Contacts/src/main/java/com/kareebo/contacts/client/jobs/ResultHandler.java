@@ -10,8 +10,8 @@ import org.vertx.java.core.AsyncResult;
  */
 abstract public class ResultHandler<T> implements org.vertx.java.core.AsyncResultHandler<T>
 {
-	final protected ErrorEnqueuer errorEnqueuer;
 	final protected ServiceMethod method;
+	private final ErrorEnqueuer errorEnqueuer;
 	final private JobType jobType;
 
 	protected ResultHandler(final ErrorEnqueuer errorEnqueuer,final ServiceMethod method,final JobType jobType)

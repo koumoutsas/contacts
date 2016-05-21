@@ -8,11 +8,11 @@ import org.apache.thrift.TException;
 /**
  * Handles incoming notifications and routes them to the correct service method
  */
-public class NotificationHandler
+class NotificationHandler
 {
 	final private ServiceDispatcher serviceDispatcher;
 
-	public NotificationHandler(final ServiceDispatcher serviceDispatcher)
+	NotificationHandler(final ServiceDispatcher serviceDispatcher)
 	{
 		this.serviceDispatcher=serviceDispatcher;
 	}

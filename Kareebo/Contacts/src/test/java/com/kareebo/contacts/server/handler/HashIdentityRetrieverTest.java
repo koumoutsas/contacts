@@ -38,7 +38,7 @@ public class HashIdentityRetrieverTest
 		identity.setHash(key);
 		final HashIdentityValue value=new HashIdentityValue();
 		value.setId((long)0);
-		value.setConfirmers(new ArrayList<Long>());
+		value.setConfirmers(new ArrayList<>());
 		identity.setHashIdentity(value);
 		dataStore.put(key,identity);
 		final ByteBuffer alias=createAlias("def",key);
@@ -124,7 +124,7 @@ public class HashIdentityRetrieverTest
 		identity.setHash(key);
 		final HashIdentityValue value=new HashIdentityValue();
 		value.setId((long)0);
-		value.setConfirmers(new ArrayList<Long>());
+		value.setConfirmers(new ArrayList<>());
 		identity.setHashIdentity(value);
 		dataStore.put(key,identity);
 		final ByteBuffer alias=createAlias("def",key);

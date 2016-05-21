@@ -91,8 +91,8 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
 		byteBuffer.mark();
 		user.setBlind(byteBuffer);
-		user.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-		user.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+		user.setIdentities(new ArrayList<>());
+		user.setSentRequests(new ArrayList<>());
 		final UserAgent userAgent=new UserAgent();
 		userAgent.setPlatform("A");
 		userAgent.setVersion("B");
@@ -105,14 +105,14 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 		final Client client=new Client();
 		client.setUserAgent(userAgent);
 		client.setKeys(publicKeys);
-		client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+		client.setComparisonIdentities(new ArrayList<>());
 		final HashMap<CharSequence,Client> clients=new HashMap<>(1);
 		clients.put(TypeConverter.convert(clientId.getClient()),client);
 		user.setClients(clients);
 		userDataStore.put(clientId.getUser(),user);
 	}
 
-	class TestSignatureVerifierWithIdentityStoreAndNotifier extends SignatureVerifierWithIdentityStoreAndNotifier
+	private class TestSignatureVerifierWithIdentityStoreAndNotifier extends SignatureVerifierWithIdentityStoreAndNotifier
 	{
 		TestSignatureVerifierWithIdentityStoreAndNotifier(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
 		{

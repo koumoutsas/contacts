@@ -93,6 +93,7 @@ abstract class SignatureVerifier
 	/**
 	 * Closure for the operations to be executed after a successful verification
 	 */
+	@FunctionalInterface
 	interface After
 	{
 		/**

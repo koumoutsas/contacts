@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
@@ -42,29 +41,22 @@ abstract class SignatureVerifierWithIdentityStoreAndNotifier extends SignatureVe
 	 * @param signature The signature of id
 	 * @param future    The future that is notified of the result of the operation
 	 */
-	protected <T extends TBase> void forward(final T t,final LongId id,final SignatureBuffer signature,final Future<T> future)
+	<T extends TBase> void forward(final T t,final LongId id,final SignatureBuffer signature,final Future<T> future)
 	{
-		verify(id,signature,new Reply<>(future,t),new After()
-		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
-			{
-				clientNotifier.get(t,id.getId());
-			}
-		});
+		verify(id,signature,new Reply<>(future,t),(user,client)->clientNotifier.get(t,id.getId()));
 	}
 
-	protected void notifyClient(final long deviceToken,final NotificationObject payload) throws FailedOperation
+	void notifyClient(final long deviceToken,final NotificationObject payload) throws FailedOperation
 	{
 		clientNotifier.put(deviceToken,payload);
 	}
 
-	protected void notifyClients(final List<Long> deviceTokens,final NotificationObject payload) throws FailedOperation
+	void notifyClients(final List<Long> deviceTokens,final NotificationObject payload) throws FailedOperation
 	{
 		clientNotifier.put(deviceTokens,payload);
 	}
 
-	protected void notifyClients(final Map<Long,NotificationObject> notifications) throws FailedOperation
+	void notifyClients(final Map<Long,NotificationObject> notifications) throws FailedOperation
 	{
 		clientNotifier.put(notifications);
 	}

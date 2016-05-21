@@ -11,7 +11,7 @@ import org.apache.thrift.async.TAsyncClientManager;
 /**
  * Client-side implementation of the update server contact book service.
  */
-public class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient>
+class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient>
 {
 	public static final String serviceName=UpdateServerContactBook.class.getSimpleName();
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");

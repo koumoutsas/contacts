@@ -22,8 +22,8 @@ import static org.junit.Assert.*;
  */
 public class ClientDBAccessorTest
 {
-	final long userIdValid=0;
-	final User userValid=new User();
+	private final long userIdValid=0;
+	private final User userValid=new User();
 	private final ClientId clientIdNew=new ClientId();
 	private final ClientId clientIdPreset=new ClientId();
 	private final ClientId clientIdInvalidClient=new ClientId();
@@ -62,14 +62,14 @@ public class ClientDBAccessorTest
 		publicKeys.setVerification(verificationKey);
 		clientPreset.setUserAgent(userAgent);
 		clientPreset.setKeys(publicKeys);
-		clientPreset.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+		clientPreset.setComparisonIdentities(new ArrayList<>());
 		dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		userValid.setBlind(byteBuffer);
 		final HashMap<CharSequence,Client> clients=new HashMap<>();
 		clients.put(TypeConverter.convert(clientIdPreset.getClient()),clientPreset);
 		userValid.setClients(clients);
-		userValid.setIdentities(new ArrayList<HashBuffer>());
-		userValid.setSentRequests(new ArrayList<HashBuffer>());
+		userValid.setIdentities(new ArrayList<>());
+		userValid.setSentRequests(new ArrayList<>());
 		dataStore.put(userIdValid,userValid);
 		clientDBAccessor=new ClientDBAccessor(dataStore);
 	}

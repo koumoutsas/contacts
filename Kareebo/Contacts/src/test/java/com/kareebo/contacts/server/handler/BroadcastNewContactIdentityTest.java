@@ -104,6 +104,7 @@ public class BroadcastNewContactIdentityTest
 				return new BroadcastNewContactIdentity(dataStore,identityDataStore,null);
 			}
 
+			@SuppressWarnings("WeakerAccess")
 			void run()
 			{
 				final Future<Void> result=new DefaultFutureResult<>();
@@ -408,7 +409,7 @@ public class BroadcastNewContactIdentityTest
 			{
 			}
 
-			void run() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
+			private void run() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 			{
 				final Future<EncryptedBufferSignedWithVerificationKey> future=new DefaultFutureResult<>();
 				final LongId id=new LongId(notifierBackend.getFirst().getId());
@@ -416,7 +417,7 @@ public class BroadcastNewContactIdentityTest
 				check(future);
 			}
 
-			void check(final Future<EncryptedBufferSignedWithVerificationKey> future)
+			private void check(final Future<EncryptedBufferSignedWithVerificationKey> future)
 			{
 				assertTrue(future.succeeded());
 				assertEquals(encryptedBufferSignedWithVerificationKey,future.result());
@@ -511,7 +512,7 @@ public class BroadcastNewContactIdentityTest
 			{
 				class BroadcastNewContactIdentityFake extends BroadcastNewContactIdentity
 				{
-					BroadcastNewContactIdentityFake(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
+					private BroadcastNewContactIdentityFake(final DataStore<Long,User> dataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
 					{
 						super(dataStore,identityDatastore,clientNotifier);
 					}
@@ -588,7 +589,7 @@ public class BroadcastNewContactIdentityTest
 			/**
 			 * Set up the datastores, make call 2 and check the results
 			 */
-			void run() throws NoSuchAlgorithmException
+			private void run() throws NoSuchAlgorithmException
 			{
 				final Future<MapClientIdEncryptionKey> future=new DefaultFutureResult<>();
 				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity2(new EncryptedBufferPairSet
@@ -727,8 +728,8 @@ public class BroadcastNewContactIdentityTest
 				b.mark();
 				user.setBlind(b);
 				user.setClients(setupClients(user.getId()));
-				user.setIdentities(new ArrayList<HashBuffer>());
-				user.setSentRequests(new ArrayList<HashBuffer>());
+				user.setIdentities(new ArrayList<>());
+				user.setSentRequests(new ArrayList<>());
 			}
 
 			@Override
@@ -757,8 +758,8 @@ public class BroadcastNewContactIdentityTest
 				final ByteBuffer b=ByteBuffer.wrap("1".getBytes());
 				b.mark();
 				newUser.setBlind(b);
-				newUser.setIdentities(new ArrayList<HashBuffer>());
-				newUser.setSentRequests(new ArrayList<HashBuffer>());
+				newUser.setIdentities(new ArrayList<>());
+				newUser.setSentRequests(new ArrayList<>());
 				final Map<CharSequence,Client> clients=new HashMap<>(expected.size());
 				final Client client0=new Client();
 				final List<EncryptedBuffer> comparisonIdentities=new ArrayList<>();
@@ -821,11 +822,11 @@ public class BroadcastNewContactIdentityTest
 				final ByteBuffer b=ByteBuffer.wrap("1".getBytes());
 				b.mark();
 				newUser.setBlind(b);
-				newUser.setIdentities(new ArrayList<HashBuffer>());
-				newUser.setSentRequests(new ArrayList<HashBuffer>());
+				newUser.setIdentities(new ArrayList<>());
+				newUser.setSentRequests(new ArrayList<>());
 				final Map<CharSequence,Client> clients=new HashMap<>(1);
 				final Client client0=new Client();
-				client0.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+				client0.setComparisonIdentities(new ArrayList<>());
 				client0.setUserAgent(userAgent);
 				final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey0=new com.kareebo.contacts.server.gora.EncryptionKey();
 				encryptionKey0.setAlgorithm(com.kareebo.contacts.server.gora.EncryptionAlgorithm.Fake);
@@ -851,12 +852,12 @@ public class BroadcastNewContactIdentityTest
 
 	abstract class Base34 extends Signer
 	{
-		protected final Notifier notifierBackend=new Notifier();
-		protected final ClientNotifier clientNotifier;
-		protected final BroadcastNewContactIdentity broadcastNewContactIdentity;
 		protected final ClientId clientId=new ClientId(0,0);
-		protected final long deviceToken=0;
-		protected final DataStore<Long,User> userDataStore;
+		final Notifier notifierBackend=new Notifier();
+		final ClientNotifier clientNotifier;
+		final BroadcastNewContactIdentity broadcastNewContactIdentity;
+		final long deviceToken=0;
+		final DataStore<Long,User> userDataStore;
 		private final DataStore<Long,PendingNotification> pendingNotificationDataStore;
 
 		private Base34() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException,
@@ -885,7 +886,7 @@ public class BroadcastNewContactIdentityTest
 			user.setId(clientId.getUser());
 			final Map<CharSequence,Client> clients=new HashMap<>(1);
 			final Client client=new Client();
-			client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+			client.setComparisonIdentities(new ArrayList<>());
 			client.setDeviceToken(deviceToken);
 			final PublicKeys publicKeys=new PublicKeys();
 			final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
@@ -901,18 +902,18 @@ public class BroadcastNewContactIdentityTest
 			client.setUserAgent(userAgent);
 			clients.put(TypeConverter.convert(clientId.getClient()),client);
 			user.setClients(clients);
-			user.setIdentities(new ArrayList<HashBuffer>());
-			user.setSentRequests(new ArrayList<HashBuffer>());
+			user.setIdentities(new ArrayList<>());
+			user.setSentRequests(new ArrayList<>());
 			userDataStore.put(user.getId(),user);
 		}
 
 		abstract void setupUserDatastore() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
 	}
 
-	abstract class Base3 extends Base34
+	private abstract class Base3 extends Base34
 	{
 		static final int clientNumber=2;
-		protected Map<Long,EncryptedBufferSigned> encryptedBuffersMap;
+		Map<Long,EncryptedBufferSigned> encryptedBuffersMap;
 		private Set<EncryptedBufferSigned> encryptedBuffers;
 
 		private Base3() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException,
@@ -946,7 +947,7 @@ public class BroadcastNewContactIdentityTest
 			for(long i=0;i<clientNumber;++i)
 			{
 				final Client client=new Client();
-				client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+				client.setComparisonIdentities(new ArrayList<>());
 				client.setDeviceToken(i);
 				final PublicKeys publicKeys=new PublicKeys();
 				final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
@@ -976,8 +977,8 @@ public class BroadcastNewContactIdentityTest
 				encryptedBuffersMap.put(i,encryptedBufferSigned);
 			}
 			user.setClients(clients);
-			user.setIdentities(new ArrayList<HashBuffer>());
-			user.setSentRequests(new ArrayList<HashBuffer>());
+			user.setIdentities(new ArrayList<>());
+			user.setSentRequests(new ArrayList<>());
 			userDataStore.put(user.getId(),user);
 		}
 	}

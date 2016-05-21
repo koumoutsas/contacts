@@ -47,7 +47,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 				@Override
 				protected void runInternal(final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,final LongId payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
-					asyncClient.suggestNewContact1(payload,sign(payload),new IntermediateResultHandler<EncryptionKeysWithHashBuffer>
+					asyncClient.suggestNewContact1(payload,sign(payload),new IntermediateResultHandler<>
 						                                                     (intermediateResultEnqueuer,
 							                                                     com.kareebo
 								                                                     .contacts.client.processor.SuggestNewContact.method1,
@@ -74,7 +74,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 				@Override
 				protected void runInternal(final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,final LongId payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
-					asyncClient.suggestNewContact3(payload,sign(payload),new IntermediateResultHandler<EncryptedBufferSignedWithVerificationKey>
+					asyncClient.suggestNewContact3(payload,sign(payload),new IntermediateResultHandler<>
 						                                                     (intermediateResultEnqueuer,com.kareebo.contacts.client.processor
 							                                                                                 .SuggestNewContact.method3,finalResultEnqueuer,method3,context));
 				}

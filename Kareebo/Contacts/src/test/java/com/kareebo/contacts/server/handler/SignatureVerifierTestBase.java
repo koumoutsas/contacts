@@ -1,7 +1,10 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
-import com.kareebo.contacts.server.gora.*;
+import com.kareebo.contacts.server.gora.Client;
+import com.kareebo.contacts.server.gora.PublicKeys;
+import com.kareebo.contacts.server.gora.User;
+import com.kareebo.contacts.server.gora.UserAgent;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.EncryptionAlgorithm;
 import com.kareebo.contacts.thrift.EncryptionKey;
@@ -26,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
 abstract class SignatureVerifierTestBase extends Signer
 {
 	final ClientId clientIdValid=new ClientId();
-	final PublicKeys publicKeys=new PublicKeys();
+	private final PublicKeys publicKeys=new PublicKeys();
 	SignatureBuffer signature;
 	SignatureBuffer wrongSignature;
 	SignatureVerifier signatureVerifier;
@@ -45,8 +48,8 @@ abstract class SignatureVerifierTestBase extends Signer
 		userValid.setBlind(byteBuffer);
 		final HashMap<CharSequence,Client> clients=new HashMap<>();
 		userValid.setClients(clients);
-		userValid.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-		userValid.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+		userValid.setIdentities(new ArrayList<>());
+		userValid.setSentRequests(new ArrayList<>());
 		dataStore.put(userId,userValid);
 		setUpCrypto();
 		clientIdValid.setClient(0);
@@ -59,7 +62,7 @@ abstract class SignatureVerifierTestBase extends Signer
 		clientValid=new Client();
 		clientValid.setUserAgent(userAgent);
 		clientValid.setKeys(publicKeys);
-		clientValid.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+		clientValid.setComparisonIdentities(new ArrayList<>());
 		signatureVerifier=construct(dataStore);
 		signatureVerifier.clientDBAccessor.put(clientIdValid,clientValid);
 		assertNotNull(signatureVerifier);
@@ -95,9 +98,9 @@ abstract class SignatureVerifierTestBase extends Signer
 			final ByteBuffer byteBuffer=ByteBuffer.wrap("".getBytes());
 			byteBuffer.mark();
 			user.setBlind(byteBuffer);
-			user.setClients(new HashMap<CharSequence,Client>());
-			user.setIdentities(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
-			user.setSentRequests(new ArrayList<com.kareebo.contacts.server.gora.HashBuffer>());
+			user.setClients(new HashMap<>());
+			user.setIdentities(new ArrayList<>());
+			user.setSentRequests(new ArrayList<>());
 			dataStore.put(++userId,user);
 			dataStore.close();
 		}

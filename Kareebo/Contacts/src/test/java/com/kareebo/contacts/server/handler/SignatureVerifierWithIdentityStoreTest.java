@@ -1,6 +1,5 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
 import com.kareebo.contacts.server.gora.User;
@@ -68,7 +67,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 		identity.setHash(key);
 		final HashIdentityValue value=new HashIdentityValue();
 		value.setId((long)0);
-		value.setConfirmers(new ArrayList<Long>());
+		value.setConfirmers(new ArrayList<>());
 		identity.setHashIdentity(value);
 		identityDatastore.put(key,identity);
 		assertEquals(value.getId(),((SignatureVerifierWithIdentityStore)signatureVerifier).find(key));
@@ -91,7 +90,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 		identity.setHash(key);
 		final HashIdentityValue value=new HashIdentityValue();
 		value.setId((long)0);
-		value.setConfirmers(new ArrayList<Long>());
+		value.setConfirmers(new ArrayList<>());
 		identity.setHashIdentity(value);
 		identityDatastore.put(key,identity);
 		assertTrue(((SignatureVerifierWithIdentityStore)signatureVerifier).exists(key));
@@ -103,7 +102,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 	@Test
 	public void testVerify() throws Exception
 	{
-		((SignatureVerifierMock)signatureVerifier).verify(constructPlaintext(),signature,new DefaultFutureResult<Void>());
+		((SignatureVerifierMock)signatureVerifier).verify(constructPlaintext(),signature,new DefaultFutureResult<>());
 		assertTrue(((MemStore)identityDatastore).hasBeenClosed());
 	}
 
@@ -111,7 +110,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 	public void testVerifyFailed() throws Exception
 	{
 		signature.setClient(clientIdInvalid);
-		((SignatureVerifierMock)signatureVerifier).verify(constructPlaintext(),signature,new DefaultFutureResult<Void>());
+		((SignatureVerifierMock)signatureVerifier).verify(constructPlaintext(),signature,new DefaultFutureResult<>());
 		assertFalse(((MemStore)identityDatastore).hasBeenClosed());
 	}
 
@@ -122,7 +121,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 		key.mark();
 		final HashIdentityValue identity=new HashIdentityValue();
 		identity.setId((long)0);
-		identity.setConfirmers(new ArrayList<Long>());
+		identity.setConfirmers(new ArrayList<>());
 		((SignatureVerifierWithIdentityStore)signatureVerifier).put(key,identity);
 		assertEquals(identity,identityDatastore.get(key).getHashIdentity());
 	}
@@ -136,7 +135,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 		identity.setHash(key);
 		final HashIdentityValue value=new HashIdentityValue();
 		value.setId((long)0);
-		value.setConfirmers(new ArrayList<Long>());
+		value.setConfirmers(new ArrayList<>());
 		identity.setHashIdentity(value);
 		identityDatastore.put(key,identity);
 		assertEquals(value,((SignatureVerifierWithIdentityStore)signatureVerifier).get(key));
@@ -167,12 +166,7 @@ public class SignatureVerifierWithIdentityStoreTest extends SignatureVerifierTes
 
 		void verify(final TBase plaintext,final SignatureBuffer signature,final Future<Void> future)
 		{
-			verify(plaintext,signature,new Reply<>(future),new After()
-			{
-				@Override
-				public void run(final User user,final Client client) throws FailedOperation
-				{
-				}
+			verify(plaintext,signature,new Reply<>(future),(user,client)->{
 			});
 		}
 	}

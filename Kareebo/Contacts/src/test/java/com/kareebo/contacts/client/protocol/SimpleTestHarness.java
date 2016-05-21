@@ -34,12 +34,12 @@ class SimpleTestHarness
 		}
 	}
 
-	public abstract static class TestBase<T,E>
+	abstract static class TestBase<T,E>
 	{
 		protected final SignatureAlgorithm algorithm=SignatureAlgorithm.SHA256withECDSAprime239v1;
-		protected final KeyPair keyPair;
-		protected final String fieldName;
 		protected final ClientId clientId=new ClientId(0,0);
+		final KeyPair keyPair;
+		final String fieldName;
 		private EnqueuerImplementation enqueuer=new EnqueuerImplementation();
 
 		TestBase(final String fieldName) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
@@ -107,7 +107,7 @@ class SimpleTestHarness
 		{
 			protected TAsyncMethodCall method;
 
-			public MyClientManager(final boolean succeed)
+			MyClientManager(final boolean succeed)
 			{
 				super(succeed);
 			}

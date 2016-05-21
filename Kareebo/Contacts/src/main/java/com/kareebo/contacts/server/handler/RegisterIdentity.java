@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Service implementation for registering an identity
  */
-public class RegisterIdentity extends SignatureVerifierWithIdentityStore implements com.kareebo.contacts.thrift.RegisterIdentity.AsyncIface
+class RegisterIdentity extends SignatureVerifierWithIdentityStore implements com.kareebo.contacts.thrift.RegisterIdentity.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(RegisterIdentity.class.getName());
 
@@ -39,38 +39,33 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 	public void registerIdentity1(final HashBuffer uA,final SignatureBuffer signature,final Future<RegisterIdentityReply> future)
 	{
 		final RegisterIdentityReply reply=new RegisterIdentityReply();
-		verify(uA,signature,new Reply<>(future,reply),new After()
-		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
+		verify(uA,signature,new Reply<>(future,reply),(user,client)->{
+			final ByteBuffer key=uA.bufferForBuffer();
+			HashIdentityValue identity=get(key);
+			Long id;
+			User newUser;
+			if(identity==null)
 			{
-				final ByteBuffer key=uA.bufferForBuffer();
-				HashIdentityValue identity=get(key);
-				Long id;
-				User newUser;
-				if(identity==null)
-				{
-					newUser=clientDBAccessor.createNewUser();
-					id=newUser.getId();
-					identity=new HashIdentityValue();
-					identity.setId(id);
-					identity.setConfirmers(new ArrayList<Long>(1));
-				}
-				else
-				{
-					id=identity.getId();
-					newUser=clientDBAccessor.get(id);
-				}
-				final ByteBuffer blind=new RandomHashPad().getBytes();
-				newUser.setBlind(blind);
-				final List<Long> confirmers=identity.getConfirmers();
-				confirmers.add(user.getId());
-				identity.setConfirmers(confirmers);
-				put(key,identity);
-				clientDBAccessor.put(newUser);
-				reply.setId(id);
-				reply.setBlind(blind);
+				newUser=clientDBAccessor.createNewUser();
+				id=newUser.getId();
+				identity=new HashIdentityValue();
+				identity.setId(id);
+				identity.setConfirmers(new ArrayList<>(1));
 			}
+			else
+			{
+				id=identity.getId();
+				newUser=clientDBAccessor.get(id);
+			}
+			final ByteBuffer blind=new RandomHashPad().getBytes();
+			newUser.setBlind(blind);
+			final List<Long> confirmers=identity.getConfirmers();
+			confirmers.add(user.getId());
+			identity.setConfirmers(confirmers);
+			put(key,identity);
+			clientDBAccessor.put(newUser);
+			reply.setId(id);
+			reply.setBlind(blind);
 		});
 	}
 
@@ -112,44 +107,39 @@ public class RegisterIdentity extends SignatureVerifierWithIdentityStore impleme
 			client.setUserAgent(TypeConverter.convert(registerIdentityInput.getUserAgent()));
 			client.setDeviceToken(registerIdentityInput.getDeviceToken());
 			clientDBAccessor.put(client);
-			verify(registerIdentityInput,signature,new Reply<>(future),new After()
-			{
-				@Override
-				public void run(final User user,final Client client) throws FailedOperation
+			verify(registerIdentityInput,signature,new Reply<>(future),(user,client1)->{
+				final List<com.kareebo.contacts.server.gora.HashBuffer> identities=user.getIdentities();
+				final HashBuffer uJ=registerIdentityInput.getUJ();
+				boolean foundUJ=false;
+				for(final HashBuffer h : registerIdentityInput.getUSet())
 				{
-					final List<com.kareebo.contacts.server.gora.HashBuffer> identities=user.getIdentities();
-					final HashBuffer uJ=registerIdentityInput.getUJ();
-					boolean foundUJ=false;
-					for(final HashBuffer h : registerIdentityInput.getUSet())
+					final HashIdentityValue value=new HashIdentityValue();
+					value.setId(clientId);
+					final List<Long> confirmers=new ArrayList<>();
+					if(h.equals(uJ))
 					{
-						final HashIdentityValue value=new HashIdentityValue();
-						value.setId(clientId);
-						final List<Long> confirmers=new ArrayList<>();
-						if(h.equals(uJ))
-						{
-							foundUJ=true;
-							aliasTo(uA,h.bufferForBuffer());
-							confirmers.addAll(identityValue.getConfirmers());
-						}
-						value.setConfirmers(confirmers);
-						put(h.bufferForBuffer(),value);
-						try
-						{
-							identities.add(TypeConverter.convert(h));
-						}
-						catch(NoSuchAlgorithmException e)
-						{
-							logger.error("Error converting algorithm",e);
-							throw new FailedOperation();
-						}
+						foundUJ=true;
+						aliasTo(uA,h.bufferForBuffer());
+						confirmers.addAll(identityValue.getConfirmers());
 					}
-					if(!foundUJ)
+					value.setConfirmers(confirmers);
+					put(h.bufferForBuffer(),value);
+					try
 					{
-						logger.error("Wrong input. Unable to find the primary identity in the identity set");
+						identities.add(TypeConverter.convert(h));
+					}
+					catch(NoSuchAlgorithmException e)
+					{
+						logger.error("Error converting algorithm",e);
 						throw new FailedOperation();
 					}
-					clientDBAccessor.put(user);
 				}
+				if(!foundUJ)
+				{
+					logger.error("Wrong input. Unable to find the primary identity in the identity set");
+					throw new FailedOperation();
+				}
+				clientDBAccessor.put(user);
 			});
 		}
 		catch(FailedOperation failedOperation)

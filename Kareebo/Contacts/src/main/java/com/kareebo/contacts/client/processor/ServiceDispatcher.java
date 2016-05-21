@@ -10,11 +10,11 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Service factory for the processor side
  */
-public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
+class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
 {
 	final private PersistedObjectRetriever persistedObjectRetriever;
 
-	public ServiceDispatcher(final PersistedObjectRetriever persistedObjectRetriever,final Enqueuers enqueuers)
+	ServiceDispatcher(final PersistedObjectRetriever persistedObjectRetriever,final Enqueuers enqueuers)
 	{
 		super(enqueuers);
 		this.persistedObjectRetriever=persistedObjectRetriever;

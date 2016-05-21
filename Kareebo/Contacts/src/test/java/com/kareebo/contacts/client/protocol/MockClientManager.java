@@ -15,13 +15,13 @@ import static org.junit.Assert.fail;
 /**
  * Mock {@link org.apache.thrift.async.TAsyncClientManager}
  */
-abstract public class MockClientManager<T> extends TAsyncClientManager
+abstract class MockClientManager<T> extends TAsyncClientManager
 {
-	protected final boolean succeed;
-	protected AsyncResultHandler<T> resultHandler;
-	protected Class cls;
+	final boolean succeed;
+	AsyncResultHandler<T> resultHandler;
+	Class cls;
 
-	public MockClientManager(final boolean succeed)
+	MockClientManager(final boolean succeed)
 	{
 		super(new TClientTransport(new THttpClientTransport.Args(VertxFactory.newVertx(),0))
 		{

@@ -14,7 +14,7 @@ public class ResultHandlerTest
 	{
 		class ResultHandlerImplementation extends ResultHandler<Long>
 		{
-			protected ResultHandlerImplementation(final ErrorEnqueuer errorEnqueuer,final ServiceMethod method)
+			private ResultHandlerImplementation(final ErrorEnqueuer errorEnqueuer,final ServiceMethod method)
 			{
 				super(errorEnqueuer,method);
 			}

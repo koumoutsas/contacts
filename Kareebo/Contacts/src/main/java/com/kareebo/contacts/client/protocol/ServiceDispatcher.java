@@ -11,13 +11,13 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Service factory for the protocol side
  */
-public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
+class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
 {
 	final private TAsyncClientManager clientManager;
 	final private SigningKey signingKey;
 	final private ClientId clientId;
 
-	public ServiceDispatcher(final Enqueuers enqueuers,final TAsyncClientManager clientManager,final SigningKey signingKey,final ClientId clientId)
+	ServiceDispatcher(final Enqueuers enqueuers,final TAsyncClientManager clientManager,final SigningKey signingKey,final ClientId clientId)
 	{
 		super(enqueuers);
 		this.clientManager=clientManager;

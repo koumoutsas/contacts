@@ -14,10 +14,8 @@ import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.async.TAsyncClient;
 import org.apache.thrift.async.TAsyncClientManager;
-import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TClientTransport;
-import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,9 +32,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class ServiceDispatcherTest
 {
-	final static long notificationIdExpected=0L;
-	final static EnqueuerImplementation enqueuerExpected=new EnqueuerImplementation();
-	final static Enqueuers enqueuers=new Enqueuers(JobType.Processor,enqueuerExpected,enqueuerExpected);
+	private final static long notificationIdExpected=0L;
+	private final static EnqueuerImplementation enqueuerExpected=new EnqueuerImplementation();
+	private final static Enqueuers enqueuers=new Enqueuers(JobType.Processor,enqueuerExpected,enqueuerExpected);
 	final private static SigningKey signingKeyExpected=new SigningKey(new PrivateKey()
 	{
 		@Override
@@ -88,14 +86,7 @@ public class ServiceDispatcherTest
 		public void write(final byte[] bytes,final int i,final int i1) throws TTransportException
 		{
 		}
-	},new TProtocolFactory()
-	{
-		@Override
-		public TProtocol getProtocol(final TTransport tTransport)
-		{
-			return null;
-		}
-	});
+	},(TProtocolFactory)tTransport->null);
 	final private static ServiceMethod invalid=new ServiceMethod(ServiceImplementation.method1.getServiceName(),"b");
 	@Rule
 	public ExpectedException thrown=ExpectedException.none();
@@ -116,13 +107,13 @@ public class ServiceDispatcherTest
 
 	private static class MyAsyncClient extends TAsyncClient
 	{
-		public MyAsyncClient(final TAsyncClientManager clientManager)
+		MyAsyncClient(final TAsyncClientManager clientManager)
 		{
 			super(clientManager);
 		}
 	}
 
-	public static class ServiceImplementation extends Service<MyAsyncClient>
+	private static class ServiceImplementation extends Service<MyAsyncClient>
 	{
 		final static ServiceMethod method1=new ServiceMethod(ServiceImplementation.class.getName().substring(ServiceImplementation.class.getPackage().getName().length()+1),"1");
 

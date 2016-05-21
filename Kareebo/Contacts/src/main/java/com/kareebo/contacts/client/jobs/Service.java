@@ -89,6 +89,7 @@ abstract public class Service
 	}
 
 	/// Functor interface for service methods
+	@FunctionalInterface
 	protected interface Functor
 	{
 		void run(TBase payload,Enqueuers enqueuers) throws Exception;

@@ -64,7 +64,7 @@ public class RegisterUnconfirmedIdentityTest
 				b1.mark();
 				hashIdentity.setHash(b1);
 				final HashIdentityValue hashIdentityValue=new HashIdentityValue();
-				hashIdentityValue.setConfirmers(new ArrayList<Long>());
+				hashIdentityValue.setConfirmers(new ArrayList<>());
 				hashIdentityValue.setId((long)10);
 				hashIdentity.setHashIdentity(hashIdentityValue);
 				identityDataStore.put(b1,hashIdentity);

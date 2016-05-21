@@ -79,7 +79,7 @@ public class RegisterIdentityTest
 				final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
 				buffer.mark();
 				return new RegisterIdentityInput(new PublicKeys(new EncryptionKey(buffer,EncryptionAlgorithm.RSA2048),new
-					                                                                                                      VerificationKey(buffer,SignatureAlgorithm.Fake)),new HashBuffer(buffer,HashAlgorithm.SHA256),9,new HashSet<HashBuffer>(),new HashBuffer(buffer,HashAlgorithm.Fake),new UserAgent("a","b"),10);
+					                                                                                                      VerificationKey(buffer,SignatureAlgorithm.Fake)),new HashBuffer(buffer,HashAlgorithm.SHA256),9,new HashSet<>(),new HashBuffer(buffer,HashAlgorithm.Fake),new UserAgent("a","b"),10);
 			}
 		});
 		new SimpleTestHarness().test(tests);

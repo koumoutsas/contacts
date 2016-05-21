@@ -14,11 +14,12 @@ import org.vertx.java.core.impl.DefaultFutureResult;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Server-side service implementation of the send contact card operation
  */
-public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifier implements com.kareebo.contacts.thrift.SendContactCard.AsyncIface
+class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifier implements com.kareebo.contacts.thrift.SendContactCard.AsyncIface
 {
 	private static final Logger logger=LoggerFactory.getLogger(SendContactCard.class.getName());
 
@@ -37,40 +38,32 @@ public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifi
 	@Override
 	public void sendContactCard1(final HashBuffer u,final SignatureBuffer signature,final Future<Void> future)
 	{
-		verify(u,signature,new Reply<>(future),new After()
-		{
-			@Override
-			public void run(final User user,final Client client) throws FailedOperation
+		verify(u,signature,new Reply<>(future),(user,client)->{
+			final Map<CharSequence,Client> clientsA=user.getClients();
+			final Map<Long,EncryptionKey> encryptionKeyMap=new HashMap<>(clientsA.size());
+			for(final Object o : clientsA.entrySet())
 			{
-				final Map<CharSequence,Client> clientsA=user.getClients();
-				final Map<Long,EncryptionKey> encryptionKeyMap=new HashMap<>(clientsA.size());
-				for(final Object o : clientsA.entrySet())
+				final Map.Entry entry=(Map.Entry)o;
+				try
 				{
-					final Map.Entry entry=(Map.Entry)o;
-					try
-					{
-						encryptionKeyMap.put(TypeConverter.convert((CharSequence)entry.getKey()),TypeConverter.convert(((Client)entry
-							                                                                                                        .getValue())
-							                                                                                               .getKeys
-								                                                                                                ().getEncryption
-									                                                                                                   ()));
-					}
-					catch(NoSuchAlgorithmException e)
-					{
-						logger.error("Unknown algorithm",e);
-						throw new FailedOperation();
-					}
+					encryptionKeyMap.put(TypeConverter.convert((CharSequence)entry.getKey()),TypeConverter.convert(((Client)entry
+						                                                                                                        .getValue())
+						                                                                                               .getKeys
+							                                                                                                ().getEncryption
+								                                                                                                   ()));
 				}
-				final EncryptionKeys encryptionKeys=new EncryptionKeys(user.getId(),encryptionKeyMap);
-				final Collection<Client> clientsB=clientDBAccessor.get(find(u.bufferForBuffer())).getClients().values();
-				final List<Long> deviceTokens=new ArrayList<>(clientsB.size());
-				for(final Client clientB : clientsB)
+				catch(NoSuchAlgorithmException e)
 				{
-					deviceTokens.add(clientB.getDeviceToken());
+					logger.error("Unknown algorithm",e);
+					throw new FailedOperation();
 				}
-				notifyClients(deviceTokens,new NotificationObject(com.kareebo.contacts.client.protocol.SendContactCard.method1,
-					                                                 encryptionKeys));
 			}
+			final EncryptionKeys encryptionKeys=new EncryptionKeys(user.getId(),encryptionKeyMap);
+			final Collection<Client> clientsB=clientDBAccessor.get(find(u.bufferForBuffer())).getClients().values();
+			final List<Long> deviceTokens=new ArrayList<>(clientsB.size());
+			deviceTokens.addAll(clientsB.stream().map(Client::getDeviceToken).collect(Collectors.toList()));
+			notifyClients(deviceTokens,new NotificationObject(com.kareebo.contacts.client.protocol.SendContactCard.method1,
+				                                                 encryptionKeys));
 		});
 	}
 
@@ -87,22 +80,17 @@ public class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifi
 		{
 			final DefaultFutureResult<Void> result=new DefaultFutureResult<>();
 			final EncryptedBuffer encryptedBuffer=encryptedBufferSigned.getEncryptedBuffer();
-			verify(encryptedBuffer,encryptedBufferSigned.getSignature(),new Reply<>(result),new After()
-			{
-				@Override
-				public void run(final User user,final Client client) throws FailedOperation
+			verify(encryptedBuffer,encryptedBufferSigned.getSignature(),new Reply<>(result),(user,client)->{
+				try
 				{
-					try
-					{
-						notifyClient(clientDBAccessor.get(encryptedBuffer.getClient()).getDeviceToken(),new
-							                                                                                NotificationObject(com.kareebo.contacts.client.protocol.SendContactCard.method3,
-								                                                                                                  new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
-					}
-					catch(NoSuchAlgorithmException e)
-					{
-						logger.error("Unknown algorithm",e);
-						throw new FailedOperation();
-					}
+					notifyClient(clientDBAccessor.get(encryptedBuffer.getClient()).getDeviceToken(),new
+						                                                                                NotificationObject(com.kareebo.contacts.client.protocol.SendContactCard.method3,
+							                                                                                                  new EncryptedBufferSignedWithVerificationKey(encryptedBufferSigned,TypeConverter.convert(client.getKeys().getVerification()))));
+				}
+				catch(NoSuchAlgorithmException e)
+				{
+					logger.error("Unknown algorithm",e);
+					throw new FailedOperation();
 				}
 			});
 			if(result.failed())

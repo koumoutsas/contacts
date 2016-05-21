@@ -174,10 +174,10 @@ class ClientDBAccessor
 		final ByteBuffer blind=ByteBuffer.wrap("".getBytes());
 		blind.mark();
 		user.setBlind(blind);
-		user.setClients(new HashMap<CharSequence,Client>());
+		user.setClients(new HashMap<>());
 		user.setId(id);
-		user.setIdentities(new ArrayList<HashBuffer>());
-		user.setSentRequests(new ArrayList<HashBuffer>());
+		user.setIdentities(new ArrayList<>());
+		user.setSentRequests(new ArrayList<>());
 		dataStore.put(id,user);
 		return user;
 	}
@@ -203,7 +203,7 @@ class ClientDBAccessor
 			throw new FailedOperation();
 		}
 		final Client client=new Client();
-		client.setComparisonIdentities(new ArrayList<EncryptedBuffer>());
+		client.setComparisonIdentities(new ArrayList<>());
 		final PublicKeys publicKeys=new PublicKeys();
 		final EncryptionKey encryptionKey=new EncryptionKey();
 		encryptionKey.setAlgorithm(EncryptionAlgorithm.Fake);

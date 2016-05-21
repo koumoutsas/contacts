@@ -11,7 +11,7 @@ import org.apache.thrift.async.TAsyncClientManager;
 /**
  * Client-side implementation of the register unconfirmed identity service
  */
-public class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient>
+class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient>
 {
 	public static final String serviceName=RegisterUnconfirmedIdentity.class.getSimpleName();
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");

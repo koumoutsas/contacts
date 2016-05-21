@@ -28,18 +28,10 @@ public class RegisterIdentity extends com.kareebo.contacts.client.jobs.Service
 	protected Functor[] functors()
 	{
 		return new Functor[]{
-			new Functor()
+			(final TBase payload,final Enqueuers enqueuers)->
 			{
-				@Override
-				public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
-				{
-				}
-			},new Functor()
-		{
-			@Override
-			public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
-			{
-			}
-		}};
+			},(final TBase payload,final Enqueuers enqueuers)->{
+		}
+		};
 	}
 }

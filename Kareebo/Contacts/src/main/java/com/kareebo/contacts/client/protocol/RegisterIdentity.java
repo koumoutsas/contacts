@@ -3,14 +3,17 @@ package com.kareebo.contacts.client.protocol;
 import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
-import com.kareebo.contacts.thrift.*;
+import com.kareebo.contacts.thrift.ClientId;
+import com.kareebo.contacts.thrift.HashBuffer;
+import com.kareebo.contacts.thrift.LongId;
+import com.kareebo.contacts.thrift.RegisterIdentityInput;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
 /**
  * Client-side implementation of the register identity service
  */
-public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdentity.VertxClient>
+class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdentity.VertxClient>
 {
 	public static final String serviceName=RegisterIdentity.class.getSimpleName();
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
@@ -45,9 +48,9 @@ public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.Regist
 				protected void runInternal(final com.kareebo.contacts.thrift.RegisterIdentity.VertxClient asyncClient,final HashBuffer payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.registerIdentity1(payload,sign
-						                                      (payload),new IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,
-							                                                                                                    com.kareebo.contacts.client.processor.RegisterIdentity.method1,
-							                                                                                                    finalResultEnqueuer,method1,context
+						                                      (payload),new IntermediateResultHandler<>(intermediateResultEnqueuer,
+							                                                                               com.kareebo.contacts.client.processor.RegisterIdentity.method1,
+							                                                                               finalResultEnqueuer,method1,context
 					));
 				}
 			},
@@ -58,8 +61,8 @@ public class RegisterIdentity extends Service<com.kareebo.contacts.thrift.Regist
 				{
 					asyncClient.registerIdentity2(payload
 						                              .getId(),new
-							                                       IntermediateResultHandler<RegisterIdentityReply>(intermediateResultEnqueuer,com.kareebo.contacts
-								                                                                                                                   .client.processor.RegisterIdentity.method2,finalResultEnqueuer,method2,context));
+							                                       IntermediateResultHandler<>(intermediateResultEnqueuer,com.kareebo.contacts
+								                                                                                              .client.processor.RegisterIdentity.method2,finalResultEnqueuer,method2,context));
 				}
 			},
 			new Functor<RegisterIdentityInput>()

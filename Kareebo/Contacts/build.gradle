@@ -1,6 +1,6 @@
 
 def SLF4J_VERSION = '1.6.4'
-def GORA_VERSION = '0.6.1'
+def GORA_VERSION = '0.7-SNAPSHOT'
 
 allprojects {
     gradle.projectsEvaluated {

@@ -1,7 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
 import org.apache.avro.Schema.Field;
-import org.apache.gora.persistency.Persistent;
 import org.apache.gora.persistency.impl.PersistentBase;
 import org.apache.gora.query.PartitionQuery;
 import org.apache.gora.query.Query;
@@ -15,7 +14,6 @@ import org.apache.gora.util.AvroUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -23,12 +21,12 @@ import java.util.concurrent.ConcurrentSkipListMap;
  */
 public class MemStore<K,T extends PersistentBase> extends DataStoreBase<K,T>
 {
-	public K useId;
 	// This map behaves like DB, has to be static and concurrent collection
 	public ConcurrentSkipListMap<K,T> map=new ConcurrentSkipListMap<>();
+	K useId;
 	private boolean isClosed=false;
 
-	public boolean hasBeenClosed()
+	boolean hasBeenClosed()
 	{
 		return isClosed;
 	}
@@ -70,7 +68,7 @@ public class MemStore<K,T extends PersistentBase> extends DataStoreBase<K,T>
 	/**
 	 * Returns a clone with exactly the requested fields shallowly copied
 	 */
-	private static <T extends Persistent> T getPersistent(T obj,String[] fields)
+	private static <T extends PersistentBase> T getPersistent(T obj,String[] fields)
 	{
 		List<Field> otherFields=obj.getSchema().getFields();
 		String[] otherFieldStrings=new String[otherFields.size()];
@@ -141,8 +139,7 @@ public class MemStore<K,T extends PersistentBase> extends DataStoreBase<K,T>
 		}
 		//check if query.fields is null
 		query.setFields(getFieldsToQuery(query.getFields()));
-		ConcurrentNavigableMap<K,T> submap=map.subMap(startKey,true,endKey,true);
-		return new MemResult<>(this,query,submap);
+		return new MemResult<>(this,query,map.subMap(startKey,true,endKey,true));
 	}
 
 	@Override
@@ -175,21 +172,21 @@ public class MemStore<K,T extends PersistentBase> extends DataStoreBase<K,T>
 		isClosed=true;
 	}
 
-	public static class MemQuery<K,T extends PersistentBase> extends QueryBase<K,T>
+	private static class MemQuery<K,T extends PersistentBase> extends QueryBase<K,T>
 	{
-		public MemQuery(DataStore<K,T> dataStore)
+		MemQuery(DataStore<K,T> dataStore)
 		{
 			super(dataStore);
 		}
 	}
 
-	public static class MemResult<K,T extends PersistentBase> extends ResultBase<K,T>
+	private static class MemResult<K,T extends PersistentBase> extends ResultBase<K,T>
 	{
 		private NavigableMap<K,T> map;
 		private Iterator<K> iterator;
 
-		public MemResult(DataStore<K,T> dataStore,Query<K,T> query
-			                ,NavigableMap<K,T> map)
+		MemResult(DataStore<K,T> dataStore,Query<K,T> query
+			         ,NavigableMap<K,T> map)
 		{
 			super(dataStore,query);
 			this.map=map;

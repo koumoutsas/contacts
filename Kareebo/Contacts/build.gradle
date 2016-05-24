@@ -1,6 +1,6 @@
 
 def SLF4J_VERSION = '1.6.4'
-def GORA_VERSION = '0.7-SNAPSHOT'
+def GORA_VERSION = '0.6.1'
 
 allprojects {
     gradle.projectsEvaluated {
@@ -134,6 +134,17 @@ sourceSets {
     }
 }
 
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.org.apache.gora.gradle:gora-gradle-plugin:0.6.1"
+  }
+}
+
 apply plugin: "org.apache.gora"
 
 buildscript {
@@ -142,7 +153,6 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.apache.gora.gradle:gora-gradle-plugin:0.6.1"
         classpath 'org.codehaus.groovy:groovy-backports-compat23:2.3.5'
     }
 }

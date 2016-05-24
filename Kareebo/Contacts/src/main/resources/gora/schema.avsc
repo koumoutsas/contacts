@@ -1,0 +1,267 @@
+[
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "EncryptionAlgorithm",
+    "type": "enum",
+    "symbols":
+    [
+        "RSA2048",
+        "Fake"
+    ]
+},
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "EncryptedBuffer",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "buffer",
+            "type": "bytes"
+        },
+        {
+            "name": "algorithm",
+            "type": "EncryptionAlgorithm"
+        }
+    ]
+},
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "EncryptionKey",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "buffer",
+            "type": "bytes"
+        },
+        {
+            "name": "algorithm",
+            "type": "EncryptionAlgorithm"
+        }
+    ]
+},
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "HashBuffer",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "buffer",
+            "type": "bytes"
+        },
+        {
+            "name": "algorithm",
+            "type":
+            {
+                "type": "enum",
+                "name": "HashAlgorithm",
+                "symbols":
+                [
+                    "SHA256",
+                    "Fake"
+                ]
+
+            }
+        }
+    ]
+},
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "VerificationKey",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "buffer",
+            "type": "bytes"
+        },
+        {
+            "name": "algorithm",
+            "type":
+            {
+                "type": "enum",
+                "name": "SignatureAlgorithm",
+                "symbols":
+                [
+                    "SHA256withECDSAprime239v1",
+                    "Fake"
+                ]
+
+            }
+        }
+    ]
+},
+{
+	"namespace": "com.kareebo.contacts.server.gora",
+	"name": "GraphNode",
+	"type": "record",
+	"fields":
+	[
+	{
+		"name": "id",
+		"type": "long"
+	},
+	{
+		"name": "adjacents",
+		"type":
+		{
+			"type": "array",
+			"items": "EncryptedBuffer"
+		}
+	}
+	]
+},
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "HashIdentity",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "hash",
+            "type": "bytes"
+        },
+        {
+            "name": "hashIdentity",
+            "type":
+            [
+                {
+                    "name": "HashIdentityValue",
+                    "type": "record",
+                    "fields":
+                    [
+                        {
+                            "name": "id",
+                            "type": "long"
+                        },
+                        {
+                            "name": "confirmers",
+                            "type":
+                            {
+                                "type": "array",
+                                "items": "long"
+                            }
+                        }
+                    ]
+                },
+                "bytes"
+            ]
+        }
+    ]
+},
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "PendingNotification",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "id",
+            "type": "long"
+        },
+        {
+            "name": "payload",
+            "type": "bytes"
+        }
+    ]
+},
+{
+    "namespace": "com.kareebo.contacts.server.gora",
+    "name": "User",
+    "type": "record",
+    "fields":
+    [
+        {
+            "name": "id",
+            "type": "long"
+        },
+        {
+            "name": "clients",
+            "type":
+            {
+                "type": "map",
+                "values":
+                {
+                    "name": "Client",
+                    "type": "record",
+                    "fields":
+                    [
+                        {
+                            "name": "userAgent",
+                            "type":
+                            {
+                                "name": "UserAgent",
+                                "type": "record",
+                                "fields":
+                                [
+                                    {
+                                        "name": "platform",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "name": "version",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "keys",
+                            "type":
+                            {
+                                "name": "PublicKeys",
+                                "type": "record",
+                                "fields":
+                                [
+                                    {
+                                        "name": "encryption",
+                                        "type": "EncryptionKey"
+                                    },
+                                    {
+                                        "name": "verification",
+                                        "type": "VerificationKey"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "comparisonIdentities",
+                            "type":
+                            {
+                                "type": "array",
+                                "items": "EncryptedBuffer"
+                            }
+                        },
+                        {
+                            "name": "deviceToken",
+                            "type": "long"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "identities",
+            "type":
+            {
+                "type": "array",
+                "items": "HashBuffer"
+            }
+        },
+        {
+            "name": "blind",
+            "type": "bytes"
+        },
+        {
+            "name": "sentRequests",
+            "type":
+            {
+                "type": "array",
+                "items": "HashBuffer"
+            }
+        }
+    ]
+}
+]

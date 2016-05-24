@@ -458,21 +458,21 @@ public class UpdateServerContactBookTest
 					                                                                     .getAlgorithm();
 				final HashSet<ByteBuffer> s1=new HashSet<>(expectedComparisonIdentities.size());
 				final HashSet<ByteBuffer> s2=new HashSet<>(expectedComparisonIdentities.size());
-				for(final com.kareebo.contacts.server.gora.EncryptedBuffer e : clientValid.getComparisonIdentities())
+				clientValid.getComparisonIdentities().forEach(e->
 				{
 					assertEquals(algorithm,e.getAlgorithm());
 					final ByteBuffer b=e.getBuffer();
 					b.rewind();
 					b.mark();
 					s1.add(b);
-				}
-				for(final com.kareebo.contacts.server.gora.EncryptedBuffer e : expectedComparisonIdentities)
+				});
+				expectedComparisonIdentities.forEach(e->
 				{
 					final ByteBuffer b=e.getBuffer();
 					b.rewind();
 					b.mark();
 					s2.add(b);
-				}
+				});
 				assertTrue(s2.containsAll(s1));
 			}
 		}

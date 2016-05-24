@@ -73,12 +73,9 @@ class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNotifier im
 			{
 				final List<com.kareebo.contacts.server.gora.HashBuffer> sentRequests=user.getSentRequests();
 				final com.kareebo.contacts.server.gora.HashBuffer uBConverted=TypeConverter.convert(uB);
-				for(final com.kareebo.contacts.server.gora.HashBuffer c : sentRequests)
+				if(sentRequests.stream().anyMatch(c->Arrays.equals(uB.getBuffer(),Utils.getBytes(c.getBuffer()))))
 				{
-					if(Arrays.equals(uB.getBuffer(),Utils.getBytes(c.getBuffer())))
-					{
-						return;
-					}
+					return;
 				}
 				sentRequests.add(uBConverted);
 				user.setSentRequests(sentRequests);

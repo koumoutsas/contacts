@@ -17,6 +17,9 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * Extension of {@link com.kareebo.contacts.client.jobs.Service} with a {@link TAsyncClient} and a {@link Signer}
@@ -42,6 +45,19 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 	 * @return The Vertx async client
 	 */
 	abstract protected T construct(TAsyncClientManager asyncClientManager);
+
+	protected <S extends TBase,R extends TBase> Set<R> sign(final Set<S> input,final BiFunction<S,SignatureBuffer,R> constructor) throws
+		InvalidKeyException,
+			TException,
+			NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	{
+		final Set<R> ret=new HashSet<>(input.size());
+		for(S t : input)
+		{
+			ret.add(constructor.apply(t,sign(t)));
+		}
+		return ret;
+	}
 
 	protected SignatureBuffer sign(final TBase object) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
 	{

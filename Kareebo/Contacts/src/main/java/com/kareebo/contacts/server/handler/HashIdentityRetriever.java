@@ -94,13 +94,12 @@ class HashIdentityRetriever
 			return;
 		}
 		aliases.remove(primary);
-		for(final ByteBuffer key : aliases)
-		{
+		aliases.stream().forEach(key->{
 			final HashIdentity identity=new HashIdentity();
 			identity.setHash(key);
 			identity.setHashIdentity(primary);
 			dataStore.put(key,identity);
-		}
+		});
 		dataStore.close();
 	}
 }

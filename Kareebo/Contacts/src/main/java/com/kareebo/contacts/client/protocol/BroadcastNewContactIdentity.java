@@ -7,9 +7,6 @@ import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Client-side implementation of the broadcast new contact identity service
  */
@@ -68,13 +65,11 @@ public class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.th
 				@Override
 				protected void runInternal(final com.kareebo.contacts.thrift.BroadcastNewContactIdentity.VertxClient asyncClient,final SetEncryptedBuffer payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
-					final Set<EncryptedBuffer> encryptedBuffersSet=payload.getBufferSet();
-					final Set<EncryptedBufferSigned> set=new HashSet<>(encryptedBuffersSet.size());
-					for(final EncryptedBuffer encryptedBuffer : encryptedBuffersSet)
-					{
-						set.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
-					}
-					asyncClient.broadcastNewContactIdentity3(set,new IntermediateVoidResultHandler(finalResultEnqueuer,method3));
+					asyncClient.broadcastNewContactIdentity3(sign(payload.getBufferSet(),EncryptedBufferSigned::new)
+						,new
+							 IntermediateVoidResultHandler
+							 (finalResultEnqueuer,
+								 method3));
 				}
 			},
 			new Functor<LongId>()

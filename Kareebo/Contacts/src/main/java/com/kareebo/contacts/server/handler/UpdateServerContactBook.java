@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Service implementation for updating the server-side contact book
@@ -77,17 +78,16 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 				}
 				final HashSet<Long> addedContacts=new HashSet<>(maxSize);
 				final HashSet<Long> deletedContacts=new HashSet<>(maxSize);
-				final HashSet<EncryptedBuffer> comparisonIdentities=new HashSet<>(maxSize);
-				for(final EncryptedBuffer e : client.getComparisonIdentities())
-				{
+				final Set<EncryptedBuffer> comparisonIdentities=client.getComparisonIdentities().stream().map(e->{
 					final EncryptedBuffer newE=new EncryptedBuffer();
 					newE.setAlgorithm(e.getAlgorithm());
 					final ByteBuffer b=e.getBuffer();
 					b.rewind();
 					b.mark();
 					newE.setBuffer(b);
-					comparisonIdentities.add(newE);
-				}
+					return newE;
+				}).collect(Collectors
+					           .toSet());
 				try
 				{
 					if(!addOperations.isEmpty())

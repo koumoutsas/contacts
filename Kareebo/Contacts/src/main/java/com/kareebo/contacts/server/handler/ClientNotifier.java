@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Stores and retrieves pending messages to clients and interfaces with the push notification system
@@ -59,12 +61,7 @@ class ClientNotifier
 	 */
 	void put(final List<Long> deviceTokens,final NotificationObject object) throws FailedOperation
 	{
-		final Map<Long,NotificationObject> notificationsInternal=new HashMap<>(deviceTokens.size());
-		for(final Long deviceToken : deviceTokens)
-		{
-			notificationsInternal.put(deviceToken,object);
-		}
-		put(notificationsInternal);
+		put(deviceTokens.stream().collect(Collectors.toMap(Function.identity(),d->object)));
 	}
 
 	/**

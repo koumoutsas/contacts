@@ -7,9 +7,6 @@ import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Client-side implementation of the suggest new contact service
  */
@@ -59,14 +56,11 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 				@Override
 				protected void runInternal(final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,final EncryptedBuffersWithHashBuffer payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
-					final Set<EncryptedBuffer> encryptedBuffers=payload.getBuffers();
 					final HashBuffer uB=payload.getUB();
-					final Set<EncryptedBufferSigned> encryptedBufferSignedSet=new HashSet<>(encryptedBuffers.size());
-					for(final EncryptedBuffer encryptedBuffer : encryptedBuffers)
-					{
-						encryptedBufferSignedSet.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
-					}
-					asyncClient.suggestNewContact2(encryptedBufferSignedSet,uB,sign(uB),new IntermediateVoidResultHandler(finalResultEnqueuer,method2));
+					asyncClient.suggestNewContact2(sign(payload.getBuffers(),EncryptedBufferSigned::new),uB,sign(uB),new
+						                                                                                                 IntermediateVoidResultHandler
+						                                                                                                 (finalResultEnqueuer,
+							                                                                                                 method2));
 				}
 			},
 			new Functor<LongId>()

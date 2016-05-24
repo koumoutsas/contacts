@@ -1,7 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
-import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.server.gora.HashIdentity;
 import com.kareebo.contacts.server.gora.HashIdentityValue;
 import com.kareebo.contacts.server.gora.User;

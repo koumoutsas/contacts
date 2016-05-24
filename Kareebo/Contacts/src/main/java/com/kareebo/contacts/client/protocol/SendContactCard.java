@@ -7,9 +7,6 @@ import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Client-side implementation of the send contact card service
  */
@@ -66,13 +63,10 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 					       @Override
 					       protected void runInternal(final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,final SetEncryptedBuffer payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 					       {
-						       final Set<EncryptedBuffer> encryptedBufferSet=payload.getBufferSet();
-						       final Set<EncryptedBufferSigned> encryptedBufferSignedSet=new HashSet<>(encryptedBufferSet.size());
-						       for(final EncryptedBuffer encryptedBuffer : encryptedBufferSet)
-						       {
-							       encryptedBufferSignedSet.add(new EncryptedBufferSigned(encryptedBuffer,sign(encryptedBuffer)));
-						       }
-						       asyncClient.sendContactCard3(encryptedBufferSignedSet,new IntermediateVoidResultHandler(finalResultEnqueuer,method3));
+						       asyncClient.sendContactCard3(sign(payload.getBufferSet(),EncryptedBufferSigned::new),new
+							                                                                                            IntermediateVoidResultHandler
+							                                                                                            (finalResultEnqueuer,
+								                                                                                            method3));
 					       }
 				       },
 				       new Functor<LongId>()

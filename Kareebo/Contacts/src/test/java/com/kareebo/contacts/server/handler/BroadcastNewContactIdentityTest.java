@@ -797,10 +797,7 @@ public class BroadcastNewContactIdentityTest
 				((BroadcastNewContactIdentity)signatureVerifier).broadcastNewContactIdentity1(new LongId(i),signature,result);
 				assertTrue(result.succeeded());
 				final Map<ClientId,EncryptionKey> reply=result.result().getKeyMap();
-				for(final EncryptionKey e : reply.values())
-				{
-					e.bufferForBuffer().rewind();
-				}
+				reply.values().forEach(e->e.bufferForBuffer().rewind());
 				assertEquals(expected,reply);
 			}
 		}.run();

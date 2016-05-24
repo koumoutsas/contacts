@@ -15,6 +15,8 @@ import org.vertx.java.core.impl.DefaultFutureResult;
 
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,16 +47,10 @@ public class SignatureVerifierWithIdentityStoreAndNotifierTest extends Signer
 		final LongId payload2=new LongId(deviceToken0+2);
 		final Map<Long,LongId> expected=new HashMap<>(deviceTokens.size()+deviceTokens2.size()+1);
 		expected.put(deviceToken0,payload0);
-		for(final Long l : deviceTokens)
-		{
-			expected.put(l,payload1);
-		}
-		final Map<Long,NotificationObject> notifications=new HashMap<>(deviceTokens2.size());
-		for(final Long l : deviceTokens2)
-		{
-			expected.put(l,payload2);
-			notifications.put(l,new NotificationObject(method,payload2));
-		}
+		deviceTokens.forEach(l->expected.put(l,payload1));
+		deviceTokens2.forEach(l->expected.put(l,payload2));
+		final Map<Long,NotificationObject> notifications=deviceTokens2.stream().collect(Collectors.toMap(Function.identity(),l->new
+			                                                                                                                        NotificationObject(method,payload2)));
 		final TestSignatureVerifierWithIdentityStoreAndNotifier testSignatureVerifierWithIdentityStoreAndNotifier=new
 			                                                                                                          TestSignatureVerifierWithIdentityStoreAndNotifier(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration()),clientNotifier);
 		testSignatureVerifierWithIdentityStoreAndNotifier.notifyClient(deviceToken0,new NotificationObject(method,payload0));

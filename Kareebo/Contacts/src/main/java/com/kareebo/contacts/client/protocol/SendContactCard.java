@@ -27,7 +27,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 	}
 
 	@Override
-	protected com.kareebo.contacts.thrift.SendContactCard.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	protected com.kareebo.contacts.thrift.SendContactCard.VertxClient construct(@Nonnull final TAsyncClientManager asyncClientManager)
 	{
 		return new com.kareebo.contacts.thrift.SendContactCard.VertxClient(asyncClientManager);
 	}
@@ -48,7 +48,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 				       new Functor<HashBuffer>()
 				       {
 					       @Override
-					       protected void runInternal(final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,final HashBuffer payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+					       protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,@Nonnull final HashBuffer payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 					       {
 						       asyncClient.sendContactCard1(payload,sign(payload),new IntermediateVoidResultHandler(finalResultEnqueuer,method1));
 					       }
@@ -56,7 +56,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 				       new Functor<LongId>()
 				       {
 					       @Override
-					       protected void runInternal(final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,final LongId payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+					       protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,@Nonnull final LongId payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 					       {
 						       asyncClient.sendContactCard2(payload,sign(payload),new IntermediateResultHandler<>(intermediateResultEnqueuer,com.kareebo.contacts.client.processor
 							                                                                                                                     .SendContactCard.method2,finalResultEnqueuer,method2,context));
@@ -65,7 +65,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 				       new Functor<SetEncryptedBuffer>()
 				       {
 					       @Override
-					       protected void runInternal(final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,final SetEncryptedBuffer payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+					       protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,@Nonnull final SetEncryptedBuffer payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 					       {
 						       asyncClient.sendContactCard3(sign(payload.getBufferSet(),EncryptedBufferSigned::new),new
 							                                                                                            IntermediateVoidResultHandler
@@ -76,7 +76,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 				       new Functor<LongId>()
 				       {
 					       @Override
-					       protected void runInternal(final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,final LongId payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+					       protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SendContactCard.VertxClient asyncClient,@Nonnull final LongId payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 					       {
 						       asyncClient.sendContactCard4(payload,sign(payload),new IntermediateResultHandler<>
 							                                                          (intermediateResultEnqueuer,com.kareebo.contacts.client.processor.SendContactCard

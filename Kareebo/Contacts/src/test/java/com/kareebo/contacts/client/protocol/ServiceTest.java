@@ -101,7 +101,7 @@ public class ServiceTest
 		}
 
 		@Override
-		protected MyAsyncClient construct(final TAsyncClientManager asyncClientManager)
+		protected MyAsyncClient construct(@Nonnull final TAsyncClientManager asyncClientManager)
 		{
 			return null;
 		}
@@ -120,7 +120,7 @@ public class ServiceTest
 			return new com.kareebo.contacts.client.jobs.Service.Functor[]{new Functor<TBase>()
 			{
 				@Override
-				protected void runInternal(final MyAsyncClient asyncClient,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final MyAsyncClient asyncClient,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 				}
 			}};
@@ -138,7 +138,7 @@ public class ServiceTest
 			new Functor<TBase>()
 			{
 				@Override
-				protected void runInternal(final MyAsyncClient asyncClient,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final MyAsyncClient asyncClient,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					lastPayload=payload;
 				}

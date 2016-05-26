@@ -26,7 +26,7 @@ class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.Update
 	}
 
 	@Override
-	protected com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	protected com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient construct(@Nonnull final TAsyncClientManager asyncClientManager)
 	{
 		return new com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient(asyncClientManager);
 	}
@@ -46,7 +46,7 @@ class UpdateServerContactBook extends Service<com.kareebo.contacts.thrift.Update
 			new Functor<ContactOperationSet>()
 			{
 				@Override
-				protected void runInternal(final com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient asyncClient,final ContactOperationSet payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.UpdateServerContactBook.VertxClient asyncClient,@Nonnull final ContactOperationSet payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.updateServerContactBook1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,
 						                                                                                 method1));

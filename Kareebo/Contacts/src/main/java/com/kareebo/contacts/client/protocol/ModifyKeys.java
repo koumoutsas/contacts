@@ -25,7 +25,7 @@ class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxCli
 	}
 
 	@Override
-	protected com.kareebo.contacts.thrift.ModifyKeys.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	protected com.kareebo.contacts.thrift.ModifyKeys.VertxClient construct(@Nonnull final TAsyncClientManager asyncClientManager)
 	{
 		return new com.kareebo.contacts.thrift.ModifyKeys.VertxClient(asyncClientManager);
 	}
@@ -45,7 +45,7 @@ class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxCli
 			new Functor<PublicKeys>()
 			{
 				@Override
-				protected void runInternal(final com.kareebo.contacts.thrift.ModifyKeys.VertxClient asyncClient,final PublicKeys payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.ModifyKeys.VertxClient asyncClient,@Nonnull final PublicKeys payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.modifyKeys1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,method1));
 				}

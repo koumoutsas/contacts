@@ -26,7 +26,7 @@ class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.Re
 	}
 
 	@Override
-	protected com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	protected com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient construct(@Nonnull final TAsyncClientManager asyncClientManager)
 	{
 		return new com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient(asyncClientManager);
 	}
@@ -46,7 +46,7 @@ class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.Re
 			new Functor<HashBufferSet>()
 			{
 				@Override
-				protected void runInternal(final com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient asyncClient,final HashBufferSet payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient asyncClient,@Nonnull final HashBufferSet payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.registerUnconfirmedIdentity1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,method1));
 				}

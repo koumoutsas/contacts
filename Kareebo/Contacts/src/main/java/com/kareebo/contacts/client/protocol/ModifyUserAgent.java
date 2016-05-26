@@ -19,13 +19,15 @@ class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgen
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
 	private final static ServiceMethod[] methods={method1};
 
-	ModifyUserAgent(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	ModifyUserAgent(final @Nonnull Context context,final @Nonnull TAsyncClientManager asyncClientManager,final @Nonnull SigningKey signingKey,final
+	@Nonnull ClientId
+		                                                                                                                         clientId)
 	{
 		super(context,asyncClientManager,signingKey,clientId);
 	}
 
 	@Override
-	protected com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	protected com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient construct(@Nonnull final TAsyncClientManager asyncClientManager)
 	{
 		return new com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient(asyncClientManager);
 	}
@@ -44,7 +46,7 @@ class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgen
 		return new com.kareebo.contacts.client.jobs.Service.Functor[]{new Functor<UserAgent>()
 		{
 			@Override
-			protected void runInternal(final com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient asyncClient,final UserAgent payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+			protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient asyncClient,@Nonnull final UserAgent payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 			{
 				asyncClient.modifyUserAgent1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,method1));
 			}

@@ -29,7 +29,7 @@ class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdent
 	}
 
 	@Override
-	protected com.kareebo.contacts.thrift.RegisterIdentity.VertxClient construct(final TAsyncClientManager asyncClientManager)
+	protected com.kareebo.contacts.thrift.RegisterIdentity.VertxClient construct(@Nonnull final TAsyncClientManager asyncClientManager)
 	{
 		return new com.kareebo.contacts.thrift.RegisterIdentity.VertxClient(asyncClientManager);
 	}
@@ -49,7 +49,7 @@ class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdent
 			new Functor<HashBuffer>()
 			{
 				@Override
-				protected void runInternal(final com.kareebo.contacts.thrift.RegisterIdentity.VertxClient asyncClient,final HashBuffer payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.RegisterIdentity.VertxClient asyncClient,@Nonnull final HashBuffer payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.registerIdentity1(payload,sign
 						                                      (payload),new IntermediateResultHandler<>(intermediateResultEnqueuer,
@@ -61,7 +61,7 @@ class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdent
 			new Functor<LongId>()
 			{
 				@Override
-				protected void runInternal(final com.kareebo.contacts.thrift.RegisterIdentity.VertxClient asyncClient,final LongId payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.RegisterIdentity.VertxClient asyncClient,@Nonnull final LongId payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.registerIdentity2(payload
 						                              .getId(),new
@@ -72,7 +72,7 @@ class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdent
 			new Functor<RegisterIdentityInput>()
 			{
 				@Override
-				protected void runInternal(final com.kareebo.contacts.thrift.RegisterIdentity.VertxClient asyncClient,final RegisterIdentityInput payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.RegisterIdentity.VertxClient asyncClient,@Nonnull final RegisterIdentityInput payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.registerIdentity3(payload,sign
 						                                      (payload),new FinalResultHandler(finalResultEnqueuer,method3));

@@ -32,7 +32,9 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 	/// A {@link Signer} for signing payloads
 	final private Signer signer;
 
-	protected Service(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	protected Service(final @Nonnull Context context,final @Nonnull TAsyncClientManager asyncClientManager,final @Nonnull SigningKey signingKey,final
+	@Nonnull ClientId
+		                                                                                                                           clientId)
 	{
 		super(context);
 		signer=new Signer(signingKey,clientId);
@@ -45,9 +47,10 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 	 * @param asyncClientManager The async client manager
 	 * @return The Vertx async client
 	 */
-	abstract protected T construct(TAsyncClientManager asyncClientManager);
+	abstract protected T construct(@Nonnull TAsyncClientManager asyncClientManager);
 
-	protected <S extends TBase,R extends TBase> Set<R> sign(final Set<S> input,final BiFunction<S,SignatureBuffer,R> constructor) throws
+	protected <S extends TBase,R extends TBase> Set<R> sign(final @Nonnull Set<S> input,final @Nonnull BiFunction<S,SignatureBuffer,R> constructor)
+		throws
 		InvalidKeyException,
 			TException,
 			NoSuchAlgorithmException, NoSuchProviderException, SignatureException
@@ -60,7 +63,8 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 		return ret;
 	}
 
-	protected SignatureBuffer sign(final TBase object) throws InvalidKeyException, TException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException
+	protected SignatureBuffer sign(final @Nonnull TBase object) throws InvalidKeyException, TException, NoSuchAlgorithmException,
+		                                                           NoSuchProviderException, SignatureException
 	{
 		return signer.sign(object);
 	}
@@ -80,7 +84,8 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 			runInternal(asyncClient,(S)payload,intermediateResultEnqueuer,enqueuers.finalResultEnqueuer());
 		}
 
-		abstract protected void runInternal(T asyncClient,S payload,IntermediateResultEnqueuer intermediateResultEnqueuer,
+		abstract protected void runInternal(@Nonnull T asyncClient,@Nonnull S payload,@Nonnull IntermediateResultEnqueuer
+		                                    intermediateResultEnqueuer,
 		                                    FinalResultEnqueuer
 			                                    finalResultEnqueuer) throws Exception;
 	}

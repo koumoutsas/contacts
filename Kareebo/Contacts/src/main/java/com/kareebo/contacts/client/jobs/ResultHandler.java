@@ -5,6 +5,8 @@ import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.vertx.java.core.AsyncResult;
 
+import javax.annotation.Nonnull;
+
 /**
  * Implementation of {@link org.vertx.java.core.AsyncResultHandler} using {@link ErrorEnqueuer}
  */
@@ -14,7 +16,7 @@ abstract public class ResultHandler<T> implements org.vertx.java.core.AsyncResul
 	private final ErrorEnqueuer errorEnqueuer;
 	final private JobType jobType;
 
-	protected ResultHandler(final ErrorEnqueuer errorEnqueuer,final ServiceMethod method,final JobType jobType)
+	protected ResultHandler(final @Nonnull ErrorEnqueuer errorEnqueuer,final @Nonnull ServiceMethod method,final @Nonnull JobType jobType)
 	{
 		this.errorEnqueuer=errorEnqueuer;
 		this.method=method;
@@ -22,7 +24,7 @@ abstract public class ResultHandler<T> implements org.vertx.java.core.AsyncResul
 	}
 
 	@Override
-	public void handle(final AsyncResult<T> event)
+	public void handle(final @Nonnull AsyncResult<T> event)
 	{
 		if(event.failed())
 		{
@@ -34,5 +36,5 @@ abstract public class ResultHandler<T> implements org.vertx.java.core.AsyncResul
 		}
 	}
 
-	abstract protected void handleSuccess(final T result);
+	abstract protected void handleSuccess(final @Nonnull T result);
 }

@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.*;
@@ -518,7 +519,7 @@ public class BroadcastNewContactIdentityTest
 					}
 
 					@Override
-					void verify(final TBase plaintext,final SignatureBuffer signature,final Reply<?> reply,final After after)
+					void verify(@Nonnull final TBase plaintext,@Nonnull final SignatureBuffer signature,@Nonnull final Reply<?> reply,@Nonnull final After after)
 					{
 						final Client client;
 						try
@@ -986,6 +987,7 @@ public class BroadcastNewContactIdentityTest
 	abstract private class Base extends SignatureVerifierTestBase
 	{
 		final DataStore<ByteBuffer,HashIdentity> identityDataStore;
+		@SuppressWarnings("ConstantConditions")
 		final ClientNotifier clientNotifier=new ClientNotifier(null,null);
 
 		Base() throws GoraException

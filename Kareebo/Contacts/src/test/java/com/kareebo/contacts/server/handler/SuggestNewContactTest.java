@@ -135,9 +135,11 @@ public class SuggestNewContactTest
 				userDataStore.close();
 				final Future<Void> future=new DefaultFutureResult<>();
 				final com.kareebo.contacts.thrift.HashBuffer uBConverted=TypeConverter.convert(uB);
+				//noinspection ConstantConditions
 				suggestNewContact.suggestNewContact2(null,uBConverted,sign(uBConverted,clientId),future);
 				assertTrue(future.succeeded());
 				uBConverted.setAlgorithm(com.kareebo.contacts.thrift.HashAlgorithm.Fake);
+				//noinspection ConstantConditions
 				suggestNewContact.suggestNewContact2(null,uBConverted,sign(uBConverted,clientId),future);
 				assertTrue(future.failed());
 			}

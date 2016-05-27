@@ -7,6 +7,7 @@ import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -18,7 +19,7 @@ abstract public class ServiceDispatcher
 	final private String packageName=getClass().getPackage().getName()+".";
 	final private Enqueuers enqueuers;
 
-	public ServiceDispatcher(final Enqueuers enqueuers)
+	public ServiceDispatcher(final @Nonnull Enqueuers enqueuers)
 	{
 		this.enqueuers=enqueuers;
 	}
@@ -30,7 +31,7 @@ abstract public class ServiceDispatcher
 	 * @param notificationId The notification id
 	 * @throws NoSuchService When the service cannot be found
 	 */
-	public void run(final ServiceMethod method,final long notificationId) throws Service.ExecutionFailed, NoSuchService, Service.NoSuchMethod
+	public void run(final @Nonnull ServiceMethod method,final long notificationId) throws Service.ExecutionFailed, NoSuchService, Service.NoSuchMethod
 	{
 		run(method,new LongId(notificationId),null);
 	}
@@ -44,7 +45,7 @@ abstract public class ServiceDispatcher
 	 * @throws NoSuchService        When the service cannot be found
 	 * @throws Service.NoSuchMethod When the service method cannot be found
 	 */
-	public void run(final ServiceMethod method,final TBase payload,final Context context) throws Service.NoSuchMethod, Service.ExecutionFailed, NoSuchService
+	public void run(final @Nonnull ServiceMethod method,final @Nonnull TBase payload,final Context context) throws Service.NoSuchMethod, Service.ExecutionFailed, NoSuchService
 	{
 		try
 		{
@@ -68,7 +69,7 @@ abstract public class ServiceDispatcher
 	 * @throws InvocationTargetException
 	 * @throws InstantiationException
 	 */
-	abstract public Service constructService(Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException;
+	abstract public Service constructService(@Nonnull Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException;
 
 	/// Exception thrown when a service cannot be found
 	public static class NoSuchService extends Exception

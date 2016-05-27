@@ -7,6 +7,7 @@ import org.apache.gora.store.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ class HashIdentityRetriever
 	private static final Logger logger=LoggerFactory.getLogger(HashIdentityRetriever.class.getName());
 	final private DataStore<ByteBuffer,HashIdentity> dataStore;
 
-	HashIdentityRetriever(final DataStore<ByteBuffer,HashIdentity> dataStore)
+	HashIdentityRetriever(final @Nonnull DataStore<ByteBuffer,HashIdentity> dataStore)
 	{
 		this.dataStore=dataStore;
 	}
@@ -31,7 +32,7 @@ class HashIdentityRetriever
 	 * @return The resolved user id, null if there is no mapped value
 	 * @throws FailedOperation When a corrupted datastore is detected
 	 */
-	Long find(final ByteBuffer key) throws FailedOperation
+	Long find(final @Nonnull ByteBuffer key) throws FailedOperation
 	{
 		final HashIdentityValue value=get(key);
 		if(value==null)
@@ -48,7 +49,7 @@ class HashIdentityRetriever
 	 * @return The resolved value, null if there is no mapped value
 	 * @throws FailedOperation When a corrupted datastore is detected
 	 */
-	HashIdentityValue get(final ByteBuffer key) throws FailedOperation
+	HashIdentityValue get(final @Nonnull ByteBuffer key) throws FailedOperation
 	{
 		final HashSet<ByteBuffer> seenKeys=new HashSet<>();
 		for(ByteBuffer nextKey=key;;)

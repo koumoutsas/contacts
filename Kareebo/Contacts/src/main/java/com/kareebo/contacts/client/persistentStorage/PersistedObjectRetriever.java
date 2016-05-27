@@ -5,6 +5,8 @@ import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 
+import javax.annotation.Nonnull;
+
 /// Wrapper around {@link PersistentStorage} that deserializes to {@link TBase}
 public class PersistedObjectRetriever
 {
@@ -15,7 +17,7 @@ public class PersistedObjectRetriever
 	 *
 	 * @param persistentStorage The {@link PersistentStorage}
 	 */
-	public PersistedObjectRetriever(final PersistentStorage persistentStorage)
+	public PersistedObjectRetriever(final @Nonnull PersistentStorage persistentStorage)
 	{
 		this.persistentStorage=persistentStorage;
 	}
@@ -28,7 +30,7 @@ public class PersistedObjectRetriever
 	 * @throws PersistentStorage.NoSuchKey When {@param key} cannot be found
 	 * @throws TException                  When deserialization to {@param object}fails
 	 */
-	public void get(final TBase object,final String key) throws PersistentStorage.NoSuchKey, TException
+	public void get(final @Nonnull TBase object,final @Nonnull String key) throws PersistentStorage.NoSuchKey, TException
 	{
 		new TDeserializer().deserialize(object,persistentStorage.get(key));
 	}
@@ -40,7 +42,7 @@ public class PersistedObjectRetriever
 	 * @param value The object
 	 * @throws TException When serialization of {@param value} fails
 	 */
-	public void put(final String key,final TBase value) throws TException
+	public void put(final @Nonnull String key,final @Nonnull TBase value) throws TException
 	{
 		persistentStorage.put(key,new TSerializer().serialize(value));
 	}
@@ -51,7 +53,7 @@ public class PersistedObjectRetriever
 	 * @param key The key
 	 * @throws PersistentStorage.NoSuchKey When {@param key} cannot be found
 	 */
-	void remove(final String key) throws PersistentStorage.NoSuchKey
+	void remove(final @Nonnull String key) throws PersistentStorage.NoSuchKey
 	{
 		persistentStorage.remove(key);
 	}

@@ -15,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
@@ -45,12 +46,12 @@ public class ServiceTest
 		},new FinalResultEnqueuer()
 		{
 			@Override
-			public void success(final JobType type,final String service,final SuccessCode result)
+			public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
 			{
 			}
 
 			@Override
-			public void error(final JobType type,final ServiceMethod method,final ErrorCode error)
+			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
 			{
 			}
 		}));
@@ -65,15 +66,18 @@ public class ServiceTest
 
 		ServiceImplementation(final PersistedObjectRetriever persistedObjectRetriever)
 		{
+			//noinspection ConstantConditions
 			super(null,persistedObjectRetriever);
 		}
 
+		@Nonnull
 		@Override
 		protected ServiceMethod[] methodNames()
 		{
 			return new ServiceMethod[0];
 		}
 
+		@Nonnull
 		@Override
 		protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 		{
@@ -85,7 +89,7 @@ public class ServiceTest
 			new Functor<TBase>()
 			{
 				@Override
-				protected void runInternal(final PersistedObjectRetriever persistedObjectRetriever,final TBase payload,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final PersistedObjectRetriever persistedObjectRetriever,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					persistedObjectRetriever.put(key,payload);
 				}

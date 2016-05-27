@@ -1,5 +1,6 @@
 package com.kareebo.contacts.base;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 
@@ -13,7 +14,9 @@ public class RandomHashPad
 	/**
 	 * Get the random bytes
 	 */
-	public RandomHashPad()
+	public
+	@Nonnull
+	RandomHashPad()
 	{
 		new SecureRandom().nextBytes(bytes);
 	}
@@ -23,7 +26,9 @@ public class RandomHashPad
 	 *
 	 * @return A {@link ByteBuffer} wrapping the random bytes
 	 */
-	public ByteBuffer getBytes()
+	public
+	@Nonnull
+	ByteBuffer getBytes()
 	{
 		final ByteBuffer ret=ByteBuffer.wrap(bytes);
 		ret.mark();

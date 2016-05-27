@@ -3,6 +3,8 @@ package com.kareebo.contacts.client.jobs;
 import com.kareebo.contacts.thrift.client.jobs.*;
 import org.apache.thrift.TBase;
 
+import javax.annotation.Nonnull;
+
 public class EnqueuerImplementation implements FinalResultEnqueuer, IntermediateResultEnqueuer
 {
 	private ErrorCode errorCode;
@@ -33,7 +35,7 @@ public class EnqueuerImplementation implements FinalResultEnqueuer, Intermediate
 	}
 
 	@Override
-	public void success(final JobType type,final String service,final SuccessCode result)
+	public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
 	{
 		set(null,result,new ServiceMethod(service,null),null,type);
 	}
@@ -49,13 +51,13 @@ public class EnqueuerImplementation implements FinalResultEnqueuer, Intermediate
 	}
 
 	@Override
-	public void error(final JobType type,final ServiceMethod method,final ErrorCode error)
+	public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
 	{
 		set(error,null,method,null,type);
 	}
 
 	@Override
-	public void enqueue(final JobType type,final ServiceMethod method,Context context,final TBase payload)
+	public void enqueue(@Nonnull final JobType type,@Nonnull final ServiceMethod method,@Nonnull Context context,@Nonnull final TBase payload)
 	{
 		set(null,null,method,payload,type);
 	}

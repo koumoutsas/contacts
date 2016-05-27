@@ -8,6 +8,7 @@ import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
 import org.apache.thrift.TBase;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 /**
@@ -24,7 +25,7 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	 * @param userDataStore     The user datastore
 	 * @param identityDatastore The identity datastore
 	 */
-	SignatureVerifierWithIdentityStore(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore)
+	SignatureVerifierWithIdentityStore(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity> identityDatastore)
 	{
 		super(userDataStore);
 		this.identityDatastore=identityDatastore;
@@ -38,7 +39,9 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	 * @return The resolved value, null if there is no mapped value
 	 * @throws FailedOperation When the datastore is corrupted or the key is not found
 	 */
-	final Long find(final ByteBuffer key) throws FailedOperation
+	final
+	@Nonnull
+	Long find(final @Nonnull ByteBuffer key) throws FailedOperation
 	{
 		final Long ret=hashIdentityRetriever.find(key);
 		if(ret==null)
@@ -54,13 +57,13 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	 * @param key The key
 	 * @return True, iff the key exists
 	 */
-	boolean exists(final ByteBuffer key) throws FailedOperation
+	boolean exists(final @Nonnull ByteBuffer key) throws FailedOperation
 	{
 		return hashIdentityRetriever.find(key)!=null;
 	}
 
 	@Override
-	void verify(final TBase plaintext,final SignatureBuffer signature,final Reply<?> reply,final After after)
+	void verify(@Nonnull final TBase plaintext,@Nonnull final SignatureBuffer signature,@Nonnull final Reply<?> reply,@Nonnull final After after)
 	{
 		super.verify(plaintext,signature,reply,after);
 		if(!reply.failed())
@@ -75,7 +78,7 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	 * @param key          The identity key
 	 * @param hashIdentity The identity
 	 */
-	void put(final ByteBuffer key,final HashIdentityValue hashIdentity)
+	void put(final @Nonnull ByteBuffer key,final @Nonnull HashIdentityValue hashIdentity)
 	{
 		final HashIdentity identity=new HashIdentity();
 		identity.setHash(key);
@@ -89,7 +92,7 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	 * @param from The value to be aliased
 	 * @param to   The alias
 	 */
-	void aliasTo(final ByteBuffer from,final ByteBuffer to)
+	void aliasTo(final @Nonnull ByteBuffer from,final @Nonnull ByteBuffer to)
 	{
 		final HashIdentity alias=new HashIdentity();
 		alias.setHash(from);
@@ -104,7 +107,7 @@ abstract class SignatureVerifierWithIdentityStore extends SignatureVerifier
 	 * @return The identity mapped to the key, null if there isn't one
 	 * @throws FailedOperation When the datastore is corrupted or the key is not found
 	 */
-	HashIdentityValue get(final ByteBuffer key) throws FailedOperation
+	HashIdentityValue get(final @Nonnull ByteBuffer key) throws FailedOperation
 	{
 		return hashIdentityRetriever.get(key);
 	}

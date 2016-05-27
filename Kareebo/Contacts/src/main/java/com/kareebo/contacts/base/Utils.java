@@ -1,5 +1,6 @@
 package com.kareebo.contacts.base;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 /**
@@ -13,7 +14,9 @@ public class Utils
 	 * @param byteBuffer The ByteBuffer object. It gets rewound before being copied
 	 * @return A byte array
 	 */
-	public static byte[] getBytes(final ByteBuffer byteBuffer)
+	public static
+	@Nonnull
+	byte[] getBytes(final @Nonnull ByteBuffer byteBuffer)
 	{
 		byteBuffer.rewind();
 		final byte[] ret=new byte[byteBuffer.remaining()];

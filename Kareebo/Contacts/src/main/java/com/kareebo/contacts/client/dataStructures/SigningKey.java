@@ -2,6 +2,7 @@ package com.kareebo.contacts.client.dataStructures;
 
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 
+import javax.annotation.Nonnull;
 import java.security.PrivateKey;
 
 /**
@@ -12,7 +13,7 @@ public class SigningKey
 	public final PrivateKey key;
 	public final SignatureAlgorithm algorithm;
 
-	public SigningKey(final PrivateKey key,final SignatureAlgorithm algorithm)
+	public SigningKey(final @Nonnull PrivateKey key,final @Nonnull SignatureAlgorithm algorithm)
 	{
 		this.key=key;
 		this.algorithm=algorithm;

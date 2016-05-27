@@ -6,6 +6,7 @@ import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ class Notifier implements ClientNotifierBackend
 	boolean fail=false;
 
 	@Override
-	public void notify(final long deviceToken,final byte[] payload) throws FailedOperation
+	public void notify(final long deviceToken,@Nonnull final byte[] payload) throws FailedOperation
 	{
 		if(fail)
 		{

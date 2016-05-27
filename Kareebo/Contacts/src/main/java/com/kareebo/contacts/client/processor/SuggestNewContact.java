@@ -1,5 +1,9 @@
 package com.kareebo.contacts.client.processor;
 
+import com.kareebo.contacts.thrift.client.jobs.Context;
+
+import javax.annotation.Nonnull;
+
 /**
  * Client-processor-side implementation of the suggest new contact identity service
  */
@@ -10,17 +14,19 @@ public class SuggestNewContact extends com.kareebo.contacts.client.jobs.Service
 	public final static ServiceMethod method2=new ServiceMethod(serviceName,"2");
 	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
 
-	protected SuggestNewContact()
+	protected SuggestNewContact(final @Nonnull Context context)
 	{
-		super(null);
+		super(context);
 	}
 
+	@Nonnull
 	@Override
 	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{
 		return new com.kareebo.contacts.thrift.client.jobs.ServiceMethod[0];
 	}
 
+	@Nonnull
 	@Override
 	protected Functor[] functors()
 	{

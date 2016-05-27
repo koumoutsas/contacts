@@ -5,6 +5,7 @@ import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.VerificationKey;
 import com.kareebo.contacts.thrift.FailedOperation;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
@@ -38,7 +39,7 @@ public class Utils
 	 * @throws InvalidKeyException
 	 * @throws InvalidKeySpecException
 	 */
-	public static boolean verifySignature(final VerificationKey verificationKey,final ByteBuffer signature,final byte[] plaintext)
+	public static boolean verifySignature(final @Nonnull VerificationKey verificationKey,final @Nonnull ByteBuffer signature,final @Nonnull byte[] plaintext)
 		throws
 		NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException, FailedOperation
 	{
@@ -78,7 +79,9 @@ public class Utils
 	 *
 	 * @return The security provider's name
 	 */
-	public static String getProvider()
+	public static
+	@Nonnull
+	String getProvider()
 	{
 		return provider;
 	}
@@ -90,7 +93,9 @@ public class Utils
 	 * @param b The second array
 	 * @return The XOR of the two inputs. If one is shorter, it's padded with 0s
 	 */
-	public static byte[] xor(final byte[] a,final byte[] b)
+	public static
+	@Nonnull
+	byte[] xor(final @Nonnull byte[] a,final @Nonnull byte[] b)
 	{
 		byte[] longer, shorter;
 		if(a.length>b.length)
@@ -123,7 +128,9 @@ public class Utils
 	 * @return A string that can be passed to the Java API
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static String getSignatureAlgorithm(final com.kareebo.contacts.thrift.SignatureAlgorithm algorithm) throws NoSuchAlgorithmException
+	public static
+	@Nonnull
+	String getSignatureAlgorithm(final @Nonnull com.kareebo.contacts.thrift.SignatureAlgorithm algorithm) throws NoSuchAlgorithmException
 	{
 		return decompose(TypeConverter.convert(algorithm)).elementAt(Private);
 	}

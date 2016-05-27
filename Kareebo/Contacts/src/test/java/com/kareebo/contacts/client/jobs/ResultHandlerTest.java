@@ -8,6 +8,8 @@ import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.junit.Test;
 import org.vertx.java.core.AsyncResult;
 
+import javax.annotation.Nonnull;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -29,7 +31,7 @@ public class ResultHandlerTest
 			}
 
 			@Override
-			protected void handleSuccess(final Void result)
+			protected void handleSuccess(@Nonnull final Void result)
 			{
 				enqueuer.success(JobType.Protocol,method.getServiceName(),SuccessCode.Ok);
 			}

@@ -7,6 +7,8 @@ import com.kareebo.contacts.thrift.UserAgent;
 import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
+import javax.annotation.Nonnull;
+
 /**
  * User agent modification operation
  */
@@ -17,13 +19,13 @@ public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.co
 	 *
 	 * @param dataStore The datastore
 	 */
-	public ModifyUserAgent(final DataStore<Long,User> dataStore)
+	public ModifyUserAgent(final @Nonnull DataStore<Long,User> dataStore)
 	{
 		super(dataStore);
 	}
 
 	@Override
-	public void modifyUserAgent1(final UserAgent userAgent,final SignatureBuffer signature,final Future<Void> future)
+	public void modifyUserAgent1(final @Nonnull UserAgent userAgent,final @Nonnull SignatureBuffer signature,final @Nonnull Future<Void> future)
 	{
 		verify(userAgent,signature,new Reply<>(future),(user,client)->{
 			client.setUserAgent(TypeConverter.convert(userAgent));

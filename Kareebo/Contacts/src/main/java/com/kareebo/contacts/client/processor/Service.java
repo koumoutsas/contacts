@@ -8,11 +8,13 @@ import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import org.apache.thrift.TBase;
 
+import javax.annotation.Nonnull;
+
 abstract class Service extends com.kareebo.contacts.client.jobs.Service
 {
 	final private PersistedObjectRetriever persistedObjectRetriever;
 
-	Service(final Context context,final PersistedObjectRetriever persistedObjectRetriever)
+	Service(final @Nonnull Context context,final @Nonnull PersistedObjectRetriever persistedObjectRetriever)
 	{
 		super(context);
 		this.persistedObjectRetriever=persistedObjectRetriever;
@@ -21,7 +23,7 @@ abstract class Service extends com.kareebo.contacts.client.jobs.Service
 	protected abstract class Functor<S extends TBase> implements com.kareebo.contacts.client.jobs.Service.Functor
 	{
 		@Override
-		public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
+		public void run(@Nonnull final TBase payload,@Nonnull final Enqueuers enqueuers) throws Exception
 		{
 			final IntermediateResultEnqueuer intermediateResultEnqueuer=enqueuers.intermediateResultEnqueuer(JobType.Protocol);
 			if(intermediateResultEnqueuer==null)
@@ -33,7 +35,7 @@ abstract class Service extends com.kareebo.contacts.client.jobs.Service
 			runInternal(persistedObjectRetriever,(S)payload,intermediateResultEnqueuer,enqueuers.finalResultEnqueuer());
 		}
 
-		abstract protected void runInternal(PersistedObjectRetriever persistedObjectRetriever,S payload,IntermediateResultEnqueuer intermediateResultEnqueuer,
+		abstract protected void runInternal(@Nonnull PersistedObjectRetriever persistedObjectRetriever,@Nonnull S payload,@Nonnull IntermediateResultEnqueuer intermediateResultEnqueuer,
 		                                    FinalResultEnqueuer
 			                                    finalResultEnqueuer) throws Exception;
 	}

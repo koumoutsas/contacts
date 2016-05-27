@@ -1,5 +1,7 @@
 package com.kareebo.contacts.client.persistentStorage;
 
+import javax.annotation.Nonnull;
+
 /// Interface to the client persistent storage
 interface PersistentStorage
 {
@@ -10,7 +12,8 @@ interface PersistentStorage
 	 * @return The byte buffer that is mapped to the key. Deserialization is performed by the caller of the method
 	 * @throws NoSuchKey If the key cannot be found
 	 */
-	byte[] get(String key) throws NoSuchKey;
+	@Nonnull
+	byte[] get(@Nonnull String key) throws NoSuchKey;
 
 	/**
 	 * Put a value to storage
@@ -18,7 +21,7 @@ interface PersistentStorage
 	 * @param key   The key for the value
 	 * @param value The value
 	 */
-	void put(final String key,byte[] value);
+	void put(final @Nonnull String key,@Nonnull byte[] value);
 
 	/**
 	 * Remove a key from storage
@@ -26,7 +29,7 @@ interface PersistentStorage
 	 * @param key The key
 	 * @throws NoSuchKey If the key cannot be found
 	 */
-	void remove(final String key) throws NoSuchKey;
+	void remove(final @Nonnull String key) throws NoSuchKey;
 
 	/// Start a transaction
 	void start();

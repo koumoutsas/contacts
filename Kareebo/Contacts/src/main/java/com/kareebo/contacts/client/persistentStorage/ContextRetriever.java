@@ -5,6 +5,7 @@ import com.kareebo.contacts.thrift.client.jobs.JobEnqueueingConstants;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 
+import javax.annotation.Nonnull;
 import java.security.SecureRandom;
 
 /**
@@ -19,7 +20,7 @@ class ContextRetriever
 	 *
 	 * @param persistentStorage The {@link PersistentStorage}
 	 */
-	ContextRetriever(final PersistentStorage persistentStorage)
+	ContextRetriever(final @Nonnull PersistentStorage persistentStorage)
 	{
 		persistedObjectRetriever=new PersistedObjectRetriever(persistentStorage);
 	}
@@ -29,24 +30,28 @@ class ContextRetriever
 	 *
 	 * @return A randomly created context
 	 */
-	public static Context create()
+	public static
+	@Nonnull
+	Context create()
 	{
 		return new Context(new SecureRandom().nextLong());
 	}
 
 	/// Wrapper around {@link PersistedObjectRetriever#get}
-	public void get(final TBase object,final Context context) throws TException, PersistentStorage.NoSuchKey
+	public void get(final @Nonnull TBase object,final @Nonnull Context context) throws TException, PersistentStorage.NoSuchKey
 	{
 		persistedObjectRetriever.get(object,constructKey(context));
 	}
 
-	private static String constructKey(final Context context)
+	private static
+	@Nonnull
+	String constructKey(final @Nonnull Context context)
 	{
 		return JobEnqueueingConstants.StorageKey+'.'+context.getId();
 	}
 
 	/// Wrapper around {@link PersistedObjectRetriever#put}
-	public void put(final Context context,final TBase value) throws TException
+	public void put(final @Nonnull Context context,final @Nonnull TBase value) throws TException
 	{
 		persistedObjectRetriever.start();
 		try
@@ -62,7 +67,7 @@ class ContextRetriever
 	}
 
 	/// Wrapper around {@link PersistedObjectRetriever#remove}
-	public void remove(final Context context) throws PersistentStorage.NoSuchKey
+	public void remove(final @Nonnull Context context) throws PersistentStorage.NoSuchKey
 	{
 		persistedObjectRetriever.start();
 		try

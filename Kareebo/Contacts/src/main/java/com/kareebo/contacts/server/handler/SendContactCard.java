@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -30,13 +31,13 @@ class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifier impl
 	 * @param identityDatastore The identity datastore
 	 * @param clientNotifier    The client notifier interface
 	 */
-	SendContactCard(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
+	SendContactCard(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity> identityDatastore,final @Nonnull ClientNotifier clientNotifier)
 	{
 		super(userDataStore,identityDatastore,clientNotifier);
 	}
 
 	@Override
-	public void sendContactCard1(final HashBuffer u,final SignatureBuffer signature,final Future<Void> future)
+	public void sendContactCard1(final @Nonnull HashBuffer u,final @Nonnull SignatureBuffer signature,final @Nonnull Future<Void> future)
 	{
 		verify(u,signature,new Reply<>(future),(user,client)->{
 			final Map<CharSequence,Client> clientsA=user.getClients();
@@ -68,13 +69,13 @@ class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifier impl
 	}
 
 	@Override
-	public void sendContactCard2(final LongId id,final SignatureBuffer signature,final Future<EncryptionKeys> future)
+	public void sendContactCard2(final @Nonnull LongId id,final @Nonnull SignatureBuffer signature,final @Nonnull Future<EncryptionKeys> future)
 	{
 		forward(new EncryptionKeys(),id,signature,future);
 	}
 
 	@Override
-	public void sendContactCard3(final Set<EncryptedBufferSigned> encryptedBuffers,final Future<Void> future)
+	public void sendContactCard3(final @Nonnull Set<EncryptedBufferSigned> encryptedBuffers,final @Nonnull Future<Void> future)
 	{
 		for(final EncryptedBufferSigned encryptedBufferSigned : encryptedBuffers)
 		{
@@ -103,7 +104,7 @@ class SendContactCard extends SignatureVerifierWithIdentityStoreAndNotifier impl
 	}
 
 	@Override
-	public void sendContactCard4(final LongId id,final SignatureBuffer signature,final Future<EncryptedBufferSignedWithVerificationKey> future)
+	public void sendContactCard4(final @Nonnull LongId id,final @Nonnull SignatureBuffer signature,final @Nonnull Future<EncryptedBufferSignedWithVerificationKey> future)
 	{
 		forward(new EncryptedBufferSignedWithVerificationKey(),id,signature,future);
 	}

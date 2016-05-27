@@ -4,6 +4,8 @@ import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 
+import javax.annotation.Nonnull;
+
 /// Interface for error job enqueuing
 public interface ErrorEnqueuer
 {
@@ -14,5 +16,5 @@ public interface ErrorEnqueuer
 	 * @param method The service method that caused the error
 	 * @param error  The error
 	 */
-	void error(JobType type,ServiceMethod method,ErrorCode error);
+	void error(@Nonnull JobType type,ServiceMethod method,@Nonnull ErrorCode error);
 }

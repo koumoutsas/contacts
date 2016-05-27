@@ -5,6 +5,8 @@ import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 
+import javax.annotation.Nonnull;
+
 /// Interface for enqueuing jobs that are not the result of a service or an error
 public interface IntermediateResultEnqueuer
 {
@@ -16,5 +18,5 @@ public interface IntermediateResultEnqueuer
 	 * @param context The service context
 	 * @param payload The payload of the operation
 	 */
-	void enqueue(JobType type,ServiceMethod method,Context context,TBase payload);
+	void enqueue(@Nonnull JobType type,@Nonnull ServiceMethod method,@Nonnull Context context,@Nonnull TBase payload);
 }

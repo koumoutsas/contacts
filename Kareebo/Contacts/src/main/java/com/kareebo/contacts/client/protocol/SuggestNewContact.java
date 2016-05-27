@@ -7,6 +7,8 @@ import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
+import javax.annotation.Nonnull;
+
 /**
  * Client-side implementation of the suggest new contact service
  */
@@ -29,12 +31,14 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 		return new com.kareebo.contacts.thrift.SuggestNewContact.VertxClient(asyncClientManager);
 	}
 
+	@Nonnull
 	@Override
 	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{
 		return methods;
 	}
 
+	@Nonnull
 	@Override
 	protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 	{

@@ -13,6 +13,7 @@ import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClient;
 import org.apache.thrift.async.TAsyncClientManager;
 
+import javax.annotation.Nonnull;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -67,7 +68,7 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 	protected abstract class Functor<S extends TBase> implements com.kareebo.contacts.client.jobs.Service.Functor
 	{
 		@Override
-		public void run(final TBase payload,final Enqueuers enqueuers) throws Exception
+		public void run(@Nonnull final TBase payload,@Nonnull final Enqueuers enqueuers) throws Exception
 		{
 			final IntermediateResultEnqueuer intermediateResultEnqueuer=enqueuers.intermediateResultEnqueuer(JobType.Processor);
 			if(intermediateResultEnqueuer==null)

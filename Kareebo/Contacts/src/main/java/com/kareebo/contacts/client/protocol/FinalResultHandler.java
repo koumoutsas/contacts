@@ -4,6 +4,8 @@ import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 
+import javax.annotation.Nullable;
+
 /**
  * Implementation of {@link ResultHandler} that notifies for success
  */
@@ -18,7 +20,7 @@ class FinalResultHandler extends ResultHandler<Void>
 	}
 
 	@Override
-	protected void handleSuccess(final Void result)
+	protected void handleSuccess(final @Nullable Void result)
 	{
 		enqueuer.success(JobType.Protocol,method.getServiceName(),SuccessCode.Ok);
 	}

@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.vertx.java.core.impl.DefaultVertx;
 
+import javax.annotation.Nonnull;
 import java.security.PrivateKey;
 
 import static org.junit.Assert.assertEquals;
@@ -129,12 +130,14 @@ public class ServiceDispatcherTest
 			return new MyAsyncClient(asyncClientManager);
 		}
 
+		@Nonnull
 		@Override
 		protected ServiceMethod[] methodNames()
 		{
 			return new ServiceMethod[]{method1};
 		}
 
+		@Nonnull
 		@Override
 		protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 		{

@@ -6,6 +6,7 @@ import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -26,7 +27,7 @@ class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatch
 	}
 
 	@Override
-	public Service constructService(final Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException,
+	public Service constructService(@Nonnull final Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException,
 		                                                                                      InvocationTargetException, InstantiationException
 	{
 		return (Service)theClass.getDeclaredConstructor(Context.class,TAsyncClientManager.class,SigningKey.class,ClientId.class).newInstance

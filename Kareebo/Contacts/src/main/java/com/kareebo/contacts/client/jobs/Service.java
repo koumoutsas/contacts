@@ -6,6 +6,7 @@ import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ abstract public class Service
 	/// The set of methods indexed by method name
 	private final Map<String,Functor> methods;
 
-	protected Service(final Context context)
+	protected Service(final @Nonnull Context context)
 	{
 		this.context=context;
 		final ServiceMethod[] methodNames=methodNames();
@@ -43,10 +44,14 @@ abstract public class Service
 	}
 
 	/// Get the method names
-	abstract protected ServiceMethod[] methodNames();
+	abstract protected
+	@Nonnull
+	ServiceMethod[] methodNames();
 
 	/// Get the functors for {@link #methodNames}
-	abstract protected Functor[] functors();
+	abstract protected
+	@Nonnull
+	Functor[] functors();
 
 	/**
 	 * Run a method based on its name and a payload
@@ -57,7 +62,7 @@ abstract public class Service
 	 * @throws NoSuchMethod    When the method cannot be found
 	 * @throws ExecutionFailed When the method was invoked, but its execution failed
 	 */
-	void run(final ServiceMethod method,final TBase payload,final Enqueuers enqueuers) throws NoSuchMethod, ExecutionFailed
+	void run(final @Nonnull ServiceMethod method,final @Nonnull TBase payload,final @Nonnull Enqueuers enqueuers) throws NoSuchMethod, ExecutionFailed
 	{
 		try
 		{
@@ -75,7 +80,7 @@ abstract public class Service
 		}
 		catch(ClassCastException e)
 		{
-			logger.error("Invalid argument type "+(payload!=null?payload.getClass().getSimpleName():"null")+" for trigger method "+method
+			logger.error("Invalid argument type "+payload.getClass().getSimpleName()+" for trigger method "+method
 				                                                                                                                       .getServiceName()+""+
 				             "."+method
 					                 .getMethodName(),e);
@@ -92,7 +97,7 @@ abstract public class Service
 	@FunctionalInterface
 	protected interface Functor
 	{
-		void run(TBase payload,Enqueuers enqueuers) throws Exception;
+		void run(@Nonnull TBase payload,@Nonnull Enqueuers enqueuers) throws Exception;
 	}
 
 	/// Exception thrown when a method cannot be found

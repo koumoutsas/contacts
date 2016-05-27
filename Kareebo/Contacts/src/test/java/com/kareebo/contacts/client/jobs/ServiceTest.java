@@ -1,11 +1,14 @@
 package com.kareebo.contacts.client.jobs;
 
+import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.UserAgent;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import javax.annotation.Nonnull;
 
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +41,7 @@ public class ServiceTest
 	public void testClassCastException() throws Exception
 	{
 		thrown.expect(Service.NoSuchMethod.class);
-		new ServiceImplementation(new ClassCastException()).run(ServiceImplementation.method,null,enqueuers);
+		new ServiceImplementation(new ClassCastException()).run(ServiceImplementation.method,new LongId(9),enqueuers);
 	}
 
 	@Test
@@ -54,12 +57,14 @@ public class ServiceTest
 		thrown.expect(IllegalArgumentException.class);
 		new Service(null)
 		{
+			@Nonnull
 			@Override
 			protected ServiceMethod[] methodNames()
 			{
 				return new ServiceMethod[]{new ServiceMethod("","")};
 			}
 
+			@Nonnull
 			@Override
 			protected Functor[] functors()
 			{
@@ -76,12 +81,14 @@ public class ServiceTest
 		thrown.expect(IllegalArgumentException.class);
 		new Service(null)
 		{
+			@Nonnull
 			@Override
 			protected ServiceMethod[] methodNames()
 			{
 				return new ServiceMethod[]{new ServiceMethod("","1"),new ServiceMethod("","1")};
 			}
 
+			@Nonnull
 			@Override
 			protected Functor[] functors()
 			{

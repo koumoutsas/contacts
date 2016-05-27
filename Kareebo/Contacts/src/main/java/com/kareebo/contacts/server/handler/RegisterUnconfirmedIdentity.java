@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -31,14 +32,14 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 	 * @param userDataStore     The user datastore
 	 * @param identityDatastore The datastore of hashed identities
 	 */
-	public RegisterUnconfirmedIdentity(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity>
+	public RegisterUnconfirmedIdentity(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity>
 		                                                                            identityDatastore)
 	{
 		super(userDataStore,identityDatastore);
 	}
 
 	@Override
-	public void registerUnconfirmedIdentity1(final HashBufferSet uSet,final SignatureBuffer signature,final Future<Void> future)
+	public void registerUnconfirmedIdentity1(final @Nonnull HashBufferSet uSet,final @Nonnull SignatureBuffer signature,final @Nonnull Future<Void> future)
 	{
 		verify(uSet,signature,new Reply<>(future),(user,client)->{
 			final Set<com.kareebo.contacts.server.gora.HashBuffer> identitySet=Utils.convertToSet(user.getIdentities());

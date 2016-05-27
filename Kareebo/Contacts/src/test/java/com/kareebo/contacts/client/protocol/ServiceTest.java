@@ -8,8 +8,10 @@ import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import com.kareebo.contacts.thrift.SignatureBuffer;
-import com.kareebo.contacts.thrift.client.jobs.*;
+import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClient;
@@ -18,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import javax.annotation.Nonnull;
 import java.security.*;
 import java.util.HashMap;
 
@@ -54,8 +57,7 @@ public class ServiceTest
 	public void testIllegalJobType() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),clientId).run(null,new Enqueuers(new HashMap<JobType,
-			                                                                                                                     IntermediateResultEnqueuer>(),null));
+		new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),clientId).run(null,new Enqueuers(new HashMap<>(),null));
 	}
 
 	@Test
@@ -65,21 +67,16 @@ public class ServiceTest
 		final ServiceImplementation serviceImplementation=new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),
 			                                                                           clientId);
 		serviceImplementation.run(expected,new Enqueuers(JobType
-			                                                 .Processor,new IntermediateResultEnqueuer()
-		{
-			@Override
-			public void enqueue(final JobType type,final ServiceMethod method,final Context context,final TBase payload)
-			{
-			}
+			                                                 .Processor,(type,method,context,payload)->{
 		},new FinalResultEnqueuer()
 		{
 			@Override
-			public void success(final JobType type,final String service,final SuccessCode result)
+			public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
 			{
 			}
 
 			@Override
-			public void error(final JobType type,final ServiceMethod method,final ErrorCode error)
+			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
 			{
 			}
 		}));
@@ -109,12 +106,14 @@ public class ServiceTest
 			return null;
 		}
 
+		@Nonnull
 		@Override
 		protected ServiceMethod[] methodNames()
 		{
 			return new ServiceMethod[]{new ServiceMethod(this.getClass().getSimpleName(),"1")};
 		}
 
+		@Nonnull
 		@Override
 		protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 		{

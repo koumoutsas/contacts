@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -29,13 +30,13 @@ class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNotifier im
 	 * @param identityDatastore The identity datastore
 	 * @param clientNotifier    The client notifier interface
 	 */
-	SuggestNewContact(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
+	SuggestNewContact(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity> identityDatastore,final @Nonnull ClientNotifier clientNotifier)
 	{
 		super(userDataStore,identityDatastore,clientNotifier);
 	}
 
 	@Override
-	public void suggestNewContact1(final LongId id,final SignatureBuffer signature,final Future<EncryptionKeysWithHashBuffer> future)
+	public void suggestNewContact1(final @Nonnull LongId id,final @Nonnull SignatureBuffer signature,final @Nonnull Future<EncryptionKeysWithHashBuffer> future)
 	{
 		final EncryptionKeysWithHashBuffer reply=new EncryptionKeysWithHashBuffer();
 		verify(id,signature,new Reply<>(future,reply),(user,client)->{
@@ -63,7 +64,7 @@ class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNotifier im
 	}
 
 	@Override
-	public void suggestNewContact2(final Set<EncryptedBufferSigned> encryptedBuffers,final HashBuffer uB,final SignatureBuffer signature,final Future<Void> future)
+	public void suggestNewContact2(final @Nonnull Set<EncryptedBufferSigned> encryptedBuffers,final @Nonnull HashBuffer uB,final @Nonnull SignatureBuffer signature,final @Nonnull Future<Void> future)
 	{
 		verify(uB,signature,new Reply<>(future),(user,client)->{
 			// Declared this early to allow the conversion exception to be caught in the first catch block, for 100% coverage.
@@ -107,7 +108,7 @@ class SuggestNewContact extends SignatureVerifierWithIdentityStoreAndNotifier im
 	}
 
 	@Override
-	public void suggestNewContact3(final LongId id,final SignatureBuffer signature,final Future<EncryptedBufferSignedWithVerificationKey> future)
+	public void suggestNewContact3(final @Nonnull LongId id,final @Nonnull SignatureBuffer signature,final @Nonnull Future<EncryptedBufferSignedWithVerificationKey> future)
 	{
 		forward(new EncryptedBufferSignedWithVerificationKey(),id,signature,future);
 	}

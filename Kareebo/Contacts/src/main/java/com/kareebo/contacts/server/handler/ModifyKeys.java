@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 
+import javax.annotation.Nonnull;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -24,7 +25,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	 *
 	 * @param dataStore The datastore
 	 */
-	public ModifyKeys(final DataStore<Long,User> dataStore)
+	public ModifyKeys(final @Nonnull DataStore<Long,User> dataStore)
 	{
 		super(dataStore);
 	}
@@ -33,7 +34,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	/**
 	 * The client sends the new keys signed with the old keys
 	 */
-	public void modifyKeys1(final PublicKeys newPublicKeys,final SignatureBuffer signature,final Future<Void>
+	public void modifyKeys1(final @Nonnull PublicKeys newPublicKeys,final @Nonnull SignatureBuffer signature,final @Nonnull Future<Void>
 		                                                                                       future)
 	{
 		verify(newPublicKeys,signature,new Reply<>(future),(user,client)->

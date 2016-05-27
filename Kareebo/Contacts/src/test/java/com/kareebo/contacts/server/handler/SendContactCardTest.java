@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -292,7 +293,7 @@ public class SendContactCardTest
 		}
 
 		@Override
-		void verify(final TBase plaintext,final SignatureBuffer signature,final Reply<?> reply,final After after)
+		void verify(@Nonnull final TBase plaintext,@Nonnull final SignatureBuffer signature,@Nonnull final Reply<?> reply,@Nonnull final After after)
 		{
 			final Client client;
 			try

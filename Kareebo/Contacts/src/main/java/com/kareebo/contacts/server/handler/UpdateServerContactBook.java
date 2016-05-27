@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -33,21 +34,21 @@ public class UpdateServerContactBook extends SignatureVerifierWithIdentityStore 
 	 * @param userDataStore     The datastore of the users
 	 * @param identityDatastore The datastore of hashed identities
 	 */
-	public UpdateServerContactBook(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity>
-		                                                                        identityDatastore,final GraphAccessor graphAccessor)
+	public UpdateServerContactBook(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity>
+		                                                                                 identityDatastore,final @Nonnull GraphAccessor graphAccessor)
 	{
 		super(userDataStore,identityDatastore);
 		this.graphAccessor=graphAccessor;
 	}
 
 	@Override
-	public void updateServerContactBook1(final ContactOperationSet contactOperationSet,final SignatureBuffer
-		                                                                                   signature,final Future<Void> future)
+	public void updateServerContactBook1(final @Nonnull ContactOperationSet contactOperationSet,final @Nonnull SignatureBuffer
+		                                                                                            signature,final @Nonnull Future<Void> future)
 	{
 		verify(contactOperationSet,signature,new Reply<>(future),new After()
 		{
 			@Override
-			public void run(final User user,final Client client) throws FailedOperation
+			public void run(@Nonnull final User user,@Nonnull final Client client) throws FailedOperation
 			{
 				final Set<ContactOperation> contactOperations=contactOperationSet.getContactOperations();
 				final int maxSize=contactOperations.size();

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -30,13 +31,13 @@ class RegisterIdentity extends SignatureVerifierWithIdentityStore implements com
 	 * @param userDataStore     The user datastore
 	 * @param identityDataStore The identity datastore
 	 */
-	RegisterIdentity(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDataStore)
+	RegisterIdentity(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity> identityDataStore)
 	{
 		super(userDataStore,identityDataStore);
 	}
 
 	@Override
-	public void registerIdentity1(final HashBuffer uA,final SignatureBuffer signature,final Future<RegisterIdentityReply> future)
+	public void registerIdentity1(final @Nonnull HashBuffer uA,final @Nonnull SignatureBuffer signature,final @Nonnull Future<RegisterIdentityReply> future)
 	{
 		final RegisterIdentityReply reply=new RegisterIdentityReply();
 		verify(uA,signature,new Reply<>(future,reply),(user,client)->{
@@ -70,7 +71,7 @@ class RegisterIdentity extends SignatureVerifierWithIdentityStore implements com
 	}
 
 	@Override
-	public void registerIdentity2(final long userIdA,final Future<RegisterIdentityReply> future)
+	public void registerIdentity2(final long userIdA,final @Nonnull Future<RegisterIdentityReply> future)
 	{
 		try
 		{
@@ -89,7 +90,7 @@ class RegisterIdentity extends SignatureVerifierWithIdentityStore implements com
 	}
 
 	@Override
-	public void registerIdentity3(final RegisterIdentityInput registerIdentityInput,final SignatureBuffer signature,final Future<Void> future)
+	public void registerIdentity3(final @Nonnull RegisterIdentityInput registerIdentityInput,final @Nonnull SignatureBuffer signature,final @Nonnull Future<Void> future)
 	{
 		final ByteBuffer uA=registerIdentityInput.getUA().bufferForBuffer();
 		try

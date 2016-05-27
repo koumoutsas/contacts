@@ -6,6 +6,8 @@ import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import org.apache.thrift.TBase;
 
+import javax.annotation.Nonnull;
+
 /**
  * Implementation of {@link ResultHandler} that spawns a job for the processor side
  */
@@ -15,9 +17,9 @@ class IntermediateResultHandler<T extends TBase> extends ResultHandler<T>
 	final private com.kareebo.contacts.client.processor.ServiceMethod jobMethod;
 	final private Context context;
 
-	IntermediateResultHandler(final IntermediateResultEnqueuer intermediateResultEnqueuer,final com.kareebo.contacts.client.processor
+	IntermediateResultHandler(final @Nonnull IntermediateResultEnqueuer intermediateResultEnqueuer,final @Nonnull com.kareebo.contacts.client.processor
 		                                                                                            .ServiceMethod jobMethod,final
-	                          ErrorEnqueuer errorEnqueuer,final ServiceMethod callerMethod,final Context context)
+	                          @Nonnull ErrorEnqueuer errorEnqueuer,final @Nonnull ServiceMethod callerMethod,final Context context)
 	{
 		super(errorEnqueuer,callerMethod);
 		this.intermediateResultEnqueuer=intermediateResultEnqueuer;
@@ -26,7 +28,7 @@ class IntermediateResultHandler<T extends TBase> extends ResultHandler<T>
 	}
 
 	@Override
-	protected void handleSuccess(final T result)
+	protected void handleSuccess(@Nonnull final T result)
 	{
 		intermediateResultEnqueuer.enqueue(JobType.Processor,jobMethod,context,result);
 	}

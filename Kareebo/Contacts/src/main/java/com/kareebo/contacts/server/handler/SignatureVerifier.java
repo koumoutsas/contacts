@@ -12,6 +12,7 @@ import org.apache.thrift.TSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -32,7 +33,7 @@ abstract class SignatureVerifier
 	 *
 	 * @param dataStore The datastore
 	 */
-	SignatureVerifier(final DataStore<Long,User> dataStore)
+	SignatureVerifier(final @Nonnull DataStore<Long,User> dataStore)
 	{
 		clientDBAccessor=new ClientDBAccessor(dataStore);
 	}
@@ -45,7 +46,7 @@ abstract class SignatureVerifier
 	 * @param reply     The reply future used to communicate the result
 	 * @param after     The after hook
 	 */
-	void verify(final TBase plaintext,final SignatureBuffer signature,final Reply<?> reply,final After after)
+	void verify(final @Nonnull TBase plaintext,final @Nonnull SignatureBuffer signature,final @Nonnull Reply<?> reply,final @Nonnull After after)
 	{
 		final Client client;
 		try
@@ -100,6 +101,6 @@ abstract class SignatureVerifier
 		 * @param user   The user
 		 * @param client The client
 		 */
-		void run(final User user,final Client client) throws FailedOperation;
+		void run(final @Nonnull User user,final @Nonnull Client client) throws FailedOperation;
 	}
 }

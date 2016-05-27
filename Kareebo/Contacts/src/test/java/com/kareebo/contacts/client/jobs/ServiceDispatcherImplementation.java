@@ -3,6 +3,7 @@ package com.kareebo.contacts.client.jobs;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -29,7 +30,7 @@ class ServiceDispatcherImplementation extends ServiceDispatcher
 	}
 
 	@Override
-	public Service constructService(final Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException,
+	public Service constructService(@Nonnull final Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException,
 		                                                                                      InvocationTargetException, InstantiationException
 	{
 		if(error instanceof IllegalAccessException)

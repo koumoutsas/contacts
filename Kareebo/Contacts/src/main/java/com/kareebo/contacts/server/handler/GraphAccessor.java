@@ -1,5 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
+import javax.annotation.Nonnull;
 import java.util.HashSet;
 
 /**
@@ -13,7 +14,7 @@ interface GraphAccessor
 	 * @param from The common node for the added edges
 	 * @param to   The set of other endpoints
 	 */
-	void addEdges(final Long from,final HashSet<Long> to);
+	void addEdges(final Long from,final @Nonnull HashSet<Long> to);
 
 	/**
 	 * Remove a set of edges from a node. If a node becomes isolated, it is removed
@@ -22,7 +23,7 @@ interface GraphAccessor
 	 * @param to   The set of other endpoints
 	 * @throws IllegalStateException When an edge to be removed doesn't already exist
 	 */
-	void removeEdges(final Long from,final HashSet<Long> to) throws IllegalStateException;
+	void removeEdges(final @Nonnull Long from,final @Nonnull HashSet<Long> to) throws IllegalStateException;
 
 	/**
 	 * Finalize the graph and store it

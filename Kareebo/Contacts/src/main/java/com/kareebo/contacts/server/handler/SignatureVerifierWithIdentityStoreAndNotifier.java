@@ -9,6 +9,7 @@ import org.apache.gora.store.DataStore;
 import org.apache.thrift.TBase;
 import org.vertx.java.core.Future;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ abstract class SignatureVerifierWithIdentityStoreAndNotifier extends SignatureVe
 	 * @param identityDatastore The identity datastore
 	 * @param clientNotifier    The client notifier interface
 	 */
-	SignatureVerifierWithIdentityStoreAndNotifier(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
+	SignatureVerifierWithIdentityStoreAndNotifier(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity> identityDatastore,final @Nonnull ClientNotifier clientNotifier)
 	{
 		super(userDataStore,identityDatastore);
 		this.clientNotifier=clientNotifier;
@@ -41,27 +42,27 @@ abstract class SignatureVerifierWithIdentityStoreAndNotifier extends SignatureVe
 	 * @param signature The signature of id
 	 * @param future    The future that is notified of the result of the operation
 	 */
-	<T extends TBase> void forward(final T t,final LongId id,final SignatureBuffer signature,final Future<T> future)
+	<T extends TBase> void forward(final @Nonnull T t,final @Nonnull LongId id,final @Nonnull SignatureBuffer signature,final @Nonnull Future<T> future)
 	{
 		verify(id,signature,new Reply<>(future,t),(user,client)->clientNotifier.get(t,id.getId()));
 	}
 
-	void notifyClient(final long deviceToken,final NotificationObject payload) throws FailedOperation
+	void notifyClient(final long deviceToken,final @Nonnull NotificationObject payload) throws FailedOperation
 	{
 		clientNotifier.put(deviceToken,payload);
 	}
 
-	void notifyClients(final List<Long> deviceTokens,final NotificationObject payload) throws FailedOperation
+	void notifyClients(final @Nonnull List<Long> deviceTokens,final @Nonnull NotificationObject payload) throws FailedOperation
 	{
 		clientNotifier.put(deviceTokens,payload);
 	}
 
-	void notifyClients(final Map<Long,NotificationObject> notifications) throws FailedOperation
+	void notifyClients(final @Nonnull Map<Long,NotificationObject> notifications) throws FailedOperation
 	{
 		clientNotifier.put(notifications);
 	}
 
-	protected void get(final TBase object,final long notificationId) throws FailedOperation
+	protected void get(final @Nonnull TBase object,final long notificationId) throws FailedOperation
 	{
 		clientNotifier.get(object,notificationId);
 	}

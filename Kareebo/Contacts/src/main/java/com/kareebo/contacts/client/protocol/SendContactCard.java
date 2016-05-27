@@ -7,6 +7,8 @@ import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
+import javax.annotation.Nonnull;
+
 /**
  * Client-side implementation of the send contact card service
  */
@@ -30,12 +32,14 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 		return new com.kareebo.contacts.thrift.SendContactCard.VertxClient(asyncClientManager);
 	}
 
+	@Nonnull
 	@Override
 	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{
 		return methods;
 	}
 
+	@Nonnull
 	@Override
 	protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 	{

@@ -18,6 +18,7 @@ public class NotificationObjectTest
 	public void testGetMethod() throws Exception
 	{
 		final ServiceMethod method=new ServiceMethod("1","2");
+		//noinspection ConstantConditions
 		assertEquals(method,new NotificationObject(method,null).getMethod());
 	}
 
@@ -25,6 +26,7 @@ public class NotificationObjectTest
 	public void testGetPayload() throws Exception
 	{
 		final LongId expected=new LongId(9);
+		//noinspection ConstantConditions
 		final ByteBuffer payload=new NotificationObject(null,expected).getPayload();
 		payload.rewind();
 		final byte[] bytes=new byte[payload.remaining()];

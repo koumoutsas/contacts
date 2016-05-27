@@ -3,6 +3,8 @@ package com.kareebo.contacts.client.jobs;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 
+import javax.annotation.Nonnull;
+
 /**
  * Implementation of {@link Service} for tests
  */
@@ -22,12 +24,14 @@ class ServiceImplementation extends Service
 		this.error=error;
 	}
 
+	@Nonnull
 	@Override
 	protected ServiceMethod[] methodNames()
 	{
 		return new ServiceMethod[]{method};
 	}
 
+	@Nonnull
 	@Override
 	protected Functor[] functors()
 	{

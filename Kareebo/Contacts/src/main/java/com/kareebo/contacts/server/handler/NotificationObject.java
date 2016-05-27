@@ -5,6 +5,7 @@ import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 /**
@@ -16,17 +17,19 @@ class NotificationObject
 	final private ServiceMethod method;
 	private ByteBuffer payload;
 
-	NotificationObject(final ServiceMethod method,final TBase object)
+	NotificationObject(final @Nonnull ServiceMethod method,final @Nonnull TBase object)
 	{
 		this.method=method;
 		this.object=object;
 	}
 
+	@Nonnull
 	ServiceMethod getMethod()
 	{
 		return method;
 	}
 
+	@Nonnull
 	ByteBuffer getPayload() throws TException
 	{
 		if(payload==null)

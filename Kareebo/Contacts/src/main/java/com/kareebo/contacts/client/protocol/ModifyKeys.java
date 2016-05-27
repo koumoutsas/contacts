@@ -8,6 +8,8 @@ import com.kareebo.contacts.thrift.PublicKeys;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import org.apache.thrift.async.TAsyncClientManager;
 
+import javax.annotation.Nonnull;
+
 /**
  * Client-side implementation of the modify keys service
  */
@@ -28,12 +30,14 @@ class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.VertxCli
 		return new com.kareebo.contacts.thrift.ModifyKeys.VertxClient(asyncClientManager);
 	}
 
+	@Nonnull
 	@Override
 	protected com.kareebo.contacts.thrift.client.jobs.ServiceMethod[] methodNames()
 	{
 		return methodNames;
 	}
 
+	@Nonnull
 	@Override
 	protected com.kareebo.contacts.client.jobs.Service.Functor[] functors()
 	{

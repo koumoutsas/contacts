@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -519,14 +520,14 @@ public class UpdateServerContactBookTest
 			boolean isClosed=false;
 
 			@Override
-			public void addEdges(final Long from,final HashSet<Long> to)
+			public void addEdges(final Long from,@Nonnull final HashSet<Long> to)
 			{
 				isClosed=false;
 				edges.addAll(to.stream().map(e->new Edge(from,e)).collect(Collectors.toList()));
 			}
 
 			@Override
-			public void removeEdges(final Long from,final HashSet<Long> to) throws IllegalStateException
+			public void removeEdges(@Nonnull final Long from,@Nonnull final HashSet<Long> to) throws IllegalStateException
 			{
 				isClosed=false;
 				for(final Long e : to)

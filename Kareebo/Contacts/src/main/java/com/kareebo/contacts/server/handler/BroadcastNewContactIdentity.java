@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -32,13 +33,13 @@ class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndN
 	 * @param identityDatastore The identity datastore
 	 * @param clientNotifier    The client notifier interface
 	 */
-	BroadcastNewContactIdentity(final DataStore<Long,User> userDataStore,final DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
+	BroadcastNewContactIdentity(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
 	{
 		super(userDataStore,identityDatastore,clientNotifier);
 	}
 
 	@Override
-	public void broadcastNewContactIdentity1(final LongId userIdB,final SignatureBuffer signature,final Future<MapClientIdEncryptionKey>
+	public void broadcastNewContactIdentity1(final @Nonnull LongId userIdB,final @Nonnull SignatureBuffer signature,final @Nonnull Future<MapClientIdEncryptionKey>
 		                                                                                              future)
 	{
 		final MapClientIdEncryptionKey reply=new MapClientIdEncryptionKey();
@@ -66,7 +67,7 @@ class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndN
 	}
 
 	@Override
-	public void broadcastNewContactIdentity2(final EncryptedBufferPairSet encryptedBufferPairs,final SignatureBuffer signature,final
+	public void broadcastNewContactIdentity2(final @Nonnull EncryptedBufferPairSet encryptedBufferPairs,final @Nonnull SignatureBuffer signature,final
 	Future<MapClientIdEncryptionKey> future)
 	{
 		final Set<EncryptedBufferPair> encryptedBufferPairsSet=encryptedBufferPairs.getEncryptedBufferPairs();
@@ -106,7 +107,7 @@ class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndN
 	}
 
 	@Override
-	public void broadcastNewContactIdentity3(final Set<EncryptedBufferSigned> encryptedBuffers,final Future<Void> future)
+	public void broadcastNewContactIdentity3(final @Nonnull Set<EncryptedBufferSigned> encryptedBuffers,final @Nonnull Future<Void> future)
 	{
 		for(final EncryptedBufferSigned encryptedBufferSigned : encryptedBuffers)
 		{
@@ -140,13 +141,13 @@ class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndN
 	}
 
 	@Override
-	public void broadcastNewContactIdentity4(final LongId id,final SignatureBuffer signature,final Future<EncryptedBufferSignedWithVerificationKey> future)
+	public void broadcastNewContactIdentity4(final @Nonnull LongId id,final @Nonnull SignatureBuffer signature,final @Nonnull Future<EncryptedBufferSignedWithVerificationKey> future)
 	{
 		forward(new EncryptedBufferSignedWithVerificationKey(),id,signature,future);
 	}
 
 	@Override
-	public void broadcastNewContactIdentity5(final HashBufferPair uCs,final SignatureBuffer signature,final Future<Void> future)
+	public void broadcastNewContactIdentity5(final @Nonnull HashBufferPair uCs,final @Nonnull SignatureBuffer signature,final @Nonnull Future<Void> future)
 	{
 		verify(uCs,signature,new Reply<>(future),(user,client)->
 		{

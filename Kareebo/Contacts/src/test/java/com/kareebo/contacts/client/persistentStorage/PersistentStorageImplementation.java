@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.persistentStorage;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,8 +12,9 @@ public class PersistentStorageImplementation implements PersistentStorage
 	final private Map<String,byte[]> storage=new HashMap<>();
 	boolean inTransaction;
 
+	@Nonnull
 	@Override
-	public byte[] get(final String key) throws NoSuchKey
+	public byte[] get(@Nonnull final String key) throws NoSuchKey
 	{
 		if(!storage.containsKey(key))
 		{
@@ -21,13 +23,13 @@ public class PersistentStorageImplementation implements PersistentStorage
 		return storage.get(key);
 	}
 
-	public void put(final String key,final byte[] value)
+	public void put(@Nonnull final String key,@Nonnull final byte[] value)
 	{
 		storage.put(key,value);
 	}
 
 	@Override
-	public void remove(final String key) throws NoSuchKey
+	public void remove(@Nonnull final String key) throws NoSuchKey
 	{
 		if(!storage.containsKey(key))
 		{

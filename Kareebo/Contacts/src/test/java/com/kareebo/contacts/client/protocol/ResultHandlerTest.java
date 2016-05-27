@@ -4,6 +4,8 @@ import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
 import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
+
 /**
  * Unit test for {@link ResultHandler}
  */
@@ -20,7 +22,7 @@ public class ResultHandlerTest
 			}
 
 			@Override
-			protected void handleSuccess(final Long result)
+			protected void handleSuccess(@Nonnull final Long result)
 			{
 			}
 		}

@@ -8,6 +8,7 @@ import org.apache.gora.store.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ class ClientDBAccessor
 	 *
 	 * @param dataStore The datastore
 	 */
-	ClientDBAccessor(final DataStore<Long,User> dataStore)
+	ClientDBAccessor(final @Nonnull DataStore<Long,User> dataStore)
 	{
 		this.dataStore=dataStore;
 	}
@@ -52,7 +53,8 @@ class ClientDBAccessor
 	 * @return The client
 	 * @throws FailedOperation If there is no such client
 	 */
-	Client get(final ClientId clientId) throws FailedOperation
+	@Nonnull
+	Client get(final @Nonnull ClientId clientId) throws FailedOperation
 	{
 		getClients(clientId);
 		final Client client=clients.get(TypeConverter.convert(clientId.getClient()));
@@ -80,25 +82,6 @@ class ClientDBAccessor
 	}
 
 	/**
-	 * Get a user by id
-	 *
-	 * @param id The user id
-	 * @return The user
-	 * @throws FailedOperation If there is no user for the id
-	 */
-	User get(final Long id) throws FailedOperation
-	{
-		user=dataStore.get(id,queryFields);
-		if(user==null)
-		{
-			logger.error("No user for "+id);
-			resetState();
-			throw new FailedOperation();
-		}
-		return user;
-	}
-
-	/**
 	 * Set a client for a user, without calling get first. The client can exist already, in
 	 * which case it's an update, or not, in which case it's an insert.
 	 *
@@ -106,7 +89,7 @@ class ClientDBAccessor
 	 * @param client   The client
 	 * @throws FailedOperation When the user cannot be found in the DB
 	 */
-	void put(final ClientId clientId,final Client client) throws FailedOperation
+	void put(final @Nonnull ClientId clientId,final @Nonnull Client client) throws FailedOperation
 	{
 		getClients(clientId);
 		put(client);
@@ -119,7 +102,7 @@ class ClientDBAccessor
 	 * @param client The client
 	 * @throws FailedOperation When the state is not correct
 	 */
-	void put(final Client client) throws FailedOperation
+	void put(final @Nonnull Client client) throws FailedOperation
 	{
 		if(user==null||clients==null||clientId==null)
 		{
@@ -135,17 +118,9 @@ class ClientDBAccessor
 	 *
 	 * @param user The user
 	 */
-	void put(final User user)
+	void put(final @Nonnull User user)
 	{
 		dataStore.put(user.getId(),user);
-	}
-
-	/**
-	 * Call this method to commit to the DB
-	 */
-	void close()
-	{
-		dataStore.close();
 	}
 
 	/**
@@ -153,6 +128,7 @@ class ClientDBAccessor
 	 *
 	 * @return The user that was created
 	 */
+	@Nonnull
 	User createNewUser() throws FailedOperation
 	{
 		final Long id=new SecureRandom().nextLong();
@@ -183,11 +159,40 @@ class ClientDBAccessor
 	}
 
 	/**
+	 * Call this method to commit to the DB
+	 */
+	void close()
+	{
+		dataStore.close();
+	}
+
+	/**
+	 * Get a user by id
+	 *
+	 * @param id The user id
+	 * @return The user
+	 * @throws FailedOperation If there is no user for the id
+	 */
+	@Nonnull
+	User get(final @Nonnull Long id) throws FailedOperation
+	{
+		user=dataStore.get(id,queryFields);
+		if(user==null)
+		{
+			logger.error("No user for "+id);
+			resetState();
+			throw new FailedOperation();
+		}
+		return user;
+	}
+
+	/**
 	 * Create and commit a new client for a user that was retrieved
 	 *
 	 * @return The id of the new client that was created
 	 * @throws FailedOperation When the state is not correct or an id couldn't be generated
 	 */
+	@Nonnull
 	Long createNewClient() throws FailedOperation
 	{
 		if(user==null)

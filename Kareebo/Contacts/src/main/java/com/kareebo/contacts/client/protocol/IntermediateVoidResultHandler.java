@@ -2,6 +2,8 @@ package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
 
+import javax.annotation.Nonnull;
+
 /**
  * Implementation of {@link ResultHandler} for {@link Void} when the result is not final
  */
@@ -13,7 +15,7 @@ class IntermediateVoidResultHandler extends ResultHandler<Void>
 	}
 
 	@Override
-	protected void handleSuccess(final Void result)
+	protected void handleSuccess(@Nonnull final Void result)
 	{
 	}
 }

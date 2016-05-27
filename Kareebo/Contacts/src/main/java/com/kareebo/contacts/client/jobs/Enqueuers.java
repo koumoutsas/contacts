@@ -2,6 +2,7 @@ package com.kareebo.contacts.client.jobs;
 
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class Enqueuers
 	 * @param intermediateResultEnqueuers The map from {@link JobType} to {@link IntermediateResultEnqueuer}
 	 * @param finalResultEnqueuer         The {@link FinalResultEnqueuer}
 	 */
-	public Enqueuers(final Map<JobType,IntermediateResultEnqueuer> intermediateResultEnqueuers,final FinalResultEnqueuer finalResultEnqueuer)
+	public Enqueuers(final @Nonnull Map<JobType,IntermediateResultEnqueuer> intermediateResultEnqueuers,final @Nonnull FinalResultEnqueuer finalResultEnqueuer)
 	{
 		this.intermediateResultEnqueuers=intermediateResultEnqueuers;
 		this.finalResultEnqueuer=finalResultEnqueuer;
@@ -30,7 +31,7 @@ public class Enqueuers
 	 * @param intermediateResultEnqueuer The {@link IntermediateResultEnqueuer}
 	 * @param finalResultEnqueuer        The {@link FinalResultEnqueuer}
 	 */
-	public Enqueuers(final JobType jobType,final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer)
+	public Enqueuers(final @Nonnull JobType jobType,final @Nonnull IntermediateResultEnqueuer intermediateResultEnqueuer,final @Nonnull FinalResultEnqueuer finalResultEnqueuer)
 	{
 		this.intermediateResultEnqueuers=new HashMap<>(1);
 		this.intermediateResultEnqueuers.put(jobType,intermediateResultEnqueuer);
@@ -42,7 +43,9 @@ public class Enqueuers
 	 *
 	 * @return The {@link FinalResultEnqueuer}
 	 */
-	public FinalResultEnqueuer finalResultEnqueuer()
+	public
+	@Nonnull
+	FinalResultEnqueuer finalResultEnqueuer()
 	{
 		return finalResultEnqueuer;
 	}
@@ -53,7 +56,8 @@ public class Enqueuers
 	 * @param jobType The {@link JobType}
 	 * @return The {@link IntermediateResultEnqueuer}, null if there is no mapping
 	 */
-	public IntermediateResultEnqueuer intermediateResultEnqueuer(final JobType jobType)
+	public
+	IntermediateResultEnqueuer intermediateResultEnqueuer(final @Nonnull JobType jobType)
 	{
 		return intermediateResultEnqueuers.get(jobType);
 	}

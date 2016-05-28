@@ -43,12 +43,18 @@ abstract public class Service
 		}
 	}
 
-	/// Get the method names
+	/**
+	 * Get the method names
+	 * @return An array with all the method names
+	 */
 	abstract protected
 	@Nonnull
 	ServiceMethod[] methodNames();
 
-	/// Get the functors for {@link #methodNames}
+	/**
+	 * Get the functors for {@link #methodNames}
+	 * @return An array with all {@link Functor}s
+	 */
 	abstract protected
 	@Nonnull
 	Functor[] functors();

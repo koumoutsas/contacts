@@ -146,7 +146,7 @@ class ClientNotifier
 		private final byte[] payloadBytes;
 
 		/**
-		 * Construct a notification from service method and notification id. The format of the payload is <service>.<method>:<id>
+		 * Construct a notification from service method and notification id. The format of the payload is {@code service>.<method>:<id>}
 		 *
 		 * @param method The notification method
 		 * @param id     The notification id

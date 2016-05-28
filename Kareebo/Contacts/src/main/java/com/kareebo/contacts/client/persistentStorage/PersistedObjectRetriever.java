@@ -27,8 +27,8 @@ public class PersistedObjectRetriever
 	 *
 	 * @param object The retrieved object
 	 * @param key    The key
-	 * @throws PersistentStorage.NoSuchKey When {@param key} cannot be found
-	 * @throws TException                  When deserialization to {@param object}fails
+	 * @throws PersistentStorage.NoSuchKey When {@code key} cannot be found
+	 * @throws TException                  When deserialization to {@code object}fails
 	 */
 	public void get(final @Nonnull TBase object,final @Nonnull String key) throws PersistentStorage.NoSuchKey, TException
 	{
@@ -40,7 +40,7 @@ public class PersistedObjectRetriever
 	 *
 	 * @param key   The key
 	 * @param value The object
-	 * @throws TException When serialization of {@param value} fails
+	 * @throws TException When serialization of {@code value} fails
 	 */
 	public void put(final @Nonnull String key,final @Nonnull TBase value) throws TException
 	{
@@ -51,7 +51,7 @@ public class PersistedObjectRetriever
 	 * Remove a key from storage
 	 *
 	 * @param key The key
-	 * @throws PersistentStorage.NoSuchKey When {@param key} cannot be found
+	 * @throws PersistentStorage.NoSuchKey When {@code key} cannot be found
 	 */
 	void remove(final @Nonnull String key) throws PersistentStorage.NoSuchKey
 	{

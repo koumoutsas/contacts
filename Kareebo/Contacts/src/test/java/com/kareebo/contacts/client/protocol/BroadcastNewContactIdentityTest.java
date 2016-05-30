@@ -48,33 +48,7 @@ public class BroadcastNewContactIdentityTest
 				return new EncryptedBufferPairSet(set);
 			}
 		});
-		tests.add(new SimpleTestHarness.CollectionSimpleTestBase<EncryptedBufferSigned,Void>("encryptedBuffers","encryptedBuffer")
-		{
-			@Override
-			SetEncryptedBuffer constructPayload()
-			{
-				final Set<EncryptedBuffer> set=new HashSet<>(2);
-				final ByteBuffer b1=ByteBuffer.wrap("a".getBytes());
-				b1.mark();
-				set.add(new EncryptedBuffer(b1,EncryptionAlgorithm.Fake,clientId));
-				final ByteBuffer b2=ByteBuffer.wrap("b".getBytes());
-				b2.mark();
-				set.add(new EncryptedBuffer(b2,EncryptionAlgorithm.Fake,clientId));
-				return new SetEncryptedBuffer(set);
-			}
-
-			@Override
-			protected ServiceMethod nextServiceMethod()
-			{
-				return null;
-			}
-
-			@Override
-			protected ServiceMethod getServiceMethod()
-			{
-				return BroadcastNewContactIdentity.method3;
-			}
-		});
+		tests.add(new EncryptedBufferSignedTestBase(BroadcastNewContactIdentity.method3));
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
 		{
 			@Override

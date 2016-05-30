@@ -45,6 +45,7 @@ abstract public class Service
 
 	/**
 	 * Get the method names
+	 *
 	 * @return An array with all the method names
 	 */
 	abstract protected
@@ -53,6 +54,7 @@ abstract public class Service
 
 	/**
 	 * Get the functors for {@link #methodNames}
+	 *
 	 * @return An array with all {@link Functor}s
 	 */
 	abstract protected
@@ -87,7 +89,7 @@ abstract public class Service
 		catch(ClassCastException e)
 		{
 			logger.error("Invalid argument type "+payload.getClass().getSimpleName()+" for trigger method "+method
-				                                                                                                                       .getServiceName()+""+
+				                                                                                                .getServiceName()+""+
 				             "."+method
 					                 .getMethodName(),e);
 			throw new NoSuchMethod();

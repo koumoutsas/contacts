@@ -19,6 +19,11 @@ abstract public class ServiceDispatcher
 	final private String packageName=getClass().getPackage().getName()+".";
 	final private Enqueuers enqueuers;
 
+	/**
+	 * Create a service dispatcher
+	 *
+	 * @param enqueuers The enqueuers handling job routing and finalization and error handling
+	 */
 	public ServiceDispatcher(final @Nonnull Enqueuers enqueuers)
 	{
 		this.enqueuers=enqueuers;
@@ -61,15 +66,17 @@ abstract public class ServiceDispatcher
 	/**
 	 * Construct a {@link Service} from class name and context
 	 *
-	 * @param theClass The class name
-	 * @param context  The context
+	 * @param service The class name
+	 * @param context The context
 	 * @return The {@link Service}
 	 * @throws NoSuchMethodException
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
 	 * @throws InstantiationException
+	 * @throws NoSuchService
 	 */
-	abstract public Service constructService(@Nonnull Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException;
+	abstract protected Service constructService(@Nonnull Class<?> service,final Context context) throws NoSuchMethodException, IllegalAccessException,
+		                                                                                                    InvocationTargetException, InstantiationException, NoSuchService;
 
 	/// Exception thrown when a service cannot be found
 	public static class NoSuchService extends Exception

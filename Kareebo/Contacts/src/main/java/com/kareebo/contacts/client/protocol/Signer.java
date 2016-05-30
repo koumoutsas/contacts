@@ -1,6 +1,6 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.dataStructures.SigningKey;
+import com.kareebo.contacts.crypto.SigningKey;
 import com.kareebo.contacts.crypto.Utils;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.SignatureBuffer;

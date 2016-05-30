@@ -17,8 +17,7 @@ public class ServiceDispatcherTest
 	public void testConstructService() throws Exception
 	{
 		//noinspection ConstantConditions
-		assertEquals(ServiceImplementation.class,new ServiceDispatcher(null,null).constructService(ServiceImplementation.class,null).getClass
-			                                                                                                                             ());
+		assertEquals(ServiceImplementation.class,new ServiceDispatcher(null,null).constructService(ServiceImplementation.class,null).getClass());
 	}
 
 	private static class ServiceImplementation extends Service

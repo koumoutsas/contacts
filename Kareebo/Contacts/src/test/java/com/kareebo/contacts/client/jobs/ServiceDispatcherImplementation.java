@@ -30,8 +30,9 @@ class ServiceDispatcherImplementation extends ServiceDispatcher
 	}
 
 	@Override
-	public Service constructService(@Nonnull final Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException,
-		                                                                                      InvocationTargetException, InstantiationException
+	protected Service constructService(@Nonnull final Class<?> service,final Context context) throws NoSuchMethodException,
+		                                                                                                 IllegalAccessException,
+		                                                                                                 InvocationTargetException, InstantiationException
 	{
 		if(error instanceof IllegalAccessException)
 		{

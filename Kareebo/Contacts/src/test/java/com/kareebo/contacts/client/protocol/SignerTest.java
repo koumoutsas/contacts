@@ -1,6 +1,6 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.dataStructures.SigningKey;
+import com.kareebo.contacts.crypto.TestKeyPair;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
@@ -21,10 +21,10 @@ public class SignerTest
 		final ClientId clientId=new ClientId(0,0);
 		final SignatureAlgorithm algorithm=SignatureAlgorithm.SHA512withECDSAprime239v1;
 		final LongId id=new LongId(5);
-		final KeyPair keyPair=new KeyPair();
-		final SignatureBuffer result=new Signer(new SigningKey(keyPair.getPrivate(),algorithm),clientId).sign(id);
+		final TestKeyPair testKeyPair=new TestKeyPair();
+		final SignatureBuffer result=new Signer(testKeyPair.signingKey(),clientId).sign(id);
 		assertEquals(algorithm,result.getAlgorithm());
 		assertEquals(clientId,result.getClient());
-		assertTrue(new Verifier(keyPair.getPublic(),algorithm).verify(id,result.getBuffer()));
+		assertTrue(new Verifier(testKeyPair.getPublic(),algorithm).verify(id,result.getBuffer()));
 	}
 }

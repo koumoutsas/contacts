@@ -1,8 +1,8 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.crypto.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.UserAgent;
 import com.kareebo.contacts.thrift.client.jobs.Context;
@@ -21,7 +21,7 @@ class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgen
 
 	ModifyUserAgent(final @Nonnull Context context,final @Nonnull TAsyncClientManager asyncClientManager,final @Nonnull SigningKey signingKey,final
 	@Nonnull ClientId
-		                                                                                                                         clientId)
+		                                                                                                                                          clientId)
 	{
 		super(context,asyncClientManager,signingKey,clientId);
 	}

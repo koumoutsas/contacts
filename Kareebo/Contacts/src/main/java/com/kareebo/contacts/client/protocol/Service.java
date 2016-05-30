@@ -1,9 +1,9 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.Enqueuers;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.crypto.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import com.kareebo.contacts.thrift.client.jobs.Context;
@@ -25,7 +25,7 @@ import java.util.function.BiFunction;
 /**
  * Extension of {@link com.kareebo.contacts.client.jobs.Service} with a {@link TAsyncClient} and a {@link Signer}
  */
-abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.client.jobs.Service
+public abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.client.jobs.Service
 {
 	/// The Vertx client
 	final protected T asyncClient;
@@ -34,7 +34,7 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 
 	protected Service(final @Nonnull Context context,final @Nonnull TAsyncClientManager asyncClientManager,final @Nonnull SigningKey signingKey,final
 	@Nonnull ClientId
-		                                                                                                                           clientId)
+		                                                                                                                                            clientId)
 	{
 		super(context);
 		signer=new Signer(signingKey,clientId);
@@ -64,7 +64,7 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 	}
 
 	protected SignatureBuffer sign(final @Nonnull TBase object) throws InvalidKeyException, TException, NoSuchAlgorithmException,
-		                                                           NoSuchProviderException, SignatureException
+		                                                                   NoSuchProviderException, SignatureException
 	{
 		return signer.sign(object);
 	}
@@ -85,7 +85,7 @@ abstract class Service<T extends TAsyncClient> extends com.kareebo.contacts.clie
 		}
 
 		abstract protected void runInternal(@Nonnull T asyncClient,@Nonnull S payload,@Nonnull IntermediateResultEnqueuer
-		                                    intermediateResultEnqueuer,
+			                                                                              intermediateResultEnqueuer,
 		                                    FinalResultEnqueuer
 			                                    finalResultEnqueuer) throws Exception;
 	}

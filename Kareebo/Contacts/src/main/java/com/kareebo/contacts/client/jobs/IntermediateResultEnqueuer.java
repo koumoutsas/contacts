@@ -8,6 +8,7 @@ import org.apache.thrift.TBase;
 import javax.annotation.Nonnull;
 
 /// Interface for enqueuing jobs that are not the result of a service or an error
+@FunctionalInterface
 public interface IntermediateResultEnqueuer
 {
 	/**

@@ -3,6 +3,7 @@ package com.kareebo.contacts.base.vertx;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Context;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.datagram.DatagramSocket;
 import org.vertx.java.core.datagram.InternetProtocolFamily;
@@ -10,10 +11,7 @@ import org.vertx.java.core.dns.DnsClient;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.file.FileSystem;
-import org.vertx.java.core.http.HttpClient;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.ServerWebSocket;
+import org.vertx.java.core.http.*;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
@@ -36,6 +34,7 @@ public class Utils
 	public static class Container implements org.vertx.java.platform.Container
 	{
 		public static Object lastFatal;
+		public static Throwable lastFatalThrowable;
 		private final JsonObject configuration;
 
 		public Container(final String configuration)
@@ -206,12 +205,14 @@ public class Utils
 				public void fatal(final Object message)
 				{
 					Container.lastFatal=message;
+					Container.lastFatalThrowable=null;
 				}
 
 				@Override
 				public void fatal(final Object message,final Throwable t)
 				{
 					Container.lastFatal=message;
+					Container.lastFatalThrowable=t;
 				}
 
 				@Override
@@ -808,6 +809,30 @@ public class Utils
 				}
 
 				@Override
+				public HttpServer setClientAuthRequired(final boolean required)
+				{
+					return null;
+				}
+
+				@Override
+				public boolean isClientAuthRequired()
+				{
+					return false;
+				}
+
+				@Override
+				public HttpServer setSSL(final boolean ssl)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpServer setTCPNoDelay(final boolean tcpNoDelay)
+				{
+					return null;
+				}
+
+				@Override
 				public HttpServer setReceiveBufferSize(final int size)
 				{
 					return null;
@@ -847,24 +872,6 @@ public class Utils
 				public int getTrafficClass()
 				{
 					return 0;
-				}
-
-				@Override
-				public HttpServer setClientAuthRequired(final boolean required)
-				{
-					return null;
-				}
-
-				@Override
-				public boolean isClientAuthRequired()
-				{
-					return false;
-				}
-
-				@Override
-				public HttpServer setSSL(final boolean ssl)
-				{
-					return null;
 				}
 
 				@Override
@@ -928,12 +935,6 @@ public class Utils
 				}
 
 				@Override
-				public HttpServer setTCPNoDelay(final boolean tcpNoDelay)
-				{
-					return null;
-				}
-
-				@Override
 				public HttpServer setTCPKeepAlive(final boolean keepAlive)
 				{
 					return null;
@@ -980,7 +981,421 @@ public class Utils
 		@Override
 		public HttpClient createHttpClient()
 		{
-			return null;
+			return new HttpClient()
+			{
+				@Override
+				public HttpClient exceptionHandler(final Handler<Throwable> handler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setMaxPoolSize(final int maxConnections)
+				{
+					return null;
+				}
+
+				@Override
+				public int getMaxPoolSize()
+				{
+					return 0;
+				}
+
+				@Override
+				public HttpClient setMaxWaiterQueueSize(final int maxWaiterQueueSize)
+				{
+					return null;
+				}
+
+				@Override
+				public int getMaxWaiterQueueSize()
+				{
+					return 0;
+				}
+
+				@Override
+				public HttpClient setConnectionMaxOutstandingRequestCount(final int connectionMaxOutstandingRequestCount)
+				{
+					return null;
+				}
+
+				@Override
+				public int getConnectionMaxOutstandingRequestCount()
+				{
+					return 0;
+				}
+
+				@Override
+				public HttpClient setKeepAlive(final boolean keepAlive)
+				{
+					return null;
+				}
+
+				@Override
+				public boolean isKeepAlive()
+				{
+					return false;
+				}
+
+				@Override
+				public HttpClient setPipelining(final boolean pipelining)
+				{
+					return null;
+				}
+
+				@Override
+				public boolean isPipelining()
+				{
+					return false;
+				}
+
+				@Override
+				public HttpClient setPort(final int port)
+				{
+					return this;
+				}
+
+				@Override
+				public int getPort()
+				{
+					return 0;
+				}
+
+				@Override
+				public HttpClient setHost(final String host)
+				{
+					return null;
+				}
+
+				@Override
+				public String getHost()
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient connectWebsocket(final String uri,final Handler<WebSocket> wsConnect)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient connectWebsocket(final String uri,final WebSocketVersion wsVersion,final Handler<WebSocket> wsConnect)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient connectWebsocket(final String uri,final WebSocketVersion wsVersion,final MultiMap headers,final Handler<WebSocket> wsConnect)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient connectWebsocket(final String uri,final WebSocketVersion wsVersion,final MultiMap headers,final Set<String> subprotocols,final Handler<WebSocket> wsConnect)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient getNow(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient getNow(final String uri,final MultiMap headers,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest options(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest get(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest head(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest post(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest put(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest delete(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest trace(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest connect(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest patch(final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClientRequest request(final String method,final String uri,final Handler<HttpClientResponse> responseHandler)
+				{
+					return null;
+				}
+
+				@Override
+				public void close()
+				{
+				}
+
+				@Override
+				public HttpClient setVerifyHost(final boolean verifyHost)
+				{
+					return null;
+				}
+
+				@Override
+				public boolean isVerifyHost()
+				{
+					return false;
+				}
+
+				@Override
+				public HttpClient setConnectTimeout(final int timeout)
+				{
+					return null;
+				}
+
+				@Override
+				public int getConnectTimeout()
+				{
+					return 0;
+				}
+
+				@Override
+				public HttpClient setTryUseCompression(final boolean tryUseCompression)
+				{
+					return null;
+				}
+
+				@Override
+				public boolean getTryUseCompression()
+				{
+					return false;
+				}
+
+				@Override
+				public HttpClient setMaxWebSocketFrameSize(final int maxSize)
+				{
+					return null;
+				}
+
+				@Override
+				public int getMaxWebSocketFrameSize()
+				{
+					return 0;
+				}
+
+				@Override
+				public HttpClient setTrustAll(final boolean trustAll)
+				{
+					return null;
+				}
+
+				@Override
+				public boolean isTrustAll()
+				{
+					return false;
+				}
+
+				@Override
+				public HttpClient setSendBufferSize(final int size)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setReceiveBufferSize(final int size)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setReuseAddress(final boolean reuse)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setTrafficClass(final int trafficClass)
+				{
+					return null;
+				}
+
+				@Override
+				public int getSendBufferSize()
+				{
+					return 0;
+				}
+
+				@Override
+				public int getReceiveBufferSize()
+				{
+					return 0;
+				}
+
+				@Override
+				public boolean isReuseAddress()
+				{
+					return false;
+				}
+
+				@Override
+				public int getTrafficClass()
+				{
+					return 0;
+				}
+
+				@Override
+				public HttpClient setSSL(final boolean ssl)
+				{
+					return null;
+				}
+
+				@Override
+				public boolean isSSL()
+				{
+					return false;
+				}
+
+				@Override
+				public HttpClient setSSLContext(final SSLContext sslContext)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setKeyStorePath(final String path)
+				{
+					return null;
+				}
+
+				@Override
+				public String getKeyStorePath()
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setKeyStorePassword(final String pwd)
+				{
+					return null;
+				}
+
+				@Override
+				public String getKeyStorePassword()
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setTrustStorePath(final String path)
+				{
+					return null;
+				}
+
+				@Override
+				public String getTrustStorePath()
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setTrustStorePassword(final String pwd)
+				{
+					return null;
+				}
+
+				@Override
+				public String getTrustStorePassword()
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setTCPNoDelay(final boolean tcpNoDelay)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setTCPKeepAlive(final boolean keepAlive)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setSoLinger(final int linger)
+				{
+					return null;
+				}
+
+				@Override
+				public HttpClient setUsePooledBuffers(final boolean pooledBuffers)
+				{
+					return null;
+				}
+
+				@Override
+				public boolean isTCPNoDelay()
+				{
+					return false;
+				}
+
+				@Override
+				public boolean isTCPKeepAlive()
+				{
+					return false;
+				}
+
+				@Override
+				public int getSoLinger()
+				{
+					return 0;
+				}
+
+				@Override
+				public boolean isUsePooledBuffers()
+				{
+					return false;
+				}
+			};
 		}
 
 		@Override

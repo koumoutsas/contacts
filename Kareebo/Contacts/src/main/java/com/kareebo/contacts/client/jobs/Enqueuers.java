@@ -3,7 +3,7 @@ package com.kareebo.contacts.client.jobs;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 /// Container for one {@link FinalResultEnqueuer} and a set of {@link IntermediateResultEnqueuer} indexed by {@link JobType}
@@ -33,8 +33,7 @@ public class Enqueuers
 	 */
 	public Enqueuers(final @Nonnull JobType jobType,final @Nonnull IntermediateResultEnqueuer intermediateResultEnqueuer,final @Nonnull FinalResultEnqueuer finalResultEnqueuer)
 	{
-		this.intermediateResultEnqueuers=new HashMap<>(1);
-		this.intermediateResultEnqueuers.put(jobType,intermediateResultEnqueuer);
+		this.intermediateResultEnqueuers=Collections.singletonMap(jobType,intermediateResultEnqueuer);
 		this.finalResultEnqueuer=finalResultEnqueuer;
 	}
 
@@ -56,8 +55,7 @@ public class Enqueuers
 	 * @param jobType The {@link JobType}
 	 * @return The {@link IntermediateResultEnqueuer}, null if there is no mapping
 	 */
-	public
-	IntermediateResultEnqueuer intermediateResultEnqueuer(final @Nonnull JobType jobType)
+	public IntermediateResultEnqueuer intermediateResultEnqueuer(final @Nonnull JobType jobType)
 	{
 		return intermediateResultEnqueuers.get(jobType);
 	}

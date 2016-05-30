@@ -15,6 +15,12 @@ class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatch
 {
 	final private PersistedObjectRetriever persistedObjectRetriever;
 
+	/**
+	 * Create a service dispatcher
+	 *
+	 * @param persistedObjectRetriever Used to access the persistent storage
+	 * @param enqueuers                The dispatcher enqueuers
+	 */
 	ServiceDispatcher(final @Nonnull PersistedObjectRetriever persistedObjectRetriever,final @Nonnull Enqueuers enqueuers)
 	{
 		super(enqueuers);
@@ -22,9 +28,9 @@ class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatch
 	}
 
 	@Override
-	public Service constructService(@Nonnull final Class<?> theClass,final Context context) throws NoSuchMethodException, IllegalAccessException,
-		                                                                                      InvocationTargetException, InstantiationException
+	protected Service constructService(@Nonnull final Class<?> service,final Context context) throws NoSuchMethodException, IllegalAccessException,
+		                                                                                                 InvocationTargetException, InstantiationException
 	{
-		return (Service)theClass.getDeclaredConstructor(PersistedObjectRetriever.class).newInstance(persistedObjectRetriever);
+		return (Service)service.getDeclaredConstructor(PersistedObjectRetriever.class).newInstance(persistedObjectRetriever);
 	}
 }

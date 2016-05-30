@@ -1,21 +1,21 @@
 package com.kareebo.contacts.client.protocol;
 
-import com.kareebo.contacts.client.dataStructures.SigningKey;
 import com.kareebo.contacts.client.jobs.Enqueuers;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.crypto.SigningKey;
+import com.kareebo.contacts.crypto.TestKeyPair;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import com.kareebo.contacts.thrift.SignatureBuffer;
-import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
-import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.*;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.TAsyncClient;
 import org.apache.thrift.async.TAsyncClientManager;
+import org.apache.thrift.async.TAsyncMethodCall;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -35,36 +35,47 @@ public class ServiceTest
 	final private ClientId clientId=new ClientId(0,0);
 	final private SignatureAlgorithm algorithm=SignatureAlgorithm.SHA512withECDSAprime239v1;
 	final private LongId id=new LongId(5);
-	final private KeyPair keyPair;
+	final private TestKeyPair testKeyPair;
 	@Rule
 	public ExpectedException thrown=ExpectedException.none();
 
 	public ServiceTest() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 	{
-		keyPair=new KeyPair();
+		testKeyPair=new TestKeyPair();
 	}
 
 	@Test
 	public void testSign() throws Exception
 	{
-		final SignatureBuffer result=new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),clientId).getSignature(id);
+		final SignatureBuffer result=new ServiceImplementation(testKeyPair.signingKey(),clientId).getSignature(id);
 		assertEquals(algorithm,result.getAlgorithm());
 		assertEquals(clientId,result.getClient());
-		assertTrue(new Verifier(keyPair.getPublic(),algorithm).verify(id,result.getBuffer()));
+		assertTrue(new Verifier(testKeyPair.getPublic(),algorithm).verify(id,result.getBuffer()));
 	}
 
 	@Test
 	public void testIllegalJobType() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),clientId).run(null,new Enqueuers(new HashMap<>(),null));
+		new ServiceImplementation(testKeyPair.signingKey(),clientId).run(null,new Enqueuers(new HashMap<>(),new FinalResultEnqueuer()
+		{
+			@Override
+			public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+			{
+			}
+
+			@Override
+			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
+			{
+			}
+		}));
 	}
 
 	@Test
 	public void test() throws Exception
 	{
 		final LongId expected=new LongId(0);
-		final ServiceImplementation serviceImplementation=new ServiceImplementation(new SigningKey(keyPair.getPrivate(),algorithm),
+		final ServiceImplementation serviceImplementation=new ServiceImplementation(testKeyPair.signingKey(),
 			                                                                           clientId);
 		serviceImplementation.run(expected,new Enqueuers(JobType
 			                                                 .Processor,(type,method,context,payload)->{
@@ -97,7 +108,14 @@ public class ServiceTest
 
 		ServiceImplementation(final SigningKey signingKey,final ClientId clientId)
 		{
-			super(null,null,signingKey,clientId);
+			super(new Context(),new MockClientManager<Void>(true)
+				{
+					@Override
+					protected void callInternal(final TAsyncMethodCall method)
+					{
+					}
+				},
+				signingKey,clientId);
 		}
 
 		@Override

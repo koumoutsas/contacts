@@ -1,53 +1,63 @@
 package com.kareebo.contacts.server.vertx;
 
+import com.kareebo.contacts.base.vertx.ServiceStarter;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.server.TEventBusServer;
 import org.apache.thrift.server.THttpServer;
 import org.apache.thrift.server.TServer;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 
-import javax.annotation.Nonnull;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Verticle extension that launches a specific service
  */
 class Verticle extends org.vertx.java.platform.Verticle
 {
-	final private Service service;
-	private TServer server;
-
-	Verticle(final @Nonnull Service service)
-	{
-		this.service=service;
-	}
+	private final List<TServer> servers=new ArrayList<>();
 
 	@Override
 	public void start()
 	{
-		final TProcessor processor=service.create();
-		final String serviceName=service.getClass().getSimpleName();
-		final JsonObject config=container.config().getElement(serviceName).asObject();
-		final String address=config.getString("address");
-		final int port=config.getInteger("port");
-		final TEventBusServer eventBusServer=new TEventBusServer(new TEventBusServer.Args(vertx,address).processor(processor));
-		eventBusServer.serve();
-		final Logger logger=container.logger();
-		logger.info("EventBusServer started on address "+address);
-		final THttpServer.Args httpArgs=new THttpServer.Args(vertx,port);
-		httpArgs.processor(processor).protocolFactory(new TJSONProtocol.Factory());
-		server=new THttpServer(httpArgs);
-		server.serve();
-		container.logger().info("Server listening on port "+port+" for service "+serviceName);
+		try
+		{
+			new ServiceStarter(container,configuration->{
+				final Service service;
+				try
+				{
+					service=(Service)Class.forName(this.getClass().getPackage().getName()+"."+configuration.service).getConstructor()
+						                 .newInstance();
+				}
+				catch(NoSuchMethodException|ClassNotFoundException|IllegalAccessException|InstantiationException|InvocationTargetException e)
+				{
+					return e;
+				}
+				final TProcessor processor=service.create();
+				final String address=configuration.address;
+				final TEventBusServer eventBusServer=new TEventBusServer(new TEventBusServer.Args(vertx,address).processor(processor));
+				eventBusServer.serve();
+				final Logger logger=container.logger();
+				logger.info("EventBusServer started on address "+address);
+				final THttpServer.Args httpArgs=new THttpServer.Args(vertx,configuration.port);
+				httpArgs.processor(processor).protocolFactory(new TJSONProtocol.Factory());
+				servers.add(new THttpServer(httpArgs));
+				return null;
+			});
+		}
+		catch(Throwable throwable)
+		{
+			container.logger().fatal("Failed to start verticle",throwable);
+			return;
+		}
+		servers.forEach(TServer::serve);
 	}
 
 	@Override
 	public void stop()
 	{
-		if(server!=null)
-		{
-			server.stop();
-		}
+		servers.forEach(TServer::stop);
 	}
 }

@@ -3,7 +3,7 @@ package com.kareebo.contacts.client.persistentStorage;
 import javax.annotation.Nonnull;
 
 /// Interface to the client persistent storage
-interface PersistentStorage
+public interface PersistentStorage
 {
 	/**
 	 * Get a byte buffer for a key

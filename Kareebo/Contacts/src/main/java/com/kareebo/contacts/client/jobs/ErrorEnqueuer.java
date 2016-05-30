@@ -7,6 +7,7 @@ import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import javax.annotation.Nonnull;
 
 /// Interface for error job enqueuing
+@FunctionalInterface
 public interface ErrorEnqueuer
 {
 	/**

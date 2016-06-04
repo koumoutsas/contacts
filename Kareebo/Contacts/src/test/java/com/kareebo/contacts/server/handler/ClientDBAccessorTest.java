@@ -57,7 +57,7 @@ public class ClientDBAccessorTest
 		encryptionKey.setBuffer(byteBuffer);
 		publicKeys.setEncryption(encryptionKey);
 		final VerificationKey verificationKey=new VerificationKey();
-		verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
+		verificationKey.setAlgorithm(SignatureAlgorithm.SHA512withECDSAprime239v1);
 		verificationKey.setBuffer(byteBuffer);
 		publicKeys.setVerification(verificationKey);
 		clientPreset.setUserAgent(userAgent);

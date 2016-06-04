@@ -47,7 +47,7 @@ class Signer
 
 	private void setUpVerificationKey(final byte[] buffer)
 	{
-		verificationKey.setAlgorithm(com.kareebo.contacts.server.gora.SignatureAlgorithm.SHA256withECDSAprime239v1);
+		verificationKey.setAlgorithm(com.kareebo.contacts.server.gora.SignatureAlgorithm.SHA512withECDSAprime239v1);
 		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
 		byteBuffer.mark();
 		verificationKey.setBuffer(byteBuffer);
@@ -62,12 +62,12 @@ class Signer
 	SignatureBuffer sign(final byte[] buffer,final ClientId clientId) throws NoSuchProviderException,
 		                                                                         NoSuchAlgorithmException, InvalidKeyException, SignatureException
 	{
-		final Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
+		final Signature ecdsaSign=Signature.getInstance("SHA512withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
 		ecdsaSign.update(buffer);
 		final SignatureBuffer signatureBuffer=new SignatureBuffer();
 		signatureBuffer.setBuffer(ecdsaSign.sign());
-		signatureBuffer.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
+		signatureBuffer.setAlgorithm(SignatureAlgorithm.SHA512withECDSAprime239v1);
 		signatureBuffer.setClient(clientId);
 		return signatureBuffer;
 	}

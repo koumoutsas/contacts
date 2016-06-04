@@ -19,7 +19,7 @@ public class SignerTest
 	public void test() throws Exception
 	{
 		final ClientId clientId=new ClientId(0,0);
-		final SignatureAlgorithm algorithm=SignatureAlgorithm.SHA256withECDSAprime239v1;
+		final SignatureAlgorithm algorithm=SignatureAlgorithm.SHA512withECDSAprime239v1;
 		final LongId id=new LongId(5);
 		final KeyPair keyPair=new KeyPair();
 		final SignatureBuffer result=new Signer(new SigningKey(keyPair.getPrivate(),algorithm),clientId).sign(id);

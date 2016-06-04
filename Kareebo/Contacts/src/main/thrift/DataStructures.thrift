@@ -22,6 +22,6 @@ enum EncryptionAlgorithm
 
 enum SignatureAlgorithm
 {
-	SHA256withECDSAprime239v1=1,
+	SHA512withECDSAprime239v1=1,
 	Fake=2,
 }

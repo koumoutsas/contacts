@@ -427,7 +427,7 @@ public class BroadcastNewContactIdentityTest
 			@Override
 			SignatureAlgorithm getSignatureAlgorithm()
 			{
-				return SignatureAlgorithm.SHA256withECDSAprime239v1;
+				return SignatureAlgorithm.SHA512withECDSAprime239v1;
 			}
 
 			@Override
@@ -444,10 +444,10 @@ public class BroadcastNewContactIdentityTest
 				b.mark();
 				encryptedBufferSignedWithVerificationKey=new
 					                                         EncryptedBufferSignedWithVerificationKey();
-				encryptedBufferSignedWithVerificationKey.setEncryptedBufferSigned(new EncryptedBufferSigned(new com.kareebo.contacts.thrift.EncryptedBuffer(b,EncryptionAlgorithm.RSA2048,clientId),new SignatureBuffer(b,com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1,clientId
+				encryptedBufferSignedWithVerificationKey.setEncryptedBufferSigned(new EncryptedBufferSigned(new com.kareebo.contacts.thrift.EncryptedBuffer(b,EncryptionAlgorithm.RSA2048,clientId),new SignatureBuffer(b,com.kareebo.contacts.thrift.SignatureAlgorithm.SHA512withECDSAprime239v1,clientId
 				)));
 				encryptedBufferSignedWithVerificationKey.setVerificationKey(new com.kareebo.contacts.thrift.VerificationKey(b,
-					                                                                                                           com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1
+					                                                                                                           com.kareebo.contacts.thrift.SignatureAlgorithm.SHA512withECDSAprime239v1
 				));
 				clientNotifier.put(deviceToken,new NotificationObject(com.kareebo.contacts.client.protocol.BroadcastNewContactIdentity
 					                                                      .method4,
@@ -494,7 +494,7 @@ public class BroadcastNewContactIdentityTest
 			@Override
 			SignatureAlgorithm getSignatureAlgorithm()
 			{
-				return SignatureAlgorithm.SHA256withECDSAprime239v1;
+				return SignatureAlgorithm.SHA512withECDSAprime239v1;
 			}
 		}.run();
 	}
@@ -647,7 +647,7 @@ public class BroadcastNewContactIdentityTest
 				b.mark();
 				encryptionKey.setBuffer(b);
 				final VerificationKey verificationKey=new VerificationKey();
-				verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
+				verificationKey.setAlgorithm(SignatureAlgorithm.SHA512withECDSAprime239v1);
 				verificationKey.setBuffer(b);
 				final PublicKeys publicKeys=new PublicKeys();
 				publicKeys.setEncryption(encryptionKey);
@@ -954,7 +954,7 @@ public class BroadcastNewContactIdentityTest
 				encryptionKey.setBuffer(b);
 				publicKeys.setEncryption(encryptionKey);
 				final VerificationKey verificationKey=new VerificationKey();
-				verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
+				verificationKey.setAlgorithm(SignatureAlgorithm.SHA512withECDSAprime239v1);
 				verificationKey.setBuffer(b);
 				publicKeys.setVerification(verificationKey);
 				client.setKeys(publicKeys);

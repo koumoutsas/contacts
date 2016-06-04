@@ -68,8 +68,8 @@ public class TypeConverter
 	{
 		switch(algorithm)
 		{
-			case SHA256withECDSAprime239v1:
-				return SignatureAlgorithm.SHA256withECDSAprime239v1;
+			case SHA512withECDSAprime239v1:
+				return SignatureAlgorithm.SHA512withECDSAprime239v1;
 			default:
 				throw new NoSuchAlgorithmException(algorithm.toString());
 		}
@@ -126,8 +126,8 @@ public class TypeConverter
 	{
 		switch(algorithm)
 		{
-			case SHA256withECDSAprime239v1:
-				return com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1;
+			case SHA512withECDSAprime239v1:
+				return com.kareebo.contacts.thrift.SignatureAlgorithm.SHA512withECDSAprime239v1;
 			default:
 				throw new NoSuchAlgorithmException(algorithm.toString());
 		}

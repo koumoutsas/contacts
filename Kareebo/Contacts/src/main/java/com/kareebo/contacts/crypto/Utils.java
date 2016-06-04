@@ -64,9 +64,9 @@ public class Utils
 		final Vector<String> ret=new Vector<>(2);
 		switch(algorithm)
 		{
-			case SHA256withECDSAprime239v1:
+			case SHA512withECDSAprime239v1:
 				ret.add("ECDSA");
-				ret.add("SHA256withECDSA");
+				ret.add("SHA512withECDSA");
 				break;
 			default:
 				throw new NoSuchAlgorithmException(algorithm.toString());

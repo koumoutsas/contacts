@@ -280,7 +280,7 @@ public class SendContactCardTest
 				final ByteBuffer b=ByteBuffer.wrap("".getBytes());
 				b.mark();
 				return new EncryptedBufferSignedWithVerificationKey(new EncryptedBufferSigned(new com.kareebo.contacts.thrift
-					                                                                                  .EncryptedBuffer(b,com.kareebo.contacts.thrift.EncryptionAlgorithm.Fake,clientId),new SignatureBuffer(b,SignatureAlgorithm.SHA256withECDSAprime239v1,clientId)),TypeConverter.convert(verificationKey));
+					                                                                                  .EncryptedBuffer(b,com.kareebo.contacts.thrift.EncryptionAlgorithm.Fake,clientId),new SignatureBuffer(b,SignatureAlgorithm.SHA512withECDSAprime239v1,clientId)),TypeConverter.convert(verificationKey));
 			}
 		}.run();
 	}

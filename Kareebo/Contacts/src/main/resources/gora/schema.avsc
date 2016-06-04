@@ -85,7 +85,7 @@
                 "name": "SignatureAlgorithm",
                 "symbols":
                 [
-                    "SHA256withECDSAprime239v1",
+                    "SHA512withECDSAprime239v1",
                     "Fake"
                 ]
 

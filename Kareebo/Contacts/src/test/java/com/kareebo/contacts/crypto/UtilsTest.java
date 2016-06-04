@@ -39,7 +39,7 @@ public class UtilsTest
 		final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
 		g.initialize(ecSpec,new SecureRandom());
 		final KeyPair keyPair=g.generateKeyPair();
-		Signature ecdsaSign=Signature.getInstance("SHA256withECDSA",Utils.getProvider());
+		Signature ecdsaSign=Signature.getInstance("SHA512withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
 		ecdsaSign.update(plaintext);
 		signature=ByteBuffer.wrap(ecdsaSign.sign());
@@ -50,7 +50,7 @@ public class UtilsTest
 			                                        .getEncoded());
 		buffer.mark();
 		verificationKey.setBuffer(buffer);
-		verificationKey.setAlgorithm(SignatureAlgorithm.SHA256withECDSAprime239v1);
+		verificationKey.setAlgorithm(SignatureAlgorithm.SHA512withECDSAprime239v1);
 	}
 
 	@Test(expected=NoSuchAlgorithmException.class)
@@ -83,6 +83,6 @@ public class UtilsTest
 	@Test
 	public void testGetSignatureAlgorithm() throws Exception
 	{
-		assertEquals("SHA256withECDSA",Utils.getSignatureAlgorithm(com.kareebo.contacts.thrift.SignatureAlgorithm.SHA256withECDSAprime239v1));
+		assertEquals("SHA512withECDSA",Utils.getSignatureAlgorithm(com.kareebo.contacts.thrift.SignatureAlgorithm.SHA512withECDSAprime239v1));
 	}
 }

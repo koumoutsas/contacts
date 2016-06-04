@@ -165,7 +165,7 @@ public class SuggestNewContactTest
 					                                                                                                       (buffer,
 						                                                                                                       EncryptionAlgorithm.RSA2048,clientId),
 					                                                                                                      new
-						                                                                                                      SignatureBuffer(buffer,SignatureAlgorithm.SHA256withECDSAprime239v1,clientId)))),uB,
+						                                                                                                      SignatureBuffer(buffer,SignatureAlgorithm.SHA512withECDSAprime239v1,clientId)))),uB,
 					sign(uB,clientId),future);
 				assertTrue(future.failed());
 				assertEquals(1,userDataStore.get(clientId.getUser()).getSentRequests().size());

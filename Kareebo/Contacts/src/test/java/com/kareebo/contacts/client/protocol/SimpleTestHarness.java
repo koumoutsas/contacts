@@ -36,7 +36,7 @@ class SimpleTestHarness
 
 	abstract static class TestBase<T,E>
 	{
-		protected final SignatureAlgorithm algorithm=SignatureAlgorithm.SHA256withECDSAprime239v1;
+		protected final SignatureAlgorithm algorithm=SignatureAlgorithm.SHA512withECDSAprime239v1;
 		protected final ClientId clientId=new ClientId(0,0);
 		final KeyPair keyPair;
 		final String fieldName;

@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 public class ServiceTest
 {
 	final private ClientId clientId=new ClientId(0,0);
-	final private SignatureAlgorithm algorithm=SignatureAlgorithm.SHA256withECDSAprime239v1;
+	final private SignatureAlgorithm algorithm=SignatureAlgorithm.SHA512withECDSAprime239v1;
 	final private LongId id=new LongId(5);
 	final private KeyPair keyPair;
 	@Rule

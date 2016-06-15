@@ -26,7 +26,8 @@ public class EnqueuersTest
 			}
 
 			@Override
-			public void error(@Nonnull final JobType jobType,final ServiceMethod serviceMethod,@Nonnull final ErrorCode errorCode)
+			public void error(@Nonnull final JobType jobType,final ServiceMethod serviceMethod,@Nonnull final ErrorCode errorCode,@Nonnull final Throwable
+				                                                                                                                      cause)
 			{
 			}
 		});

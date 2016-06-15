@@ -1,12 +1,12 @@
 package com.kareebo.contacts.client.protocol;
 
+import com.kareebo.contacts.base.vertx.Utils;
 import org.apache.thrift.async.TAsyncClientManager;
 import org.apache.thrift.async.TAsyncMethodCall;
 import org.apache.thrift.transport.TClientTransport;
 import org.apache.thrift.transport.THttpClientTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.VertxFactory;
 
 import java.lang.reflect.Field;
 
@@ -23,7 +23,7 @@ abstract class MockClientManager<T> extends TAsyncClientManager
 
 	MockClientManager(final boolean succeed)
 	{
-		super(new TClientTransport(new THttpClientTransport.Args(VertxFactory.newVertx(),0))
+		super(new TClientTransport(new THttpClientTransport.Args(new Utils.Vertx(),0))
 		{
 			@Override
 			public boolean isOpen()

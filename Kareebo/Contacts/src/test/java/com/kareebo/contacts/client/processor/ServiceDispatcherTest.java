@@ -62,7 +62,7 @@ public class ServiceDispatcherTest
 			}
 
 			@Override
-			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
+			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable cause)
 			{
 			}
 		})).constructService

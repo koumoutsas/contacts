@@ -6,7 +6,7 @@ import java.util.HashSet;
 /**
  * Accessor interface for contacts graph
  */
-interface GraphAccessor
+public interface GraphAccessor
 {
 	/**
 	 * Add a set of edges from a node to a set of nodes. If one of the endpoints doesn't exist, it is created as a node. If an edge already exists, it is ignored

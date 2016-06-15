@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.protocol;
 
+import com.kareebo.contacts.base.Utils;
 import com.kareebo.contacts.crypto.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.client.jobs.Context;
@@ -15,7 +16,7 @@ import java.util.Map;
  */
 public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
 {
-	final private static String packageName=ServiceDispatcher.class.getPackage().getName()+".";
+	final private static String packageName=ServiceDispatcher.class.getPackage().getName();
 	final private Map<Class<?>,TAsyncClientManager> clientManagers=new HashMap<>();
 	final private SigningKey signingKey;
 	final private ClientId clientId;
@@ -44,32 +45,12 @@ public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceD
 	 */
 	public void add(@Nonnull final String service,@Nonnull TAsyncClientManager asyncClientManager) throws ClassNotFoundException, DuplicateService
 	{
-		final Class<?> serviceClass=resolve(service);
+		final Class<?> serviceClass=Utils.resolveClass(service,packageName);
 		if(clientManagers.containsKey(serviceClass))
 		{
 			throw new DuplicateService(service);
 		}
 		clientManagers.put(serviceClass,asyncClientManager);
-	}
-
-	/**
-	 * Resolve the service class by name. First it looks for it in the package and if not found it interprets the service name as an absolute
-	 * class name
-	 *
-	 * @param service The service name
-	 * @return A {@link Class}
-	 * @throws ClassNotFoundException If the class is not in the package or it doesn't point to a reachable absolute class path
-	 */
-	private static Class<?> resolve(@Nonnull final String service) throws ClassNotFoundException
-	{
-		try
-		{
-			return Class.forName(packageName+service);
-		}
-		catch(ClassNotFoundException ignored)
-		{
-			return Class.forName(service);
-		}
 	}
 
 	/**

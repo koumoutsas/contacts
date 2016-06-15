@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +27,7 @@ public class UtilsTest
 	}
 
 	private final byte[] plaintext="abc".getBytes();
-	final private VerificationKey verificationKey=new VerificationKey();
+	private VerificationKey verificationKey;
 	private ByteBuffer signature;
 
 	@Before
@@ -38,19 +37,13 @@ public class UtilsTest
 		final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
 		final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
 		g.initialize(ecSpec,new SecureRandom());
-		final KeyPair keyPair=g.generateKeyPair();
+		final TestKeyPair keyPair=new TestKeyPair();
 		Signature ecdsaSign=Signature.getInstance("SHA512withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
 		ecdsaSign.update(plaintext);
 		signature=ByteBuffer.wrap(ecdsaSign.sign());
 		signature.mark();
-		final ByteBuffer buffer=ByteBuffer.wrap(new X509EncodedKeySpec(
-			                                                              keyPair.getPublic().getEncoded
-				                                                                                  ())
-			                                        .getEncoded());
-		buffer.mark();
-		verificationKey.setBuffer(buffer);
-		verificationKey.setAlgorithm(SignatureAlgorithm.SHA512withECDSAprime239v1);
+		verificationKey=keyPair.verificationKey();
 	}
 
 	@Test(expected=NoSuchAlgorithmException.class)

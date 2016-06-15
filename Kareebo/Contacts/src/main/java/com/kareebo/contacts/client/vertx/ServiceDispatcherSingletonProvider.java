@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 /**
  * Provides a singleton of {@link ServiceDispatcher}
  */
-class ServiceDispatcherSingletonProvider
+public class ServiceDispatcherSingletonProvider
 {
 	private static ServiceDispatcher serviceDispatcher;
 

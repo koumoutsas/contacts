@@ -15,6 +15,9 @@ public class ModifyUserAgentTest
 	@Test
 	public void create() throws Exception
 	{
-		assertTrue(new ModifyUserAgent(DataStoreFactory.getDataStore(Long.class,User.class,new Configuration())).create() instanceof com.kareebo.contacts.thrift.ModifyUserAgent.AsyncProcessor);
+		//noinspection ConstantConditions
+		assertTrue(new ModifyUserAgent(new com.kareebo.contacts.server.handler.Configuration(DataStoreFactory.getDataStore(Long.class,User
+			                                                                                                                              .class,new Configuration()),null,null,null)).create() instanceof
+			           com.kareebo.contacts.thrift.ModifyUserAgent.AsyncProcessor);
 	}
 }

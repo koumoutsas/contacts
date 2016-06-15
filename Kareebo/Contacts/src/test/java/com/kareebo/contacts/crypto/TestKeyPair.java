@@ -1,5 +1,6 @@
 package com.kareebo.contacts.crypto;
 
+import com.kareebo.contacts.server.gora.VerificationKey;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -9,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 /**
  * Utility class for generating a random key pair
@@ -31,11 +33,6 @@ public class TestKeyPair
 		return keyPair.getPrivate();
 	}
 
-	public PublicKey getPublic()
-	{
-		return keyPair.getPublic();
-	}
-
 	/**
 	 * Generate a {@link SigningKey} from the {@link PrivateKey}
 	 *
@@ -49,5 +46,25 @@ public class TestKeyPair
 		buffer.mark();
 		signingKey.setBuffer(buffer);
 		return new SigningKey(signingKey);
+	}
+
+	/**
+	 * Generate a datastore {@link VerificationKey}
+	 *
+	 * @return A valid {@link VerificationKey}
+	 */
+	public VerificationKey verificationKey()
+	{
+		final VerificationKey verificationKey=new VerificationKey();
+		verificationKey.setAlgorithm(com.kareebo.contacts.server.gora.SignatureAlgorithm.SHA512withECDSAprime239v1);
+		final ByteBuffer buffer=ByteBuffer.wrap(new X509EncodedKeySpec(getPublic().getEncoded()).getEncoded());
+		buffer.mark();
+		verificationKey.setBuffer(buffer);
+		return verificationKey;
+	}
+
+	public PublicKey getPublic()
+	{
+		return keyPair.getPublic();
 	}
 }

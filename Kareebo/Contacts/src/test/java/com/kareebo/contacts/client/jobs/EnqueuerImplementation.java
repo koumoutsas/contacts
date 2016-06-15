@@ -51,7 +51,8 @@ public class EnqueuerImplementation implements FinalResultEnqueuer, Intermediate
 	}
 
 	@Override
-	public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
+	public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
+		                                                                                                        cause)
 	{
 		set(error,null,method,null,type);
 	}

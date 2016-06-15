@@ -5,7 +5,7 @@ import org.apache.thrift.TProcessor;
 import javax.annotation.Nonnull;
 
 /**
- * Interface providing
+ * Interface for services that can be started by {@link Verticle}
  */
 interface Service
 {

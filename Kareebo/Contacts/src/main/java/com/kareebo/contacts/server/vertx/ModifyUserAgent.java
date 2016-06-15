@@ -1,7 +1,6 @@
 package com.kareebo.contacts.server.vertx;
 
-import com.kareebo.contacts.server.gora.User;
-import org.apache.gora.store.DataStore;
+import com.kareebo.contacts.server.handler.Configuration;
 import org.apache.thrift.TProcessor;
 
 import javax.annotation.Nonnull;
@@ -11,11 +10,11 @@ import javax.annotation.Nonnull;
  */
 class ModifyUserAgent implements Service
 {
-	final private DataStore<Long,User> datastore;
+	final private Configuration configuration;
 
-	ModifyUserAgent(final @Nonnull DataStore<Long,User> datastore)
+	public ModifyUserAgent(final @Nonnull Configuration configuration)
 	{
-		this.datastore=datastore;
+		this.configuration=configuration;
 	}
 
 	@Nonnull
@@ -23,6 +22,6 @@ class ModifyUserAgent implements Service
 	public TProcessor create()
 	{
 		return new com.kareebo.contacts.thrift.ModifyUserAgent.AsyncProcessor<>(new com.kareebo.contacts.server.handler.ModifyUserAgent
-			                                                                        (datastore));
+			                                                                        (configuration));
 	}
 }

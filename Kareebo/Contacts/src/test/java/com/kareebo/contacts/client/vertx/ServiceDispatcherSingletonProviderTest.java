@@ -7,8 +7,7 @@ import com.kareebo.contacts.thrift.ClientId;
 import org.junit.After;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Unit test for {@link ServiceDispatcherSingletonProvider}
@@ -33,7 +32,7 @@ public class ServiceDispatcherSingletonProviderTest
 			                                                                                        (),new Implementations
 				                                                                                               .TestFinalResultEnqueuer()),new TestKeyPair().signingKey(),new ClientId());
 		assertNotNull(dispatcher);
-		assert (dispatcher==ServiceDispatcherSingletonProvider.get());
+		assertSame(dispatcher,ServiceDispatcherSingletonProvider.get());
 		try
 		{
 			ServiceDispatcherSingletonProvider.get(new Enqueuers(new Implementations.TestIntermediateResultEnqueuer(),new

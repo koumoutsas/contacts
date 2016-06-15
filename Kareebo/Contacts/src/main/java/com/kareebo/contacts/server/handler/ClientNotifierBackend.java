@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 /**
  * Interface to the push notification system
  */
-interface ClientNotifierBackend
+public interface ClientNotifierBackend
 {
 	/**
 	 * Send a notification to a client

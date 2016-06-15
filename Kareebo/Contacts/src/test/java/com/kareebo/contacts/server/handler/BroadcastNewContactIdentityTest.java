@@ -102,7 +102,16 @@ public class BroadcastNewContactIdentityTest
 			@Override
 			SignatureVerifier construct(final DataStore<Long,User> dataStore)
 			{
-				return new BroadcastNewContactIdentity(dataStore,identityDataStore,null);
+				try
+				{
+					return new BroadcastNewContactIdentity(dataStore,
+						                                      identityDataStore,new ClientNotifier((deviceToken,payload)->{
+					},DataStoreFactory.getDataStore(Long.class,PendingNotification.class,new Configuration())));
+				}
+				catch(GoraException e)
+				{
+					return null;
+				}
 			}
 
 			@SuppressWarnings("WeakerAccess")

@@ -16,6 +16,7 @@ public interface ErrorEnqueuer
 	 * @param type   The job type
 	 * @param method The service method that caused the error
 	 * @param error  The error
+	 * @param cause  The cause of the error
 	 */
-	void error(@Nonnull JobType type,ServiceMethod method,@Nonnull ErrorCode error);
+	void error(@Nonnull JobType type,ServiceMethod method,@Nonnull ErrorCode error,@Nonnull Throwable cause);
 }

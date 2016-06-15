@@ -1,6 +1,5 @@
 package com.kareebo.contacts.client.vertx;
 
-import com.google.inject.AbstractModule;
 import com.kareebo.contacts.base.vertx.Utils;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
@@ -11,7 +10,7 @@ import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.async.TAsyncClient;
 import org.apache.thrift.async.TAsyncClientManager;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.annotation.Nonnull;
@@ -32,6 +31,7 @@ public class VerticleTest
 		final String serviceName=Service.class.getName();
 		verticle.setContainer(new Utils.Container("{\"services\":[{\"name\":\""+serviceName+"\","+"\"port\":0,"+"\"address\":\"localhost\"}]}"));
 		verticle.start();
+		verticle.stop();
 		if(Utils.Container.lastFatal!=null&&Utils.Container.lastFatalThrowable!=null)
 		{
 			Utils.Container.lastFatalThrowable.printStackTrace();
@@ -52,28 +52,33 @@ public class VerticleTest
 		assertThat(Utils.Container.lastFatalThrowable,instanceOf(ClassNotFoundException.class));
 	}
 
-	@After
-	public void tearDown() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		ServiceDispatcherSingletonProvider.reset();
 		Utils.Container.lastFatal=null;
 	}
 
 	private static class Verticle extends com.kareebo.contacts.client.vertx.Verticle
 	{
+		@Nonnull
 		@Override
-		protected AbstractModule provideContactsModule()
+		protected Class<? extends IntermediateResultEnqueuer> getIntermediateResultEnqueuerBinding()
 		{
-			return new AbstractModule()
-			{
-				@Override
-				protected void configure()
-				{
-					bind(IntermediateResultEnqueuer.class).to(Implementations.TestIntermediateResultEnqueuer.class);
-					bind(FinalResultEnqueuer.class).to(Implementations.TestFinalResultEnqueuer.class);
-					bind(PersistentStorage.class).to(Implementations.TestPersistentStorage.class);
-				}
-			};
+			return Implementations.TestIntermediateResultEnqueuer.class;
+		}
+
+		@Nonnull
+		@Override
+		protected Class<? extends FinalResultEnqueuer> getFinalResultEnqueuerBinding()
+		{
+			return Implementations.TestFinalResultEnqueuer.class;
+		}
+
+		@Nonnull
+		@Override
+		protected Class<? extends PersistentStorage> getPersistentStorageBinding()
+		{
+			return Implementations.TestPersistentStorage.class;
 		}
 	}
 

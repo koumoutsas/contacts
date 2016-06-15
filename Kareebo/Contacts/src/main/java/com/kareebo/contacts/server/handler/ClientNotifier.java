@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Stores and retrieves pending messages to clients and interfaces with the push notification system
  */
-class ClientNotifier
+public class ClientNotifier
 {
 	private static final Logger logger=LoggerFactory.getLogger(ClientNotifier.class.getName());
 	private final ClientNotifierBackend clientNotifierBackend;
@@ -33,7 +33,8 @@ class ClientNotifier
 	 * @param clientNotifierBackend        The interface to the push notifications backend
 	 * @param pendingNotificationDataStore The datastore for pending notifications
 	 */
-	ClientNotifier(final @Nonnull ClientNotifierBackend clientNotifierBackend,final @Nonnull DataStore<Long,PendingNotification> pendingNotificationDataStore)
+	public ClientNotifier(final @Nonnull ClientNotifierBackend clientNotifierBackend,final @Nonnull DataStore<Long,PendingNotification>
+		                                                                           pendingNotificationDataStore)
 	{
 		this.clientNotifierBackend=clientNotifierBackend;
 		this.pendingNotificationDataStore=pendingNotificationDataStore;

@@ -24,8 +24,7 @@ import javax.annotation.Nonnull;
 import java.security.*;
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Unit test for {@link Service}
@@ -65,7 +64,8 @@ public class ServiceTest
 			}
 
 			@Override
-			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
+			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
+				                                                                                                        cause)
 			{
 			}
 		}));
@@ -87,11 +87,12 @@ public class ServiceTest
 			}
 
 			@Override
-			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
+			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
+				                                                                                                        cause)
 			{
 			}
 		}));
-		assertTrue(expected==serviceImplementation.lastPayload);
+		assertSame(expected,serviceImplementation.lastPayload);
 	}
 
 	private static class MyAsyncClient extends TAsyncClient

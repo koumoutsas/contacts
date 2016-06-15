@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 /**
  * Client-side implementation of the modify user agent service
  */
-class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient>
+public class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient>
 {
 	public static final String serviceName=ModifyUserAgent.class.getSimpleName();
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");

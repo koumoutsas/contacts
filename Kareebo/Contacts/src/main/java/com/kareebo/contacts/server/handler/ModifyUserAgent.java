@@ -1,10 +1,8 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
-import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import com.kareebo.contacts.thrift.UserAgent;
-import org.apache.gora.store.DataStore;
 import org.vertx.java.core.Future;
 
 import javax.annotation.Nonnull;
@@ -14,14 +12,9 @@ import javax.annotation.Nonnull;
  */
 public class ModifyUserAgent extends SignatureVerifier implements com.kareebo.contacts.thrift.ModifyUserAgent.AsyncIface
 {
-	/**
-	 * Constructor from a datastore
-	 *
-	 * @param dataStore The datastore
-	 */
-	public ModifyUserAgent(final @Nonnull DataStore<Long,User> dataStore)
+	public ModifyUserAgent(final @Nonnull Configuration configuration)
 	{
-		super(dataStore);
+		super(configuration.getUserDataStore());
 	}
 
 	@Override

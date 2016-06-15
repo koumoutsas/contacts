@@ -28,7 +28,7 @@ abstract public class ResultHandler<T> implements org.vertx.java.core.AsyncResul
 	{
 		if(event.failed())
 		{
-			errorEnqueuer.error(jobType,method,ErrorCode.Failure);
+			errorEnqueuer.error(jobType,method,ErrorCode.Failure,event.cause());
 		}
 		else
 		{

@@ -33,7 +33,8 @@ class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndN
 	 * @param identityDatastore The identity datastore
 	 * @param clientNotifier    The client notifier interface
 	 */
-	BroadcastNewContactIdentity(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity> identityDatastore,final ClientNotifier clientNotifier)
+	BroadcastNewContactIdentity(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity>
+		                                                                              identityDatastore,@Nonnull final ClientNotifier clientNotifier)
 	{
 		super(userDataStore,identityDatastore,clientNotifier);
 	}

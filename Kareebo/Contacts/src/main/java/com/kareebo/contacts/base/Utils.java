@@ -23,4 +23,29 @@ public class Utils
 		byteBuffer.get(ret);
 		return ret;
 	}
+
+	/**
+	 * Resolve a class based on a package
+	 *
+	 * @param className   The class name
+	 * @param packageName An optional package name
+	 * @return A class whose fully qualified name is package name + class name. If this fails, as a fallback only class name is used to resolve
+	 * the class
+	 * @throws ClassNotFoundException If no resolution succeeds
+	 */
+	@Nonnull
+	public static Class<?> resolveClass(@Nonnull final String className,final String packageName) throws ClassNotFoundException
+	{
+		if(packageName!=null)
+		{
+			try
+			{
+				return Class.forName(packageName+'.'+className);
+			}
+			catch(ClassNotFoundException ignored)
+			{
+			}
+		}
+		return Class.forName(className);
+	}
 }

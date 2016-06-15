@@ -1,7 +1,6 @@
 package com.kareebo.contacts.client.vertx;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.kareebo.contacts.base.vertx.ServiceStarter;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
@@ -15,19 +14,26 @@ import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.client.persistentStorage.PersistentStorageConstants;
 import org.apache.thrift.async.TAsyncClientManager;
 import org.apache.thrift.protocol.TJSONProtocol;
+import org.apache.thrift.transport.TClientTransport;
 import org.apache.thrift.transport.THttpClientTransport;
 import org.apache.thrift.transport.TTransportException;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Client verticle starting HTTP endpoints for each service and mapping them with a {@link ServiceDispatcher}. Active services are read from the
  * configuration of Vertx
  */
-abstract class Verticle extends org.vertx.java.platform.Verticle
+abstract public class Verticle extends com.kareebo.contacts.base.vertx.Verticle
 {
+	private final List<TClientTransport> transports=new ArrayList<>();
+
 	@Override
 	public void start()
 	{
-		final Injector injector=Guice.createInjector(provideContactsModule());
+		final Injector injector=getInjector();
 		final PersistedObjectRetriever persistedObjectRetriever=new PersistedObjectRetriever(injector.getInstance(PersistentStorage.class));
 		final com.kareebo.contacts.thrift.client.SigningKey storedSigningKey=new com.kareebo.contacts.thrift.client.SigningKey();
 		try
@@ -44,6 +50,7 @@ abstract class Verticle extends org.vertx.java.platform.Verticle
 				try
 				{
 					transport.open();
+					transports.add(transport);
 					serviceDispatcher.add(configuration.service,new TAsyncClientManager(transport,new TJSONProtocol.Factory()));
 				}
 				catch(TTransportException|ClassNotFoundException|ServiceDispatcher.DuplicateService e)
@@ -55,13 +62,55 @@ abstract class Verticle extends org.vertx.java.platform.Verticle
 		}
 		catch(Throwable throwable)
 		{
+			stop();
 			container.logger().fatal("Failed to start verticle",throwable);
 		}
 	}
 
+	@Override
+	public void stop()
+	{
+		transports.forEach(TClientTransport::close);
+		ServiceDispatcherSingletonProvider.reset();
+	}
+
+	@Nonnull
+	@Override
+	protected AbstractModule provideModule()
+	{
+		return new AbstractModule()
+		{
+			@Override
+			protected void configure()
+			{
+				bind(IntermediateResultEnqueuer.class).to(getIntermediateResultEnqueuerBinding());
+				bind(FinalResultEnqueuer.class).to(getFinalResultEnqueuerBinding());
+				bind(PersistentStorage.class).to(getPersistentStorageBinding());
+			}
+		};
+	}
+
 	/**
-	 * @return An {@link AbstractModule} that provides {@link IntermediateResultEnqueuer}, {@link FinalResultEnqueuer}, and
-	 * {@link PersistentStorage} implementations
+	 * Get the implementation to be bound to {@link IntermediateResultEnqueuer}
+	 *
+	 * @return An implementation class of @link IntermediateResultEnqueuer}
 	 */
-	protected abstract AbstractModule provideContactsModule();
+	@Nonnull
+	abstract protected Class<? extends IntermediateResultEnqueuer> getIntermediateResultEnqueuerBinding();
+
+	/**
+	 * Get the implementation to be bound to {@link FinalResultEnqueuer}
+	 *
+	 * @return An implementation class of @link FinalResultEnqueuer}
+	 */
+	@Nonnull
+	abstract protected Class<? extends FinalResultEnqueuer> getFinalResultEnqueuerBinding();
+
+	/**
+	 * Get the implementation to be bound to {@link PersistentStorage}
+	 *
+	 * @return An implementation class of @link PersistentStorage}
+	 */
+	@Nonnull
+	abstract protected Class<? extends PersistentStorage> getPersistentStorageBinding();
 }

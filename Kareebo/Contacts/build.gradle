@@ -8,6 +8,14 @@ allprojects {
     }
 }
 
+if(JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
 apply from: "gradle/vertx.gradle"
 
 dependencies {
@@ -53,6 +61,25 @@ sourceSets {
             srcDir thriftOutputDir
         }
     }
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.11'
+    testCompile 'com.jayway.awaitility:awaitility:1.7.0'
+}
+
+//noinspection GroovyAssignabilityCheck
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
 }
 
 buildscript {
@@ -120,3 +147,16 @@ idea {
         generatedSourceDirs += file('src/main/java/com/kareebo/contacts/server/gora')
     }
 }
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+}
+
+//noinspection GroovyAssignabilityCheck
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test

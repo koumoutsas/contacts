@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class ServiceDispatcherTest
 {
+	private static final LongId dumbPayload=new LongId();
 	final private EnqueuerImplementation enqueuer=new EnqueuerImplementation();
 	@Rule
 	public ExpectedException thrown=ExpectedException.none();
@@ -40,34 +41,34 @@ public class ServiceDispatcherTest
 	public void testClassNotFoundException() throws Exception
 	{
 		thrown.expect(ServiceDispatcher.NoSuchService.class);
-		new ServiceDispatcherImplementation(enqueuer).run(new ServiceMethod("",""),null,null);
+		new ServiceDispatcherImplementation(enqueuer).run(new ServiceMethod("",""),dumbPayload,null);
 	}
 
 	@Test
 	public void testNoSuchMethodException() throws Exception
 	{
 		thrown.expect(Service.NoSuchMethod.class);
-		new ServiceDispatcherImplementation(enqueuer).run(new ServiceMethod(ServiceImplementation.method.getServiceName(),""),null,null);
+		new ServiceDispatcherImplementation(enqueuer).run(new ServiceMethod(ServiceImplementation.method.getServiceName(),""),dumbPayload,null);
 	}
 
 	@Test
 	public void testInstantiationException() throws Exception
 	{
 		thrown.expect(ServiceDispatcher.NoSuchService.class);
-		new ServiceDispatcherImplementation(enqueuer,new InstantiationException()).run(ServiceImplementation.method,null,null);
+		new ServiceDispatcherImplementation(enqueuer,new InstantiationException()).run(ServiceImplementation.method,dumbPayload,null);
 	}
 
 	@Test
 	public void testIllegalAccessException() throws Exception
 	{
 		thrown.expect(ServiceDispatcher.NoSuchService.class);
-		new ServiceDispatcherImplementation(enqueuer,new IllegalAccessException()).run(ServiceImplementation.method,null,null);
+		new ServiceDispatcherImplementation(enqueuer,new IllegalAccessException()).run(ServiceImplementation.method,dumbPayload,null);
 	}
 
 	@Test
 	public void testInvocationTargetException() throws Exception
 	{
 		thrown.expect(ServiceDispatcher.NoSuchService.class);
-		new ServiceDispatcherImplementation(enqueuer,new InvocationTargetException(null)).run(ServiceImplementation.method,null,null);
+		new ServiceDispatcherImplementation(enqueuer,new InvocationTargetException(null)).run(ServiceImplementation.method,dumbPayload,null);
 	}
 }

@@ -32,7 +32,8 @@ public class ModifyUserAgentTest extends SignatureVerifierTestBase
 	@Override
 	SignatureVerifier construct(final DataStore<Long,User> dataStore)
 	{
-		return new ModifyUserAgent(dataStore);
+		//noinspection ConstantConditions
+		return new ModifyUserAgent(new Configuration(dataStore,null,null,null));
 	}
 
 	@Override

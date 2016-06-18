@@ -121,8 +121,7 @@ public class RegisterIdentityTest
 		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(newUserId,newUser);
 		final Future<RegisterIdentityReply> result=new DefaultFutureResult<>();
-		//noinspection ConstantConditions
-		final RegisterIdentity handler=new RegisterIdentity(dataStore,null);
+		final RegisterIdentity handler=new RegisterIdentity(dataStore,new MemStore<>());
 		handler.registerIdentity2(newUserId,result);
 		assertTrue(result.succeeded());
 		final RegisterIdentityReply reply=result.result();
@@ -153,8 +152,7 @@ public class RegisterIdentityTest
 		final DataStore<Long,User> dataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 		dataStore.put(newUserId,newUser);
 		final Future<RegisterIdentityReply> result=new DefaultFutureResult<>();
-		//noinspection ConstantConditions
-		final RegisterIdentity handler=new RegisterIdentity(dataStore,null);
+		final RegisterIdentity handler=new RegisterIdentity(dataStore,new MemStore<>());
 		handler.registerIdentity2(newUserId,result);
 		assertTrue(result.failed());
 		assertNull(result.result());

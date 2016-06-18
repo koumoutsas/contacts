@@ -8,6 +8,8 @@ import org.apache.thrift.TFieldIdEnum;
 import org.apache.thrift.protocol.TProtocol;
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
+
 import static org.junit.Assert.*;
 
 /**
@@ -55,7 +57,6 @@ public class ContextRetrieverTest
 		}
 		try
 		{
-			//noinspection NullableProblems
 			contextRetriever.put(context2,new TBase()
 			{
 				@Override
@@ -104,7 +105,7 @@ public class ContextRetrieverTest
 				}
 
 				@Override
-				public int compareTo(final Object o)
+				public int compareTo(final @Nonnull Object o)
 				{
 					return 0;
 				}

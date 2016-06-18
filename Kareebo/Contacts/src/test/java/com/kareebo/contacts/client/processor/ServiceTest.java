@@ -6,10 +6,8 @@ import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.client.persistentStorage.PersistedObjectRetriever;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorageImplementation;
 import com.kareebo.contacts.thrift.LongId;
-import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
-import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.*;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.apache.thrift.TBase;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +31,19 @@ public class ServiceTest
 	{
 		thrown.expect(IllegalArgumentException.class);
 		new ServiceImplementation(new PersistedObjectRetriever(new PersistentStorageImplementation())).run(null,new Enqueuers(new HashMap<>()
-			                                                                                                                     ,null));
+			                                                                                                                     ,new
+				                                                                                                                      FinalResultEnqueuer()
+				                                                                                                                      {
+					                                                                                                                      @Override
+					                                                                                                                      public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+					                                                                                                                      {
+					                                                                                                                      }
+
+					                                                                                                                      @Override
+					                                                                                                                      public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error)
+					                                                                                                                      {
+					                                                                                                                      }
+				                                                                                                                      }));
 	}
 
 	@Test
@@ -66,8 +76,7 @@ public class ServiceTest
 
 		ServiceImplementation(final PersistedObjectRetriever persistedObjectRetriever)
 		{
-			//noinspection ConstantConditions
-			super(null,persistedObjectRetriever);
+			super(new Context(),persistedObjectRetriever);
 		}
 
 		@Nonnull

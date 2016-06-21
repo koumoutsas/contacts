@@ -1,6 +1,7 @@
 package com.kareebo.contacts.integrationTest.serverClient;
 
 import com.kareebo.contacts.client.persistentStorage.PersistentStorage;
+import com.kareebo.contacts.client.protocol.ServiceMethod;
 import com.kareebo.contacts.client.vertx.ServiceDispatcherSingletonProvider;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
@@ -47,5 +48,5 @@ abstract class SingleOperationIntegrationTest<T extends TBase> extends Integrati
 	abstract protected Supplier<T> expectedStateSupplier();
 
 	@Nonnull
-	abstract com.kareebo.contacts.client.protocol.ServiceMethod serviceMethod();
+	abstract ServiceMethod serviceMethod();
 }

@@ -87,7 +87,8 @@ public class ModifyKeysTest
 		@Override
 		SignatureVerifier construct(final DataStore<Long,User> dataStore)
 		{
-			return new ModifyKeys(dataStore);
+			//noinspection ConstantConditions
+			return new ModifyKeys(new com.kareebo.contacts.server.handler.Configuration(dataStore,null,null,null));
 		}
 
 		@Override

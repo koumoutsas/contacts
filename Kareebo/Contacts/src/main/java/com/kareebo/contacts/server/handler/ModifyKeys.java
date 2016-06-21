@@ -1,11 +1,9 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
-import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.PublicKeys;
 import com.kareebo.contacts.thrift.SignatureBuffer;
-import org.apache.gora.store.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Future;
@@ -20,14 +18,9 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 {
 	private static final Logger logger=LoggerFactory.getLogger(ModifyKeys.class.getName());
 
-	/**
-	 * Constructor from a datastore
-	 *
-	 * @param dataStore The datastore
-	 */
-	public ModifyKeys(final @Nonnull DataStore<Long,User> dataStore)
+	public ModifyKeys(final @Nonnull Configuration configuration)
 	{
-		super(dataStore);
+		super(configuration.getUserDataStore());
 	}
 
 	@Override

@@ -50,6 +50,7 @@ import java.util.concurrent.TimeUnit;
 import static com.jayway.awaitility.Awaitility.await;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Base class for all integration tests
@@ -57,35 +58,36 @@ import static org.junit.Assert.fail;
 abstract class IntegrationTestBase
 {
 	private static final String host="localhost";
-	private final com.kareebo.contacts.client.vertx.Verticle client=new com.kareebo.contacts.client.vertx.Verticle()
-	{
-		@Nonnull
-		@Override
-		protected Class<? extends IntermediateResultEnqueuer> getIntermediateResultEnqueuerBinding()
-		{
-			return TestIntermediateResultEnqueuer.class;
-		}
-
-		@Nonnull
-		@Override
-		protected Class<? extends FinalResultEnqueuer> getFinalResultEnqueuerBinding()
-		{
-			return TestFinalResultEnqueuer.class;
-		}
-
-		@Nonnull
-		@Override
-		protected Class<? extends PersistentStorage> getPersistentStorageBinding()
-		{
-			return TestPersistentStorage.class;
-		}
-	};
-	private final Injector clientInjector=client.getInjector();
-	private final TestFinalResultEnqueuer finalResultEnqueuer=(TestFinalResultEnqueuer)clientInjector.getInstance(FinalResultEnqueuer.class);
+	private com.kareebo.contacts.client.vertx.Verticle client;
+	private Injector clientInjector;
+	private TestFinalResultEnqueuer finalResultEnqueuer;
 	private Verticle server;
 	private Injector serverInjector;
 	private DataStore<Long,User> dataStore;
-	private PersistedObjectRetriever persistedObjectRetriever=new PersistedObjectRetriever(clientInjector.getInstance(PersistentStorage.class));
+	private PersistedObjectRetriever persistedObjectRetriever;
+
+	@Test
+	public void testIdempotent() throws Exception
+	{
+		assumeTrue(isIdempotent());
+		testMethod();
+		test();
+	}
+
+	protected abstract boolean isIdempotent();
+
+	abstract protected void testMethod() throws Exception;
+
+	@Test
+	public void test() throws Exception
+	{
+		testMethod();
+		await().atMost(5,TimeUnit.SECONDS).until(()->finalResultEnqueuer.done);
+		assertNull(finalResultEnqueuer.error);
+		checkDatastore();
+	}
+
+	abstract protected void checkDatastore() throws TException, PersistentStorage.NoSuchKey;
 
 	@Nonnull
 	abstract protected String serviceName();
@@ -145,6 +147,32 @@ abstract class IntegrationTestBase
 		                                                                    ClassNotFoundException,
 		                                                                    InvalidKeySpecException, NoSuchAlgorithmException
 	{
+		client=new com.kareebo.contacts.client.vertx.Verticle()
+		{
+			@Nonnull
+			@Override
+			protected Class<? extends IntermediateResultEnqueuer> getIntermediateResultEnqueuerBinding()
+			{
+				return TestIntermediateResultEnqueuer.class;
+			}
+
+			@Nonnull
+			@Override
+			protected Class<? extends FinalResultEnqueuer> getFinalResultEnqueuerBinding()
+			{
+				return TestFinalResultEnqueuer.class;
+			}
+
+			@Nonnull
+			@Override
+			protected Class<? extends PersistentStorage> getPersistentStorageBinding()
+			{
+				return TestPersistentStorage.class;
+			}
+		};
+		clientInjector=client.getInjector();
+		finalResultEnqueuer=(TestFinalResultEnqueuer)clientInjector.getInstance(FinalResultEnqueuer.class);
+		persistedObjectRetriever=new PersistedObjectRetriever(clientInjector.getInstance(PersistentStorage.class));
 		prepareVerticle(vertx,port,client);
 	}
 
@@ -154,16 +182,32 @@ abstract class IntegrationTestBase
 		verticle.setContainer(new Utils.Container("{\"services\":[{\"name\":\""+serviceName()+"\",\"port\":"+port+","
 			                                          +"\"address\":\""+host+"\"}]}"));
 		verticle.start();
-		assertNull(Utils.Container.lastFatal);
+		if(Utils.Container.lastFatal!=null)
+		{
+			if(Utils.Container.lastFatalThrowable!=null)
+			{
+				Utils.Container.lastFatalThrowable.printStackTrace();
+			}
+			fail(Utils.Container.lastFatal.toString());
+		}
 	}
 
 	@After
 	public void tearDown() throws Exception
 	{
+		Utils.Container.lastFatal=null;
 		finalResultEnqueuer.done=false;
 		finalResultEnqueuer.error=null;
-		server.stop();
-		client.stop();
+		if(server!=null)
+		{
+			server.stop();
+		}
+		if(client!=null)
+		{
+			client.stop();
+		}
+		server=null;
+		client=null;
 	}
 
 	@Nonnull
@@ -180,26 +224,6 @@ abstract class IntegrationTestBase
 		persistedObjectRetriever.get(clientId,PersistentStorageConstants.ClientId);
 		return clientId;
 	}
-
-	@Test
-	public void testIdempotent() throws Exception
-	{
-		testMethod();
-		test();
-	}
-
-	abstract protected void testMethod() throws Exception;
-
-	@Test
-	public void test() throws Exception
-	{
-		testMethod();
-		await().atMost(5,TimeUnit.SECONDS).until(()->finalResultEnqueuer.done);
-		assertNull(finalResultEnqueuer.error);
-		checkDatastore();
-	}
-
-	abstract protected void checkDatastore() throws TException, PersistentStorage.NoSuchKey;
 
 	private static class TestClientNotifierBackend implements ClientNotifierBackend
 	{

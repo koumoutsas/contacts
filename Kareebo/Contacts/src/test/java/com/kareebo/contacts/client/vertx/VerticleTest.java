@@ -1,8 +1,7 @@
 package com.kareebo.contacts.client.vertx;
 
 import com.kareebo.contacts.base.vertx.Utils;
-import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
-import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorage;
 import com.kareebo.contacts.crypto.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
@@ -79,6 +78,42 @@ public class VerticleTest
 		protected Class<? extends PersistentStorage> getPersistentStorageBinding()
 		{
 			return Implementations.TestPersistentStorage.class;
+		}
+
+		@Nonnull
+		@Override
+		protected Class<? extends Dequeuer> getDequeuerBinding()
+		{
+			return TestDequeuer.class;
+		}
+
+		@Nonnull
+		@Override
+		protected Class<? extends FinalResultDispatcher> getFinalResultDispatcher()
+		{
+			return TestFinalResultDispatcher.class;
+		}
+
+		static class TestDequeuer implements Dequeuer
+		{
+			@Override
+			public Job get()
+			{
+				return null;
+			}
+		}
+
+		static class TestFinalResultDispatcher implements FinalResultDispatcher
+		{
+			@Override
+			public void dispatch(@Nonnull final ErrorJob errorJob)
+			{
+			}
+
+			@Override
+			public void dispatch(@Nonnull final SuccessJob successJob)
+			{
+			}
 		}
 	}
 

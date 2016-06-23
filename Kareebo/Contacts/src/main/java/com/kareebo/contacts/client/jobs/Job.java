@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 /**
  * Base class for all job types
  */
-abstract class Job
+public abstract class Job
 {
 	private final JobType type;
 

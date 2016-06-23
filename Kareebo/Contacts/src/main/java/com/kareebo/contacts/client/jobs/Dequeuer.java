@@ -4,7 +4,7 @@ package com.kareebo.contacts.client.jobs;
  * Interface for dequeuing jobs. Used to construct {@link Runner}. Should be implemented by the platform implementation of a job queue
  */
 @FunctionalInterface
-interface Dequeuer
+public interface Dequeuer
 {
 	/**
 	 * Dequeue a job

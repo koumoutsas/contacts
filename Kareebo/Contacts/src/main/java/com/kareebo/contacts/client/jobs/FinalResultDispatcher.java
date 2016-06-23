@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 /**
  * Dispatcher for {@link ErrorJob}s and {@link SuccessJob}s. Used to construct {@link Dispatcher}
  */
-interface FinalResultDispatcher
+public interface FinalResultDispatcher
 {
 	void dispatch(@Nonnull final ErrorJob errorJob);
 

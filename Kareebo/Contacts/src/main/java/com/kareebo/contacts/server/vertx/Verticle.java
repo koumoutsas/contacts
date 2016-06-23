@@ -48,7 +48,8 @@ abstract public class Verticle extends com.kareebo.contacts.base.vertx.Verticle
 			})),new ClientNotifier(injector.getInstance(ClientNotifierBackend.class),injector.getInstance(Key.get(new TypeLiteral<DataStore<Long,PendingNotification>>()
 			{
 			}))),injector.getInstance(GraphAccessor.class));
-			final String packageName=Verticle.class.getPackage().getName();
+			final Package classPackage=Verticle.class.getPackage();
+			final String packageName=classPackage.getName();
 			new ServiceStarter(container,configuration->{
 				final Service service;
 				try

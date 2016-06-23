@@ -11,7 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Service factory for the processor side
  */
-class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
+public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatcher
 {
 	final private PersistedObjectRetriever persistedObjectRetriever;
 
@@ -21,7 +21,7 @@ class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceDispatch
 	 * @param persistedObjectRetriever Used to access the persistent storage
 	 * @param enqueuers                The dispatcher enqueuers
 	 */
-	ServiceDispatcher(final @Nonnull PersistedObjectRetriever persistedObjectRetriever,final @Nonnull Enqueuers enqueuers)
+	public ServiceDispatcher(final @Nonnull PersistedObjectRetriever persistedObjectRetriever,final @Nonnull Enqueuers enqueuers)
 	{
 		super(enqueuers);
 		this.persistedObjectRetriever=persistedObjectRetriever;

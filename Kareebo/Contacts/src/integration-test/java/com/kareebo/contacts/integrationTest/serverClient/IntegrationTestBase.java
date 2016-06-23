@@ -57,7 +57,7 @@ abstract class IntegrationTestBase
 	private static final String host="localhost";
 	private com.kareebo.contacts.client.vertx.Verticle client;
 	private Injector clientInjector;
-	private TestFinalResultEnqueuer finalResultEnqueuer;
+	private JobQueue jobQueue;
 	private Verticle server;
 	private Injector serverInjector;
 	private DataStore<Long,User> dataStore;
@@ -79,8 +79,8 @@ abstract class IntegrationTestBase
 	public void test() throws Exception
 	{
 		testMethod();
-		await().atMost(5,TimeUnit.SECONDS).until(()->finalResultEnqueuer.done);
-		assertNull(finalResultEnqueuer.error);
+		await().atMost(5,TimeUnit.SECONDS).until(()->jobQueue.done);
+		assertNull(jobQueue.error);
 		checkDatastore();
 	}
 
@@ -150,14 +150,14 @@ abstract class IntegrationTestBase
 			@Override
 			protected Class<? extends IntermediateResultEnqueuer> getIntermediateResultEnqueuerBinding()
 			{
-				return TestIntermediateResultEnqueuer.class;
+				return JobQueue.class;
 			}
 
 			@Nonnull
 			@Override
 			protected Class<? extends FinalResultEnqueuer> getFinalResultEnqueuerBinding()
 			{
-				return TestFinalResultEnqueuer.class;
+				return JobQueue.class;
 			}
 
 			@Nonnull
@@ -166,9 +166,26 @@ abstract class IntegrationTestBase
 			{
 				return TestPersistentStorage.class;
 			}
+
+			@Nonnull
+			@Override
+			protected Class<? extends Dequeuer> getDequeuerBinding()
+			{
+				return JobQueue.class;
+			}
+
+			@Nonnull
+			@Override
+			protected Class<? extends FinalResultDispatcher> getFinalResultDispatcher()
+			{
+				return JobQueue.class;
+			}
 		};
 		clientInjector=client.getInjector();
-		finalResultEnqueuer=(TestFinalResultEnqueuer)clientInjector.getInstance(FinalResultEnqueuer.class);
+		jobQueue=(JobQueue)clientInjector.getInstance(IntermediateResultEnqueuer.class);
+		final Runner runner=clientInjector.getInstance(Runner.class);
+		jobQueue.createDispatchers(clientInjector).forEach(runner::put);
+		jobQueue.setRunner(runner);
 		persistedObjectRetriever=new PersistedObjectRetriever(clientInjector.getInstance(PersistentStorage.class));
 		prepareVerticle(vertx,port,client);
 	}
@@ -193,8 +210,6 @@ abstract class IntegrationTestBase
 	public void tearDown() throws Exception
 	{
 		Utils.Container.lastFatal=null;
-		finalResultEnqueuer.done=false;
-		finalResultEnqueuer.error=null;
 		if(server!=null)
 		{
 			server.stop();
@@ -262,41 +277,6 @@ abstract class IntegrationTestBase
 		protected Class<? extends GraphAccessor> getGraphAccessorBinding()
 		{
 			return TestGraphAccessor.class;
-		}
-	}
-
-	@Singleton
-	private static class TestFinalResultEnqueuer implements FinalResultEnqueuer
-	{
-		private boolean done;
-		private Throwable error;
-
-		TestFinalResultEnqueuer()
-		{
-			done=false;
-		}
-
-		@Override
-		public void success(@Nonnull final SuccessJob job)
-		{
-			done=true;
-		}
-
-		@Override
-		public void error(@Nonnull final ErrorJob job)
-		{
-			done=true;
-			this.error=job.getCause();
-		}
-	}
-
-	@Singleton
-	private static class TestIntermediateResultEnqueuer implements IntermediateResultEnqueuer
-	{
-		@Override
-		public void put(@Nonnull final IntermediateJob job)
-		{
-			fail("This should not be reachable");
 		}
 	}
 

@@ -1,16 +1,15 @@
 package com.kareebo.contacts.client.vertx;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
+import com.google.inject.*;
 import com.kareebo.contacts.base.vertx.ServiceStarter;
-import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
-import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.client.persistentStorage.PersistedObjectRetriever;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorage;
 import com.kareebo.contacts.client.protocol.Enqueuers;
 import com.kareebo.contacts.client.protocol.ServiceDispatcher;
 import com.kareebo.contacts.crypto.SigningKey;
 import com.kareebo.contacts.thrift.ClientId;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.persistentStorage.PersistentStorageConstants;
 import org.apache.thrift.async.TAsyncClientManager;
 import org.apache.thrift.protocol.TJSONProtocol;
@@ -20,6 +19,7 @@ import org.apache.thrift.transport.TTransportException;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -44,6 +44,8 @@ abstract public class Verticle extends com.kareebo.contacts.base.vertx.Verticle
 			persistedObjectRetriever.get(clientId,PersistentStorageConstants.ClientId);
 			final ServiceDispatcher serviceDispatcher=ServiceDispatcherSingletonProvider.get(new Enqueuers(injector.getInstance(IntermediateResultEnqueuer.class),injector.getInstance
 				                                                                                                                                                               (FinalResultEnqueuer.class)),signingKey,clientId);
+			injector.getInstance(Runner.class).put(JobType.Protocol,new Dispatcher(serviceDispatcher,injector.getInstance
+				                                                                                                  (FinalResultDispatcher.class)));
 			new ServiceStarter(container,configuration->{
 				final THttpClientTransport transport=new THttpClientTransport(new THttpClientTransport.Args(vertx,configuration.port,
 					                                                                                           configuration.address));
@@ -86,6 +88,16 @@ abstract public class Verticle extends com.kareebo.contacts.base.vertx.Verticle
 				bind(IntermediateResultEnqueuer.class).to(getIntermediateResultEnqueuerBinding());
 				bind(FinalResultEnqueuer.class).to(getFinalResultEnqueuerBinding());
 				bind(PersistentStorage.class).to(getPersistentStorageBinding());
+				bind(Dequeuer.class).to(getDequeuerBinding());
+				bind(FinalResultDispatcher.class).to(getFinalResultDispatcher());
+			}
+
+			@Provides
+			@Singleton
+			@Nonnull
+			Runner provideRunner(@Nonnull final Provider<Dequeuer> dequeuerProvider)
+			{
+				return new Runner(new HashMap<>(),dequeuerProvider.get());
 			}
 		};
 	}
@@ -113,4 +125,19 @@ abstract public class Verticle extends com.kareebo.contacts.base.vertx.Verticle
 	 */
 	@Nonnull
 	abstract protected Class<? extends PersistentStorage> getPersistentStorageBinding();
+
+	/**
+	 * Get a {@link com.kareebo.contacts.client.jobs.Dequeuer} binding to be provided to the constructed {@link Runner}
+	 * @return An implementation of {@link com.kareebo.contacts.client.jobs.Dequeuer}
+	 */
+	@Nonnull
+	abstract protected Class<? extends Dequeuer> getDequeuerBinding();
+
+	/**
+	 * Get a {@link FinalResultDispatcher} binding to be used to dispatch final jobs from the protocol
+	 *
+	 * @return An implementation of {@link FinalResultDispatcher}
+	 */
+	@Nonnull
+	abstract protected Class<? extends FinalResultDispatcher> getFinalResultDispatcher();
 }

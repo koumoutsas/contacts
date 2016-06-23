@@ -11,7 +11,7 @@ import java.util.Map;
  * This is the entry point to the job processing part of the client. It is an implementation of {@link Runnable} that on each cycle pulls a
  * {@link Job} from a queue implementing {@link Dequeuer} and passes it to the {@link Dispatcher} that is assigned to the {@link JobType}
  */
-class Runner implements Runnable
+public class Runner implements Runnable
 {
 	private static final Logger logger=LoggerFactory.getLogger(Runner.class.getName());
 	final private Map<JobType,Dispatcher> dispatchers;
@@ -23,7 +23,7 @@ class Runner implements Runnable
 	 * @param dispatchers The {@link Dispatcher} map
 	 * @param dequeuer    The queue providing {@link Job}s
 	 */
-	Runner(final @Nonnull Map<JobType,Dispatcher> dispatchers,final @Nonnull Dequeuer dequeuer)
+	public Runner(final @Nonnull Map<JobType,Dispatcher> dispatchers,final @Nonnull Dequeuer dequeuer)
 	{
 		this.dispatchers=dispatchers;
 		this.dequeuer=dequeuer;
@@ -60,5 +60,15 @@ class Runner implements Runnable
 			logger.error("Unable to execute job",e);
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Map a {@link JobType} to a {@link Dispatcher}. If a mapping already exists, it is replaced
+	 * @param type The {@link JobType}
+	 * @param dispatcher The {@link Dispatcher}
+	 */
+	public void put(@Nonnull final JobType type,@Nonnull final Dispatcher dispatcher)
+	{
+		dispatchers.put(type,dispatcher);
 	}
 }

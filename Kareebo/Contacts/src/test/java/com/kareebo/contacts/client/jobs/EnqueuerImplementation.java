@@ -1,6 +1,9 @@
 package com.kareebo.contacts.client.jobs;
 
-import com.kareebo.contacts.thrift.client.jobs.*;
+import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
+import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
+import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 import org.apache.thrift.TBase;
 
 import javax.annotation.Nonnull;
@@ -34,10 +37,18 @@ public class EnqueuerImplementation implements FinalResultEnqueuer, Intermediate
 		return method==null&&errorCode==null&&payload==null&&jobType==null;
 	}
 
-	@Override
-	public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+	void reset()
 	{
-		set(null,result,new ServiceMethod(service,null),null,type);
+		method=null;
+		errorCode=null;
+		payload=null;
+		jobType=null;
+	}
+
+	@Override
+	public void success(@Nonnull final SuccessJob job)
+	{
+		set(null,job.getResult(),new ServiceMethod(job.getService(),null),null,job.getType());
 	}
 
 	private void set(final ErrorCode errorCode,final SuccessCode successCode,final ServiceMethod serviceMethod,final TBase payload,final
@@ -51,15 +62,14 @@ public class EnqueuerImplementation implements FinalResultEnqueuer, Intermediate
 	}
 
 	@Override
-	public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
-		                                                                                                        cause)
+	public void error(@Nonnull final ErrorJob job)
 	{
-		set(error,null,method,null,type);
+		set(job.getError(),null,job.getMethod(),null,job.getType());
 	}
 
 	@Override
-	public void enqueue(@Nonnull final JobType type,@Nonnull final ServiceMethod method,@Nonnull Context context,@Nonnull final TBase payload)
+	public void put(@Nonnull final IntermediateJob job)
 	{
-		set(null,null,method,payload,type);
+		set(null,null,job.getMethod(),job.getPayload(),job.getType());
 	}
 }

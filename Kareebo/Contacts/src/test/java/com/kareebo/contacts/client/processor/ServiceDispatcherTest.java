@@ -1,10 +1,12 @@
 package com.kareebo.contacts.client.processor;
 
 import com.kareebo.contacts.client.jobs.Enqueuers;
+import com.kareebo.contacts.client.jobs.ErrorJob;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.SuccessJob;
 import com.kareebo.contacts.client.persistentStorage.PersistedObjectRetriever;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorage;
-import com.kareebo.contacts.thrift.client.jobs.*;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.junit.Test;
 
@@ -57,12 +59,12 @@ public class ServiceDispatcherTest
 		}),new Enqueuers(new HashMap<>(),new FinalResultEnqueuer()
 		{
 			@Override
-			public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+			public void error(@Nonnull final ErrorJob job)
 			{
 			}
 
 			@Override
-			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable cause)
+			public void success(@Nonnull final SuccessJob job)
 			{
 			}
 		})).constructService

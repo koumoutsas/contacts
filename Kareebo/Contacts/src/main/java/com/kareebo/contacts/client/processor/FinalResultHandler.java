@@ -1,6 +1,7 @@
 package com.kareebo.contacts.client.processor;
 
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.SuccessJob;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 
@@ -23,6 +24,6 @@ class FinalResultHandler extends ResultHandler<Void>
 	@Override
 	protected void handleSuccess(final @Nullable Void result)
 	{
-		enqueuer.success(JobType.Processor,method.getServiceName(),SuccessCode.Ok);
+		enqueuer.success(new SuccessJob(JobType.Processor,method.getServiceName(),SuccessCode.Ok));
 	}
 }

@@ -1,14 +1,11 @@
 package com.kareebo.contacts.client.vertx;
 
-import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
-import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorage;
 import com.kareebo.contacts.crypto.TestKeyPair;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
-import com.kareebo.contacts.thrift.client.jobs.*;
 import com.kareebo.contacts.thrift.client.persistentStorage.PersistentStorageConstants;
-import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 
@@ -28,7 +25,7 @@ class Implementations
 	static class TestIntermediateResultEnqueuer implements IntermediateResultEnqueuer
 	{
 		@Override
-		public void enqueue(@Nonnull final JobType type,@Nonnull final ServiceMethod method,@Nonnull final Context context,@Nonnull final TBase payload)
+		public void put(@Nonnull final IntermediateJob job)
 		{
 		}
 	}
@@ -36,13 +33,12 @@ class Implementations
 	static class TestFinalResultEnqueuer implements FinalResultEnqueuer
 	{
 		@Override
-		public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+		public void success(@Nonnull final SuccessJob job)
 		{
 		}
 
 		@Override
-		public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
-			                                                                                                        cause)
+		public void error(@Nonnull final ErrorJob job)
 		{
 		}
 	}

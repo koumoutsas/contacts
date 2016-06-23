@@ -28,7 +28,7 @@ abstract public class ResultHandler<T> implements org.vertx.java.core.AsyncResul
 	{
 		if(event.failed())
 		{
-			errorEnqueuer.error(jobType,method,ErrorCode.Failure,event.cause());
+			errorEnqueuer.error(new ErrorJob(jobType,method,ErrorCode.Failure,event.cause()));
 		}
 		else
 		{
@@ -36,5 +36,10 @@ abstract public class ResultHandler<T> implements org.vertx.java.core.AsyncResul
 		}
 	}
 
+	/**
+	 * The implementation should issue either a success event in the form of {@link SuccessJob}, or another {@link IntermediateJob}
+	 *
+	 * @param result The result of the operation
+	 */
 	abstract protected void handleSuccess(final @Nonnull T result);
 }

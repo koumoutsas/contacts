@@ -33,7 +33,7 @@ public class ResultHandlerTest
 			@Override
 			protected void handleSuccess(@Nonnull final Void result)
 			{
-				enqueuer.success(JobType.Protocol,method.getServiceName(),SuccessCode.Ok);
+				enqueuer.success(new SuccessJob(JobType.Protocol,method.getServiceName(),SuccessCode.Ok));
 			}
 		}
 		final ServiceMethod method=new ServiceMethod("a","b");

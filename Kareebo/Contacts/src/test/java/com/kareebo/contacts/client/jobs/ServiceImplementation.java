@@ -1,5 +1,6 @@
 package com.kareebo.contacts.client.jobs;
 
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 
@@ -20,7 +21,7 @@ class ServiceImplementation extends Service
 
 	ServiceImplementation(final Exception error)
 	{
-		super(null);
+		super(new Context());
 		this.error=error;
 	}
 
@@ -38,7 +39,8 @@ class ServiceImplementation extends Service
 		return new Functor[]{(payload,enqueuers)->{
 			if(error==null)
 			{
-				enqueuers.intermediateResultEnqueuer(JobType.Protocol).enqueue(JobType.Protocol,method,null,payload);
+				enqueuers.intermediateResultEnqueuer(JobType.Protocol).put(new IntermediateJob(JobType.Protocol,method,new Context(),
+					                                                                              payload));
 			}
 			else
 			{

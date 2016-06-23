@@ -6,8 +6,7 @@ import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.kareebo.contacts.base.TypeConverter;
 import com.kareebo.contacts.base.vertx.Utils;
-import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
-import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.client.persistentStorage.PersistedObjectRetriever;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorage;
 import com.kareebo.contacts.client.protocol.ServiceDispatcher;
@@ -19,11 +18,9 @@ import com.kareebo.contacts.server.vertx.Verticle;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.FailedOperation;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
-import com.kareebo.contacts.thrift.client.jobs.*;
 import com.kareebo.contacts.thrift.client.persistentStorage.PersistentStorageConstants;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.util.GoraException;
-import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.transport.TTransportException;
@@ -280,17 +277,16 @@ abstract class IntegrationTestBase
 		}
 
 		@Override
-		public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+		public void success(@Nonnull final SuccessJob job)
 		{
 			done=true;
 		}
 
 		@Override
-		public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
-			                                                                                                        cause)
+		public void error(@Nonnull final ErrorJob job)
 		{
 			done=true;
-			this.error=cause;
+			this.error=job.getCause();
 		}
 	}
 
@@ -298,7 +294,7 @@ abstract class IntegrationTestBase
 	private static class TestIntermediateResultEnqueuer implements IntermediateResultEnqueuer
 	{
 		@Override
-		public void enqueue(@Nonnull final JobType type,@Nonnull final ServiceMethod method,@Nonnull final Context context,@Nonnull final TBase payload)
+		public void put(@Nonnull final IntermediateJob job)
 		{
 			fail("This should not be reachable");
 		}

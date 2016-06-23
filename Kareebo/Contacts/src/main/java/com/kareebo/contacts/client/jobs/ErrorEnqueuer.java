@@ -1,22 +1,17 @@
 package com.kareebo.contacts.client.jobs;
 
-import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
-import com.kareebo.contacts.thrift.client.jobs.JobType;
-import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
-
 import javax.annotation.Nonnull;
 
-/// Interface for error job enqueuing
+/**
+ * Interface for error job enqueuing. It's purpose is to put an error in the job queue
+ */
 @FunctionalInterface
 public interface ErrorEnqueuer
 {
 	/**
 	 * Store an error from the protocol side
 	 *
-	 * @param type   The job type
-	 * @param method The service method that caused the error
-	 * @param error  The error
-	 * @param cause  The cause of the error
+	 * @param job   The job
 	 */
-	void error(@Nonnull JobType type,ServiceMethod method,@Nonnull ErrorCode error,@Nonnull Throwable cause);
+	void error(@Nonnull ErrorJob job);
 }

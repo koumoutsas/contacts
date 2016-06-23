@@ -1,12 +1,11 @@
 package com.kareebo.contacts.client.processor;
 
-import com.kareebo.contacts.client.jobs.Enqueuers;
-import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
-import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.client.persistentStorage.PersistedObjectRetriever;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorageImplementation;
 import com.kareebo.contacts.thrift.LongId;
-import com.kareebo.contacts.thrift.client.jobs.*;
+import com.kareebo.contacts.thrift.client.jobs.Context;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.junit.Rule;
@@ -35,13 +34,12 @@ public class ServiceTest
 				                                                                                                                      FinalResultEnqueuer()
 				                                                                                                                      {
 					                                                                                                                      @Override
-					                                                                                                                      public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+					                                                                                                                      public void error(@Nonnull final ErrorJob job)
 					                                                                                                                      {
 					                                                                                                                      }
 
 					                                                                                                                      @Override
-					                                                                                                                      public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
-						                                                                                                                                                                                                                              cause)
+					                                                                                                                      public void success(@Nonnull final SuccessJob job)
 					                                                                                                                      {
 					                                                                                                                      }
 				                                                                                                                      }));
@@ -53,17 +51,16 @@ public class ServiceTest
 		final LongId expected=new LongId(8);
 		final PersistedObjectRetriever persistedObjectRetriever=new PersistedObjectRetriever(new PersistentStorageImplementation());
 		new ServiceImplementation(persistedObjectRetriever).run(expected,new Enqueuers(JobType
-			                                                                               .Protocol,(type,method,context,payload)->{
+			                                                                               .Protocol,(job)->{
 		},new FinalResultEnqueuer()
 		{
 			@Override
-			public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+			public void error(@Nonnull final ErrorJob job)
 			{
 			}
 
 			@Override
-			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
-				                                                                                                        cause)
+			public void success(@Nonnull final SuccessJob job)
 			{
 			}
 		}));

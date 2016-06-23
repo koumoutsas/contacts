@@ -2,6 +2,7 @@ package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
 import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateJob;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.crypto.SigningKey;
 import com.kareebo.contacts.crypto.TestKeyPair;
@@ -189,8 +190,8 @@ public class ServiceDispatcherTest
 					assertEquals(notificationIdExpected,payload);
 					assertEquals(enqueuerExpected,intermediateResultEnqueuer);
 					assertEquals(enqueuerExpected,finalResultEnqueuer);
-					enqueuerExpected.enqueue(JobType.Processor,method1,context,payload);
-					enqueuerExpected.enqueue(JobType.Processor,methodExpected,context,payload);
+					enqueuerExpected.put(new IntermediateJob(JobType.Processor,method1,context,payload));
+					enqueuerExpected.put(new IntermediateJob(JobType.Processor,methodExpected,context,payload));
 				}
 			}};
 		}

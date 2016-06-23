@@ -1,6 +1,7 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.ErrorEnqueuer;
+import com.kareebo.contacts.client.jobs.IntermediateJob;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
@@ -30,6 +31,6 @@ class IntermediateResultHandler<T extends TBase> extends ResultHandler<T>
 	@Override
 	protected void handleSuccess(@Nonnull final T result)
 	{
-		intermediateResultEnqueuer.enqueue(JobType.Processor,jobMethod,context,result);
+		intermediateResultEnqueuer.put(new IntermediateJob(JobType.Processor,jobMethod,context,result));
 	}
 }

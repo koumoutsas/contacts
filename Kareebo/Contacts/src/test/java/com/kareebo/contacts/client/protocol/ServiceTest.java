@@ -1,15 +1,15 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.Enqueuers;
-import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
-import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
+import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.crypto.SigningKey;
 import com.kareebo.contacts.crypto.TestKeyPair;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import com.kareebo.contacts.thrift.SignatureBuffer;
-import com.kareebo.contacts.thrift.client.jobs.*;
+import com.kareebo.contacts.thrift.client.jobs.Context;
+import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
@@ -59,13 +59,12 @@ public class ServiceTest
 		new ServiceImplementation(testKeyPair.signingKey(),clientId).run(null,new Enqueuers(new HashMap<>(),new FinalResultEnqueuer()
 		{
 			@Override
-			public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+			public void error(@Nonnull final ErrorJob job)
 			{
 			}
 
 			@Override
-			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
-				                                                                                                        cause)
+			public void success(@Nonnull final SuccessJob job)
 			{
 			}
 		}));
@@ -78,17 +77,16 @@ public class ServiceTest
 		final ServiceImplementation serviceImplementation=new ServiceImplementation(testKeyPair.signingKey(),
 			                                                                           clientId);
 		serviceImplementation.run(expected,new Enqueuers(JobType
-			                                                 .Processor,(type,method,context,payload)->{
+			                                                 .Processor,(jobs)->{
 		},new FinalResultEnqueuer()
 		{
 			@Override
-			public void success(@Nonnull final JobType type,@Nonnull final String service,final SuccessCode result)
+			public void error(@Nonnull final ErrorJob job)
 			{
 			}
 
 			@Override
-			public void error(@Nonnull final JobType type,final ServiceMethod method,@Nonnull final ErrorCode error,@Nonnull final Throwable
-				                                                                                                        cause)
+			public void success(@Nonnull final SuccessJob job)
 			{
 			}
 		}));

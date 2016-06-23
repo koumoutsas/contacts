@@ -8,7 +8,7 @@ import org.apache.thrift.TException;
 import javax.annotation.Nonnull;
 
 /**
- * Handles incoming notifications and routes them to the correct service method
+ * Bridge between notification system and {@link ServiceDispatcher}. Handles incoming notifications and routes them to the correct service method
  */
 class NotificationHandler
 {

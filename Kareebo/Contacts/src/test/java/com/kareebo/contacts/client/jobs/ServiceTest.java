@@ -2,6 +2,7 @@ package com.kareebo.contacts.client.jobs;
 
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.UserAgent;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.ServiceMethod;
 import org.junit.Rule;
@@ -34,7 +35,7 @@ public class ServiceTest
 	public void testNoSuchMethod() throws Exception
 	{
 		thrown.expect(Service.NoSuchMethod.class);
-		new ServiceImplementation().run(new ServiceMethod("",""),null,enqueuers);
+		new ServiceImplementation().run(new ServiceMethod("",""),new LongId(),enqueuers);
 	}
 
 	@Test
@@ -48,14 +49,14 @@ public class ServiceTest
 	public void testException() throws Exception
 	{
 		thrown.expect(Service.ExecutionFailed.class);
-		new ServiceImplementation(new Exception()).run(ServiceImplementation.method,null,enqueuers);
+		new ServiceImplementation(new Exception()).run(ServiceImplementation.method,new LongId(),enqueuers);
 	}
 
 	@Test
 	public void testMismatchedFunctors() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new Service(null)
+		new Service(new Context())
 		{
 			@Nonnull
 			@Override
@@ -79,7 +80,7 @@ public class ServiceTest
 	public void testDuplicateMethods() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new Service(null)
+		new Service(new Context())
 		{
 			@Nonnull
 			@Override

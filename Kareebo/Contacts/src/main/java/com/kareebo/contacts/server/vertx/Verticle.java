@@ -48,32 +48,25 @@ abstract public class Verticle extends com.kareebo.contacts.base.vertx.Verticle
 			})),new ClientNotifier(injector.getInstance(ClientNotifierBackend.class),injector.getInstance(Key.get(new TypeLiteral<DataStore<Long,PendingNotification>>()
 			{
 			}))),injector.getInstance(GraphAccessor.class));
-			final Package classPackage=Verticle.class.getPackage();
-			final String packageName=classPackage.getName();
 			new ServiceStarter(container,configuration->{
-				final Service service;
 				try
 				{
-					service=(Service)Utils.resolveClass(configuration.service,packageName)
-						                 .getConstructor(com.kareebo.contacts.server.handler
-							                                 .Configuration.class)
-						                 .newInstance(handlerConfiguration);
+					final TProcessor processor=create(configuration.service,handlerConfiguration);
+					final String address=configuration.address;
+					final TEventBusServer eventBusServer=new TEventBusServer(new TEventBusServer.Args(vertx,address).processor(processor));
+					eventBusServer.serve();
+					final Logger logger=container.logger();
+					logger.info("EventBusServer started on address "+address);
+					final THttpServer.Args httpArgs=new THttpServer.Args(vertx,configuration.port);
+					httpArgs.processor(processor).protocolFactory(new TJSONProtocol.Factory());
+					servers.add(new THttpServer(httpArgs));
+					return null;
 				}
 				catch(NoSuchMethodException|ClassNotFoundException|IllegalAccessException|InstantiationException
 					      |InvocationTargetException e)
 				{
 					return e;
 				}
-				final TProcessor processor=service.create();
-				final String address=configuration.address;
-				final TEventBusServer eventBusServer=new TEventBusServer(new TEventBusServer.Args(vertx,address).processor(processor));
-				eventBusServer.serve();
-				final Logger logger=container.logger();
-				logger.info("EventBusServer started on address "+address);
-				final THttpServer.Args httpArgs=new THttpServer.Args(vertx,configuration.port);
-				httpArgs.processor(processor).protocolFactory(new TJSONProtocol.Factory());
-				servers.add(new THttpServer(httpArgs));
-				return null;
 			});
 		}
 		catch(Throwable throwable)
@@ -82,6 +75,15 @@ abstract public class Verticle extends com.kareebo.contacts.base.vertx.Verticle
 			return;
 		}
 		servers.forEach(TServer::serve);
+	}
+
+	private TProcessor create(final String service,final com.kareebo.contacts.server.handler.Configuration handlerConfiguration) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
+	{
+		final Class<?> handlerClass=Utils.resolveClass(service,"com.kareebo.contacts.server.handler");
+		final Class<?> ifaceClass=Utils.resolveClass(service+"$AsyncIface","com.kareebo.contacts.thrift");
+		return (TProcessor)Utils.resolveClass(service+"$AsyncProcessor","com.kareebo.contacts.thrift").getConstructor(ifaceClass).newInstance(handlerClass.getConstructor(com.kareebo.contacts.server.handler
+			                                                                                                                                                                    .Configuration.class)
+			                                                                                                                                        .newInstance(handlerConfiguration));
 	}
 
 	@Override

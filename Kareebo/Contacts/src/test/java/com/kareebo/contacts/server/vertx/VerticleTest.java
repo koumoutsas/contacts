@@ -2,12 +2,9 @@ package com.kareebo.contacts.server.vertx;
 
 import com.kareebo.contacts.base.vertx.Utils;
 import com.kareebo.contacts.server.handler.ClientNotifierBackend;
-import com.kareebo.contacts.server.handler.Configuration;
 import com.kareebo.contacts.server.handler.GraphAccessor;
 import com.kareebo.contacts.thrift.FailedOperation;
-import org.apache.thrift.TException;
-import org.apache.thrift.TProcessor;
-import org.apache.thrift.protocol.TProtocol;
+import com.kareebo.contacts.thrift.VerticleDummyHandler;
 import org.junit.Test;
 
 import javax.annotation.Nonnull;
@@ -24,8 +21,7 @@ public class VerticleTest
 	public void test() throws Exception
 	{
 		final Verticle verticle=new TestVerticle();
-		verticle.setContainer(new Utils.Container("{\"services\":[{\"name\":\""+VerticleTest.class.getSimpleName()+"$"+Service.class
-			                                                                                                               .getSimpleName()+"\","+
+		verticle.setContainer(new Utils.Container("{\"services\":[{\"name\":\""+VerticleDummyHandler.class.getSimpleName()+"\","+
 			                                          "\"port\":0,"+"\"address\":\"localhost\"}]}"));
 		final Utils.Vertx vertx=new Utils.Vertx();
 		verticle.setVertx(vertx);
@@ -86,33 +82,6 @@ public class VerticleTest
 		protected Class<? extends GraphAccessor> getGraphAccessorBinding()
 		{
 			return TestGraphAccessor.class;
-		}
-	}
-
-	private static class Service implements com.kareebo.contacts.server.vertx.Service
-	{
-		public Service(@SuppressWarnings("UnusedParameters") final Configuration configuration)
-		{
-		}
-
-		@Nonnull
-		@Override
-		public TProcessor create()
-		{
-			return new TProcessor()
-			{
-				@Override
-				public boolean process(final TProtocol tProtocol,final TProtocol tProtocol1) throws TException
-				{
-					return false;
-				}
-
-				@Override
-				public boolean isAsyncProcessor()
-				{
-					return false;
-				}
-			};
 		}
 	}
 }

@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
  */
 public class ServiceMethod extends com.kareebo.contacts.thrift.client.jobs.ServiceMethod
 {
-	public ServiceMethod(final @Nonnull String serviceName,final @Nonnull String methodName)
+	public ServiceMethod(final @Nonnull String serviceName,final String methodName)
 	{
 		super(serviceName,methodName);
 	}

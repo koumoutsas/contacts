@@ -22,7 +22,7 @@ public class BroadcastNewContactIdentity extends Service<com.kareebo.contacts.th
 	final static ServiceMethod method5=new ServiceMethod(serviceName,"5");
 	private final static ServiceMethod[] methods={method1,method2,method3,method4,method5};
 
-	BroadcastNewContactIdentity(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	BroadcastNewContactIdentity(@Nonnull final Context context,@Nonnull final TAsyncClientManager asyncClientManager,@Nonnull final SigningKey signingKey,@Nonnull final ClientId clientId)
 	{
 		super(context,asyncClientManager,signingKey,clientId);
 	}

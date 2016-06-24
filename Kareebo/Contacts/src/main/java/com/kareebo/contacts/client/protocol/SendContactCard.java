@@ -21,7 +21,7 @@ public class SendContactCard extends Service<com.kareebo.contacts.thrift.SendCon
 	final static ServiceMethod method4=new ServiceMethod(serviceName,"4");
 	private final static ServiceMethod[] methods={method1,method2,method3,method4};
 
-	SendContactCard(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	SendContactCard(@Nonnull final Context context,@Nonnull final TAsyncClientManager asyncClientManager,@Nonnull final SigningKey signingKey,@Nonnull final ClientId clientId)
 	{
 		super(context,asyncClientManager,signingKey,clientId);
 	}

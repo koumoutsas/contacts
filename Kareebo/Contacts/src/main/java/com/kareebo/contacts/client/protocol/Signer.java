@@ -8,6 +8,7 @@ import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 
+import javax.annotation.Nonnull;
 import java.security.*;
 
 /**
@@ -18,13 +19,13 @@ class Signer
 	private final SigningKey signingKey;
 	private final ClientId clientId;
 
-	Signer(final SigningKey signingKey,final ClientId clientId)
+	Signer(@Nonnull final SigningKey signingKey,@Nonnull final ClientId clientId)
 	{
 		this.signingKey=signingKey;
 		this.clientId=clientId;
 	}
 
-	SignatureBuffer sign(final TBase object) throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
+	SignatureBuffer sign(@Nonnull final TBase object) throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
 	{
 		final Signature ecdsaSign=Signature.getInstance(Utils.getSignatureAlgorithm(signingKey.algorithm),Utils.getProvider());
 		ecdsaSign.initSign(signingKey.key);

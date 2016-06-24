@@ -5,6 +5,7 @@ import com.kareebo.contacts.client.jobs.SuccessJob;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import com.kareebo.contacts.thrift.client.jobs.SuccessCode;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -14,7 +15,7 @@ class FinalResultHandler extends ResultHandler<Void>
 {
 	final private FinalResultEnqueuer enqueuer;
 
-	FinalResultHandler(final FinalResultEnqueuer enqueuer,final ServiceMethod method)
+	FinalResultHandler(@Nonnull final FinalResultEnqueuer enqueuer,@Nonnull final ServiceMethod method)
 	{
 		super(enqueuer,method);
 		this.enqueuer=enqueuer;

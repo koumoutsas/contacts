@@ -19,14 +19,14 @@ public class EnqueuersTest
 	@Test
 	public void testFinalResultEnqueuer() throws Exception
 	{
-		assertEquals(enqueuerImplementation,new Enqueuers(null,enqueuerImplementation).finalResultEnqueuer());
+		assertEquals(enqueuerImplementation,new Enqueuers(new HashMap<>(),enqueuerImplementation).finalResultEnqueuer());
 	}
 
 	@Test
 	public void testIntermediateResultEnqueuer() throws Exception
 	{
-		testInternal(new Enqueuers(constructMap(),null));
-		testInternal(new Enqueuers(JobType.ExternalService,enqueuerImplementation,null));
+		testInternal(new Enqueuers(constructMap(),enqueuerImplementation));
+		testInternal(new Enqueuers(JobType.ExternalService,enqueuerImplementation,enqueuerImplementation));
 	}
 
 	private void testInternal(final Enqueuers enqueuers)

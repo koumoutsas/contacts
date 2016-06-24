@@ -23,7 +23,7 @@ class RegisterIdentity extends Service<com.kareebo.contacts.thrift.RegisterIdent
 	public final static ServiceMethod method3=new ServiceMethod(serviceName,"3");
 	private final static ServiceMethod[] methods={method1,method2,method3};
 
-	RegisterIdentity(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	RegisterIdentity(@Nonnull final Context context,@Nonnull final TAsyncClientManager asyncClientManager,@Nonnull final SigningKey signingKey,@Nonnull final ClientId clientId)
 	{
 		super(context,asyncClientManager,signingKey,clientId);
 	}

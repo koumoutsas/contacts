@@ -19,7 +19,7 @@ public class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.V
 	public final static ServiceMethod method1=new ServiceMethod(serviceName,"1");
 	private final static ServiceMethod[] methodNames={method1};
 
-	ModifyKeys(final Context context,final TAsyncClientManager asyncClientManager,final SigningKey signingKey,final ClientId clientId)
+	ModifyKeys(@Nonnull final Context context,@Nonnull final TAsyncClientManager asyncClientManager,@Nonnull final SigningKey signingKey,@Nonnull final ClientId clientId)
 	{
 		super(context,asyncClientManager,signingKey,clientId);
 	}

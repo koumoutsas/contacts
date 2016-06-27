@@ -47,11 +47,6 @@ public class ServiceDispatcherTest
 	final private static TAsyncClientManager clientManagerExpected=new TAsyncClientManager(new TClientTransport(new TClientTransport.AbstractArgs
 		                                                                                                                (new DefaultVertx())
 	{
-		@Override
-		public TClientTransport.AbstractArgs setTimeout(final long timeout)
-		{
-			return super.setTimeout(timeout);
-		}
 	})
 	{
 		@Override
@@ -90,7 +85,7 @@ public class ServiceDispatcherTest
 	}
 
 	@Rule
-	public ExpectedException thrown=ExpectedException.none();
+	final public ExpectedException thrown=ExpectedException.none();
 
 	@Test(expected=ClassNotFoundException.class)
 	public void testAddUnknownService() throws Exception
@@ -185,7 +180,7 @@ public class ServiceDispatcherTest
 			return new com.kareebo.contacts.client.jobs.Service.Functor[]{new Functor<TBase>()
 			{
 				@Override
-				protected void runInternal(@Nonnull final MyAsyncClient asyncClient,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final MyAsyncClient asyncClient,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					assertEquals(notificationIdExpected,payload);
 					assertEquals(enqueuerExpected,intermediateResultEnqueuer);

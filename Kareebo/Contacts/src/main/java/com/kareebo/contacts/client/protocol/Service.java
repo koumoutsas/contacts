@@ -86,7 +86,7 @@ public abstract class Service<T extends TAsyncClient> extends com.kareebo.contac
 
 		abstract protected void runInternal(@Nonnull T asyncClient,@Nonnull S payload,@Nonnull IntermediateResultEnqueuer
 			                                                                              intermediateResultEnqueuer,
-		                                    FinalResultEnqueuer
+		                                    @Nonnull FinalResultEnqueuer
 			                                    finalResultEnqueuer) throws Exception;
 	}
 }

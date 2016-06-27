@@ -29,13 +29,13 @@ import static org.junit.Assert.*;
  */
 public class ClientNotifierTest
 {
+	@Rule
+	final public ExpectedException thrown=ExpectedException.none();
 	private final long deviceToken=94;
 	private final List<Long> deviceTokens=Arrays.asList(deviceToken,deviceToken+1);
 	final private UserAgent expected=new UserAgent("a","b");
 	final private ServiceMethod expectedMethod=new ServiceMethod("a","b");
 	final private NotificationObject notificationObject=new NotificationObject(expectedMethod,expected);
-	@Rule
-	public ExpectedException thrown=ExpectedException.none();
 	private MemStore<Long,PendingNotification> datastore;
 	private Notifier notifierBackend;
 	private ClientNotifier clientNotifier;

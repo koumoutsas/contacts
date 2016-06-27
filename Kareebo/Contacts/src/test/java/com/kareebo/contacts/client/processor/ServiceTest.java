@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class ServiceTest
 {
 	@Rule
-	public ExpectedException thrown=ExpectedException.none();
+	final public ExpectedException thrown=ExpectedException.none();
 
 	@Test
 	public void testIllegalJobType() throws Exception

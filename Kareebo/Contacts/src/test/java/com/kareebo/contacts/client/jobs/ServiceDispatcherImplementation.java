@@ -11,22 +11,17 @@ import java.lang.reflect.InvocationTargetException;
  */
 class ServiceDispatcherImplementation extends ServiceDispatcher
 {
+	static final JobType jobType=JobType.Protocol;
 	final private Exception error;
 
 	ServiceDispatcherImplementation(final EnqueuerImplementation enqueuer)
 	{
 		this(enqueuer,null);
 	}
-
 	ServiceDispatcherImplementation(final EnqueuerImplementation enqueuer,final Exception error)
 	{
-		super(new Enqueuers(jobType(),enqueuer,enqueuer));
+		super(new Enqueuers(jobType,enqueuer,enqueuer));
 		this.error=error;
-	}
-
-	static JobType jobType()
-	{
-		return JobType.Protocol;
 	}
 
 	@Override

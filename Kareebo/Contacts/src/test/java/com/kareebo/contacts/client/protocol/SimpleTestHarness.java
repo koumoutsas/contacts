@@ -40,7 +40,7 @@ class SimpleTestHarness
 		protected final ClientId clientId=new ClientId(0,0);
 		final TestKeyPair testKeyPair;
 		final String fieldName;
-		private EnqueuerImplementation enqueuer=new EnqueuerImplementation();
+		final private EnqueuerImplementation enqueuer=new EnqueuerImplementation();
 
 		TestBase(final String fieldName) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 		{

@@ -18,7 +18,7 @@ public class PersistedObjectRetrieverTest
 	final static private String wrongKey="x";
 	final static private LongId expected=new LongId(9);
 	@Rule
-	public ExpectedException thrown=ExpectedException.none();
+	final public ExpectedException thrown=ExpectedException.none();
 
 	@Test
 	public void testGet() throws Exception

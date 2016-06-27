@@ -2,6 +2,7 @@ package com.kareebo.contacts.client.processor;
 
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
 import com.kareebo.contacts.thrift.LongId;
+import com.kareebo.contacts.thrift.client.jobs.Context;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class IntermediateResultHandlerTest
 		final ServiceMethod method=new ServiceMethod
 			                           ("c","d");
 		final EnqueuerImplementation enqueuer=new EnqueuerImplementation();
-		final IntermediateResultHandler<LongId> resultHandler=new IntermediateResultHandler<>(enqueuer,protocolMethod,enqueuer,method,null);
+		final IntermediateResultHandler<LongId> resultHandler=new IntermediateResultHandler<>(enqueuer,protocolMethod,enqueuer,method,new Context());
 		final LongId expected=new LongId(9);
 		resultHandler.handleSuccess(expected);
 		assertTrue(enqueuer.hasJob(JobType.Protocol,protocolMethod,expected));

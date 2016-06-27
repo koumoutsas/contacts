@@ -46,7 +46,7 @@ public class ModifyUserAgent extends Service<com.kareebo.contacts.thrift.ModifyU
 		return new com.kareebo.contacts.client.jobs.Service.Functor[]{new Functor<UserAgent>()
 		{
 			@Override
-			protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient asyncClient,@Nonnull final UserAgent payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+			protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.ModifyUserAgent.VertxClient asyncClient,@Nonnull final UserAgent payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 			{
 				asyncClient.modifyUserAgent1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,method1));
 			}

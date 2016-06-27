@@ -17,16 +17,16 @@ import static org.junit.Assert.assertTrue;
 public class ServiceDispatcherTest
 {
 	private static final LongId dumbPayload=new LongId();
-	final private EnqueuerImplementation enqueuer=new EnqueuerImplementation();
 	@Rule
-	public ExpectedException thrown=ExpectedException.none();
+	final public ExpectedException thrown=ExpectedException.none();
+	final private EnqueuerImplementation enqueuer=new EnqueuerImplementation();
 
 	@Test
 	public void testRun() throws Exception
 	{
 		final UserAgent userAgent=new UserAgent("a","b");
 		new ServiceDispatcherImplementation(enqueuer).run(ServiceImplementation.method,userAgent,null);
-		assertTrue(enqueuer.hasJob(ServiceDispatcherImplementation.jobType(),ServiceImplementation.method,userAgent));
+		assertTrue(enqueuer.hasJob(ServiceDispatcherImplementation.jobType,ServiceImplementation.method,userAgent));
 	}
 
 	@Test
@@ -34,7 +34,7 @@ public class ServiceDispatcherTest
 	{
 		final LongId id=new LongId(4);
 		new ServiceDispatcherImplementation(enqueuer).run(ServiceImplementation.method,id.getId());
-		assertTrue(enqueuer.hasJob(ServiceDispatcherImplementation.jobType(),ServiceImplementation.method,id));
+		assertTrue(enqueuer.hasJob(ServiceDispatcherImplementation.jobType,ServiceImplementation.method,id));
 	}
 
 	@Test

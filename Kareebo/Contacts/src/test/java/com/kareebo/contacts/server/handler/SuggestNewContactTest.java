@@ -302,56 +302,21 @@ public class SuggestNewContactTest
 		abstract protected void runImpl() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, TException, InvalidAlgorithmParameterException;
 	}
 
-	private abstract class Base extends Signer
+	private abstract class Base extends SignerWithSetupMainUser
 	{
-		final DataStore<Long,User> userDataStore;
 		final DataStore<Long,PendingNotification> pendingNotificationDataStore;
 		final Notifier notifierBackend=new Notifier();
 		final ClientNotifier clientNotifier;
 		final SuggestNewContact suggestNewContact;
 		final DataStore<ByteBuffer,HashIdentity> identityDataStore;
-		final ClientId clientId=new ClientId(0,0);
-		final long deviceToken=0;
 
 		Base() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, GoraException
 		{
-			userDataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 			pendingNotificationDataStore=DataStoreFactory.getDataStore(Long.class,PendingNotification.class,new Configuration());
 			clientNotifier=new ClientNotifier(notifierBackend,pendingNotificationDataStore);
 			identityDataStore=DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration());
 			suggestNewContact=new SuggestNewContact(userDataStore,identityDataStore,clientNotifier);
 			setupMainUser();
-		}
-
-		private void setupMainUser() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException,
-			                                    InvalidKeyException
-		{
-			final User user=new User();
-			final ByteBuffer b=ByteBuffer.wrap("".getBytes());
-			b.mark();
-			user.setBlind(b);
-			user.setId(clientId.getUser());
-			final Map<CharSequence,Client> clients=new HashMap<>(1);
-			final Client client=new Client();
-			client.setComparisonIdentities(new ArrayList<>());
-			client.setDeviceToken(deviceToken);
-			final PublicKeys publicKeys=new PublicKeys();
-			final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
-				                                                                       .EncryptionKey();
-			encryptionKey.setAlgorithm(com.kareebo.contacts.server.gora.EncryptionAlgorithm.RSA2048);
-			encryptionKey.setBuffer(b);
-			publicKeys.setEncryption(encryptionKey);
-			publicKeys.setVerification(verificationKey);
-			client.setKeys(publicKeys);
-			final UserAgent userAgent=new UserAgent();
-			userAgent.setPlatform("");
-			userAgent.setVersion("");
-			client.setUserAgent(userAgent);
-			clients.put(TypeConverter.convert(clientId.getClient()),client);
-			user.setClients(clients);
-			user.setIdentities(new ArrayList<>());
-			user.setSentRequests(new ArrayList<>());
-			userDataStore.put(user.getId(),user);
 		}
 	}
 }

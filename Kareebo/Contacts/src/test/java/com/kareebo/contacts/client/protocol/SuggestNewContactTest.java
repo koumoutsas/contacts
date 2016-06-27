@@ -44,13 +44,7 @@ public class SuggestNewContactTest
 			@Override
 			EncryptedBuffersWithHashBuffer constructPayload()
 			{
-				final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
-				buffer.mark();
-				final Set<EncryptedBuffer> encryptedBuffers=new HashSet<>(2);
-				encryptedBuffers.add(new EncryptedBuffer(buffer,EncryptionAlgorithm.Fake,clientId));
-				encryptedBuffers.add(new EncryptedBuffer(buffer,EncryptionAlgorithm.RSA2048,clientId));
-				return new EncryptedBuffersWithHashBuffer(encryptedBuffers,new HashBuffer(buffer,
-					                                                                         HashAlgorithm.Fake));
+				return SuggestNewContactTest.this.constructPayload(clientId);
 			}
 		});
 		tests.add(new SimpleTestHarness.CollectionSimpleTestBase<EncryptedBuffer,Void>("encryptedBuffers","encryptedBuffer")
@@ -70,13 +64,7 @@ public class SuggestNewContactTest
 			@Override
 			EncryptedBuffersWithHashBuffer constructPayload()
 			{
-				final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
-				buffer.mark();
-				final Set<EncryptedBuffer> encryptedBuffers=new HashSet<>(2);
-				encryptedBuffers.add(new EncryptedBuffer(buffer,EncryptionAlgorithm.Fake,clientId));
-				encryptedBuffers.add(new EncryptedBuffer(buffer,EncryptionAlgorithm.RSA2048,clientId));
-				return new EncryptedBuffersWithHashBuffer(encryptedBuffers,new HashBuffer(buffer,
-					                                                                         HashAlgorithm.Fake));
+				return SuggestNewContactTest.this.constructPayload(clientId);
 			}
 		});
 		tests.add(new SimpleTestHarness.LongIdTestBase<EncryptedBufferSignedWithVerificationKey>("id")
@@ -88,5 +76,16 @@ public class SuggestNewContactTest
 			}
 		});
 		new SimpleTestHarness().test(tests);
+	}
+
+	private EncryptedBuffersWithHashBuffer constructPayload(final ClientId clientId)
+	{
+		final ByteBuffer buffer=ByteBuffer.wrap("a".getBytes());
+		buffer.mark();
+		final Set<EncryptedBuffer> encryptedBuffers=new HashSet<>(2);
+		encryptedBuffers.add(new EncryptedBuffer(buffer,EncryptionAlgorithm.Fake,clientId));
+		encryptedBuffers.add(new EncryptedBuffer(buffer,EncryptionAlgorithm.RSA2048,clientId));
+		return new EncryptedBuffersWithHashBuffer(encryptedBuffers,new HashBuffer(buffer,
+			                                                                         HashAlgorithm.Fake));
 	}
 }

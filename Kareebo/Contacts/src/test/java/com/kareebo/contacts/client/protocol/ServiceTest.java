@@ -31,12 +31,12 @@ import static org.junit.Assert.*;
  */
 public class ServiceTest
 {
+	@Rule
+	final public ExpectedException thrown=ExpectedException.none();
 	final private ClientId clientId=new ClientId(0,0);
 	final private SignatureAlgorithm algorithm=SignatureAlgorithm.SHA512withECDSAprime239v1;
 	final private LongId id=new LongId(5);
 	final private TestKeyPair testKeyPair;
-	@Rule
-	public ExpectedException thrown=ExpectedException.none();
 
 	public ServiceTest() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 	{
@@ -137,7 +137,7 @@ public class ServiceTest
 			return new com.kareebo.contacts.client.jobs.Service.Functor[]{new Functor<TBase>()
 			{
 				@Override
-				protected void runInternal(@Nonnull final MyAsyncClient asyncClient,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final MyAsyncClient asyncClient,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 				}
 			}};
@@ -155,7 +155,7 @@ public class ServiceTest
 			new Functor<TBase>()
 			{
 				@Override
-				protected void runInternal(@Nonnull final MyAsyncClient asyncClient,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final MyAsyncClient asyncClient,@Nonnull final TBase payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					lastPayload=payload;
 				}

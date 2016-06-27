@@ -28,6 +28,8 @@ import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import static org.junit.Assert.*;
 
@@ -47,9 +49,18 @@ public class BroadcastNewContactIdentityTest
 		{
 			final HashBufferPair hashBufferPair=new HashBufferPair();
 			final DataStore<ByteBuffer,HashIdentity> identityDataStore;
+			final int confirmers1Size;
+			final int confirmers2Size;
 
 			private Base5() throws Exception
 			{
+				this(0,0);
+			}
+
+			private Base5(final int confirmers1Size,final int confirmers2Size) throws Exception
+			{
+				this.confirmers1Size=confirmers1Size;
+				this.confirmers2Size=confirmers2Size;
 				identityDataStore=DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration());
 				setupIdentityDatastore();
 				setUp();
@@ -93,11 +104,17 @@ public class BroadcastNewContactIdentityTest
 				identityDataStore.close();
 			}
 
-			abstract List<String> getIds();
+			List<String> getIds()
+			{
+				return Arrays.asList("1","2");
+			}
 
 			abstract void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2);
 
-			abstract List<Boolean> add();
+			List<Boolean> add()
+			{
+				return Arrays.asList(true,true);
+			}
 
 			@Override
 			SignatureVerifier construct(final DataStore<Long,User> dataStore)
@@ -130,196 +147,54 @@ public class BroadcastNewContactIdentityTest
 				return hashBufferPair;
 			}
 		}
-		new Base5()
+		abstract class Base5Success extends Base5
 		{
-			@Override
-			List<String> getIds()
+			final static private long lower=2;
+			final static private long upper=5;
+			final private boolean o1isUC;
+			private Base5Success(final int confirmers1Size) throws Exception
 			{
-				return Arrays.asList("1","2");
+				super(confirmers1Size,(int)(upper-lower+2-confirmers1Size));
+				this.o1isUC=this.confirmers1Size>confirmers2Size;
 			}
 
-			@Override
-			List<Boolean> add()
+			private Base5Success(final boolean o1isUC) throws Exception
 			{
-				return Arrays.asList(true,true);
+				super((int)(upper-lower+1)/2,(int)(upper-lower+1)/2);
+				this.o1isUC=o1isUC;
 			}
 
 			@Override
 			void check(final Future<Void> result)
 			{
 				assertTrue(result.succeeded());
-				final Object o1=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
-				final Object o2=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
+				final Object oUC=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
+				final Object oUPrimeC=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
+				final Object o1=o1isUC?oUC:oUPrimeC;
+				final Object o2=o1isUC?oUPrimeC:oUC;
 				assertTrue(o1 instanceof HashIdentityValue);
 				assertTrue(o2 instanceof ByteBuffer);
-				assertEquals(hashBufferPair.getUC().bufferForBuffer(),o2);
+				assertEquals((o1isUC?hashBufferPair.getUC():hashBufferPair.getUPrimeC()).bufferForBuffer(),o2);
 				final List<Long> mergedConfirmers=((HashIdentityValue)o1).getConfirmers();
 				assertEquals(4,mergedConfirmers.size());
-				assertTrue(mergedConfirmers.containsAll(Arrays.asList((long)2,(long)3,(long)4,(long)5)));
+				assertTrue(mergedConfirmers.containsAll(LongStream.rangeClosed(lower,upper).boxed().collect(Collectors.toList())));
 			}
 
 			@Override
 			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
 			{
-				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
-				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
-				final List<Long> confirmers1=new ArrayList<>(3);
-				confirmers1.add((long)2);
-				confirmers1.add((long)3);
-				confirmers1.add((long)4);
-				hashIdentityValue1.setConfirmers(confirmers1);
-				final List<Long> confirmers2=new ArrayList<>(2);
-				confirmers1.add((long)4);
-				confirmers1.add((long)5);
-				hashIdentityValue2.setConfirmers(confirmers2);
+				((HashIdentityValue)identity1.getHashIdentity()).setConfirmers(LongStream.rangeClosed(lower,lower+confirmers1Size-1)
+					                                                               .boxed()
+					                                                               .collect(Collectors.toList()));
+				((HashIdentityValue)identity2.getHashIdentity()).setConfirmers(LongStream.rangeClosed(upper+1-confirmers2Size,upper)
+					                                                               .boxed()
+					                                                               .collect(Collectors.toList()));
 			}
-		}.run();
-		new Base5()
+		}
+		abstract class Base5Failure extends Base5
 		{
-			@Override
-			List<Boolean> add()
+			private Base5Failure() throws Exception
 			{
-				return Arrays.asList(true,true);
-			}
-
-			@Override
-			void check(final Future<Void> result)
-			{
-				assertTrue(result.succeeded());
-				final Object o1=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
-				final Object o2=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
-				assertTrue(o1 instanceof HashIdentityValue);
-				assertTrue(o2 instanceof ByteBuffer);
-				assertEquals(hashBufferPair.getUPrimeC().bufferForBuffer(),o2);
-				final List<Long> mergedConfirmers=((HashIdentityValue)o1).getConfirmers();
-				assertEquals(4,mergedConfirmers.size());
-				assertTrue(mergedConfirmers.containsAll(Arrays.asList((long)2,(long)3,(long)4,(long)5)));
-			}
-
-			@Override
-			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
-			{
-				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
-				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
-				final List<Long> confirmers2=new ArrayList<>(3);
-				confirmers2.add((long)2);
-				confirmers2.add((long)3);
-				confirmers2.add((long)4);
-				hashIdentityValue2.setConfirmers(confirmers2);
-				final List<Long> confirmers1=new ArrayList<>(2);
-				confirmers1.add((long)4);
-				confirmers1.add((long)5);
-				hashIdentityValue1.setConfirmers(confirmers1);
-			}
-
-			@Override
-			List<String> getIds()
-			{
-				return Arrays.asList("1","2");
-			}
-		}.run();
-		new Base5()
-		{
-			@Override
-			List<Boolean> add()
-			{
-				return Arrays.asList(true,true);
-			}
-
-			@Override
-			void check(final Future<Void> result)
-			{
-				assertTrue(result.succeeded());
-				final Object o1=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
-				final Object o2=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
-				assertTrue(o1 instanceof HashIdentityValue);
-				assertTrue(o2 instanceof ByteBuffer);
-				assertEquals(hashBufferPair.getUPrimeC().bufferForBuffer(),o2);
-				final List<Long> mergedConfirmers=((HashIdentityValue)o1).getConfirmers();
-				assertEquals(4,mergedConfirmers.size());
-				assertTrue(mergedConfirmers.containsAll(Arrays.asList((long)2,(long)3,(long)4,(long)5)));
-			}
-
-			@Override
-			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
-			{
-				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
-				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
-				final List<Long> confirmers2=new ArrayList<>(3);
-				confirmers2.add((long)2);
-				confirmers2.add((long)3);
-				hashIdentityValue2.setConfirmers(confirmers2);
-				final List<Long> confirmers1=new ArrayList<>(2);
-				confirmers1.add((long)4);
-				confirmers1.add((long)5);
-				hashIdentityValue1.setConfirmers(confirmers1);
-			}
-
-			@Override
-			List<String> getIds()
-			{
-				return Arrays.asList("1","2");
-			}
-		}.run();
-		new Base5()
-		{
-			@Override
-			List<Boolean> add()
-			{
-				return Arrays.asList(true,true);
-			}
-
-			@Override
-			void check(final Future<Void> result)
-			{
-				assertTrue(result.succeeded());
-				final Object o1=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
-				final Object o2=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
-				assertTrue(o1 instanceof HashIdentityValue);
-				assertTrue(o2 instanceof ByteBuffer);
-				assertEquals(hashBufferPair.getUC().bufferForBuffer(),o2);
-				final List<Long> mergedConfirmers=((HashIdentityValue)o1).getConfirmers();
-				assertEquals(4,mergedConfirmers.size());
-				assertTrue(mergedConfirmers.containsAll(Arrays.asList((long)2,(long)3,(long)4,(long)5)));
-			}
-
-			@Override
-			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
-			{
-				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
-				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
-				final List<Long> confirmers2=new ArrayList<>(2);
-				confirmers2.add((long)2);
-				confirmers2.add((long)3);
-				hashIdentityValue2.setConfirmers(confirmers2);
-				final List<Long> confirmers1=new ArrayList<>(2);
-				confirmers1.add((long)4);
-				confirmers1.add((long)5);
-				hashIdentityValue1.setConfirmers(confirmers1);
-			}
-
-			@Override
-			List<String> getIds()
-			{
-				return Arrays.asList("2","1");
-			}
-		}.run();
-		new Base5()
-		{
-			@Override
-			List<Boolean> add()
-			{
-				return Arrays.asList(true,true);
-			}
-
-			@Override
-			void check(final Future<Void> result)
-			{
-				assertTrue(result.failed());
-				final Object o1=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
-				final Object o2=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
-				assertTrue(o1 instanceof HashIdentityValue);
-				assertTrue(o2 instanceof HashIdentityValue);
 			}
 
 			@Override
@@ -331,6 +206,40 @@ public class BroadcastNewContactIdentityTest
 				hashIdentityValue2.setConfirmers(confirmers2);
 				final List<Long> confirmers1=new ArrayList<>(1);
 				hashIdentityValue1.setConfirmers(confirmers1);
+			}
+
+			@Override
+			void check(final Future<Void> result)
+			{
+				assertTrue(result.failed());
+			}
+		}
+		new Base5Success(3)
+		{
+		}.run();
+		new Base5Success(2)
+		{
+		}.run();
+		new Base5Success(false)
+		{
+		}.run();
+		new Base5Success(true)
+		{
+			List<String> getIds()
+			{
+				return Arrays.asList("2","1");
+			}
+		}.run();
+		new Base5Failure()
+		{
+			@Override
+			void check(final Future<Void> result)
+			{
+				super.check(result);
+				final Object o1=identityDataStore.get(hashBufferPair.getUC().bufferForBuffer()).getHashIdentity();
+				final Object o2=identityDataStore.get(hashBufferPair.getUPrimeC().bufferForBuffer()).getHashIdentity();
+				assertTrue(o1 instanceof HashIdentityValue);
+				assertTrue(o2 instanceof HashIdentityValue);
 			}
 
 			@Override
@@ -339,66 +248,20 @@ public class BroadcastNewContactIdentityTest
 				return Arrays.asList("1","1");
 			}
 		}.run();
-		new Base5()
+		new Base5Failure()
 		{
 			@Override
 			List<Boolean> add()
 			{
 				return Arrays.asList(true,false);
 			}
-
-			@Override
-			void check(final Future<Void> result)
-			{
-				assertTrue(result.failed());
-			}
-
-			@Override
-			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
-			{
-				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
-				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
-				final List<Long> confirmers2=new ArrayList<>();
-				hashIdentityValue2.setConfirmers(confirmers2);
-				final List<Long> confirmers1=new ArrayList<>(1);
-				hashIdentityValue1.setConfirmers(confirmers1);
-			}
-
-			@Override
-			List<String> getIds()
-			{
-				return Arrays.asList("1","2");
-			}
 		}.run();
-		new Base5()
+		new Base5Failure()
 		{
 			@Override
 			List<Boolean> add()
 			{
 				return Arrays.asList(false,true);
-			}
-
-			@Override
-			void check(final Future<Void> result)
-			{
-				assertTrue(result.failed());
-			}
-
-			@Override
-			void setupIdentityDatastoreImplementation(final HashIdentity identity1,final HashIdentity identity2)
-			{
-				final HashIdentityValue hashIdentityValue1=(HashIdentityValue)identity1.getHashIdentity();
-				final HashIdentityValue hashIdentityValue2=(HashIdentityValue)identity2.getHashIdentity();
-				final List<Long> confirmers2=new ArrayList<>();
-				hashIdentityValue2.setConfirmers(confirmers2);
-				final List<Long> confirmers1=new ArrayList<>(1);
-				hashIdentityValue1.setConfirmers(confirmers1);
-			}
-
-			@Override
-			List<String> getIds()
-			{
-				return Arrays.asList("1","2");
 			}
 		}.run();
 	}
@@ -530,27 +393,7 @@ public class BroadcastNewContactIdentityTest
 					@Override
 					void verify(@Nonnull final TBase plaintext,@Nonnull final SignatureBuffer signature,@Nonnull final Reply<?> reply,@Nonnull final After after)
 					{
-						final Client client;
-						try
-						{
-							client=clientDBAccessor.get(signature.getClient());
-						}
-						catch(FailedOperation failedOperation)
-						{
-							reply.setFailure(failedOperation);
-							return;
-						}
-						try
-						{
-							after.run(clientDBAccessor.user,client);
-						}
-						catch(FailedOperation failedOperation)
-						{
-							reply.setFailure(failedOperation);
-							return;
-						}
-						clientDBAccessor.close();
-						reply.setReply();
+						new BlindVerifier(clientDBAccessor).verify(signature,reply,after);
 					}
 				}
 				return new BroadcastNewContactIdentityFake(userDataStore,DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity
@@ -857,21 +700,17 @@ public class BroadcastNewContactIdentityTest
 		}.run();
 	}
 
-	abstract class Base34 extends Signer
+	abstract class Base34 extends SignerWithSetupMainUser
 	{
-		protected final ClientId clientId=new ClientId(0,0);
 		final Notifier notifierBackend=new Notifier();
 		final ClientNotifier clientNotifier;
 		final BroadcastNewContactIdentity broadcastNewContactIdentity;
-		final long deviceToken=0;
-		final DataStore<Long,User> userDataStore;
 		private final DataStore<Long,PendingNotification> pendingNotificationDataStore;
 
 		private Base34() throws GoraException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException,
 			                        InvalidKeyException, SignatureException, TException
 		{
 			verificationKey.setAlgorithm(getSignatureAlgorithm());
-			userDataStore=DataStoreFactory.getDataStore(Long.class,User.class,new Configuration());
 			pendingNotificationDataStore=DataStoreFactory.getDataStore(Long.class,PendingNotification.class,new Configuration());
 			clientNotifier=new ClientNotifier(notifierBackend,pendingNotificationDataStore);
 			broadcastNewContactIdentity=construct();
@@ -882,37 +721,6 @@ public class BroadcastNewContactIdentityTest
 		abstract SignatureAlgorithm getSignatureAlgorithm();
 
 		abstract BroadcastNewContactIdentity construct() throws GoraException;
-
-		private void setupMainUser() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException,
-			                                    InvalidKeyException
-		{
-			final User user=new User();
-			final ByteBuffer b=ByteBuffer.wrap("".getBytes());
-			b.mark();
-			user.setBlind(b);
-			user.setId(clientId.getUser());
-			final Map<CharSequence,Client> clients=new HashMap<>(1);
-			final Client client=new Client();
-			client.setComparisonIdentities(new ArrayList<>());
-			client.setDeviceToken(deviceToken);
-			final PublicKeys publicKeys=new PublicKeys();
-			final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
-				                                                                       .EncryptionKey();
-			encryptionKey.setAlgorithm(com.kareebo.contacts.server.gora.EncryptionAlgorithm.RSA2048);
-			encryptionKey.setBuffer(b);
-			publicKeys.setEncryption(encryptionKey);
-			publicKeys.setVerification(verificationKey);
-			client.setKeys(publicKeys);
-			final UserAgent userAgent=new UserAgent();
-			userAgent.setPlatform("");
-			userAgent.setVersion("");
-			client.setUserAgent(userAgent);
-			clients.put(TypeConverter.convert(clientId.getClient()),client);
-			user.setClients(clients);
-			user.setIdentities(new ArrayList<>());
-			user.setSentRequests(new ArrayList<>());
-			userDataStore.put(user.getId(),user);
-		}
 
 		abstract void setupUserDatastore() throws TException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
 	}

@@ -46,7 +46,7 @@ class RegisterUnconfirmedIdentity extends Service<com.kareebo.contacts.thrift.Re
 			new Functor<HashBufferSet>()
 			{
 				@Override
-				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient asyncClient,@Nonnull final HashBufferSet payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.RegisterUnconfirmedIdentity.VertxClient asyncClient,@Nonnull final HashBufferSet payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.registerUnconfirmedIdentity1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,method1));
 				}

@@ -46,7 +46,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 			new Functor<LongId>()
 			{
 				@Override
-				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,@Nonnull final LongId payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,@Nonnull final LongId payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.suggestNewContact1(payload,sign(payload),new IntermediateResultHandler<>
 						                                                     (intermediateResultEnqueuer,
@@ -58,7 +58,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 			new Functor<EncryptedBuffersWithHashBuffer>()
 			{
 				@Override
-				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,@Nonnull final EncryptedBuffersWithHashBuffer payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,@Nonnull final EncryptedBuffersWithHashBuffer payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					final HashBuffer uB=payload.getUB();
 					asyncClient.suggestNewContact2(sign(payload.getBuffers(),EncryptedBufferSigned::new),uB,sign(uB),new
@@ -70,7 +70,7 @@ public class SuggestNewContact extends Service<com.kareebo.contacts.thrift.Sugge
 			new Functor<LongId>()
 			{
 				@Override
-				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,@Nonnull final LongId payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.SuggestNewContact.VertxClient asyncClient,@Nonnull final LongId payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.suggestNewContact3(payload,sign(payload),new IntermediateResultHandler<>
 						                                                     (intermediateResultEnqueuer,com.kareebo.contacts.client.processor

@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class RunnerTest extends DispatcherTestBase
 {
 	@Rule
-	public ExpectedException thrown=ExpectedException.none();
+	final public ExpectedException thrown=ExpectedException.none();
 
 	@Test
 	public void run() throws Exception

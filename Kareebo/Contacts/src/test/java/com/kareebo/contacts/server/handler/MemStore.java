@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class MemStore<K,T extends PersistentBase> extends DataStoreBase<K,T>
 {
 	// This map behaves like DB, has to be static and concurrent collection
-	public ConcurrentSkipListMap<K,T> map=new ConcurrentSkipListMap<>();
+	final public ConcurrentSkipListMap<K,T> map=new ConcurrentSkipListMap<>();
 	K useId;
 	private boolean isClosed=false;
 
@@ -182,8 +182,8 @@ public class MemStore<K,T extends PersistentBase> extends DataStoreBase<K,T>
 
 	private static class MemResult<K,T extends PersistentBase> extends ResultBase<K,T>
 	{
-		private NavigableMap<K,T> map;
-		private Iterator<K> iterator;
+		final private NavigableMap<K,T> map;
+		final private Iterator<K> iterator;
 
 		MemResult(DataStore<K,T> dataStore,Query<K,T> query
 			         ,NavigableMap<K,T> map)

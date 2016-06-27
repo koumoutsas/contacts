@@ -209,11 +209,6 @@ public class UpdateServerContactBookTest
 			}
 
 			@Override
-			void adjustContactOperations()
-			{
-			}
-
-			@Override
 			void runImpl(final Future<Void> result)
 			{
 				expectedEdges.add(new Edge(clientIdValid.getUser(),userId));
@@ -337,7 +332,7 @@ public class UpdateServerContactBookTest
 		final DataStore<ByteBuffer,HashIdentity> identityDataStore;
 		final HashSet<Edge> expectedEdges=new HashSet<>();
 		final HashSet<com.kareebo.contacts.server.gora.EncryptedBuffer> expectedComparisonIdentities=new HashSet<>();
-		Graph graph=new Graph();
+		final Graph graph=new Graph();
 		private long startUserId;
 
 		Base(final boolean expectedResult) throws Exception

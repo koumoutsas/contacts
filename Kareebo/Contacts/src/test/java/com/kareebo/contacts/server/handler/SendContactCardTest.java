@@ -295,27 +295,7 @@ public class SendContactCardTest
 		@Override
 		void verify(@Nonnull final TBase plaintext,@Nonnull final SignatureBuffer signature,@Nonnull final Reply<?> reply,@Nonnull final After after)
 		{
-			final Client client;
-			try
-			{
-				client=clientDBAccessor.get(signature.getClient());
-			}
-			catch(FailedOperation failedOperation)
-			{
-				reply.setFailure(failedOperation);
-				return;
-			}
-			try
-			{
-				after.run(clientDBAccessor.user,client);
-			}
-			catch(FailedOperation failedOperation)
-			{
-				reply.setFailure(failedOperation);
-				return;
-			}
-			clientDBAccessor.close();
-			reply.setReply();
+			new BlindVerifier(clientDBAccessor).verify(signature,reply,after);
 		}
 	}
 

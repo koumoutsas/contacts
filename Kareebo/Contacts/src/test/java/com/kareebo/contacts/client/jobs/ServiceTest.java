@@ -18,10 +18,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class ServiceTest
 {
+	@Rule
+	final public ExpectedException thrown=ExpectedException.none();
 	final private EnqueuerImplementation enqueuer=new EnqueuerImplementation();
 	final private Enqueuers enqueuers=new Enqueuers(JobType.Protocol,enqueuer,enqueuer);
-	@Rule
-	public ExpectedException thrown=ExpectedException.none();
 
 	@Test
 	public void testRun() throws Exception

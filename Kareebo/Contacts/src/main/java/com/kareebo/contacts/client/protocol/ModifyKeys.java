@@ -45,7 +45,7 @@ public class ModifyKeys extends Service<com.kareebo.contacts.thrift.ModifyKeys.V
 			new Functor<PublicKeys>()
 			{
 				@Override
-				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.ModifyKeys.VertxClient asyncClient,@Nonnull final PublicKeys payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,final FinalResultEnqueuer finalResultEnqueuer) throws Exception
+				protected void runInternal(@Nonnull final com.kareebo.contacts.thrift.ModifyKeys.VertxClient asyncClient,@Nonnull final PublicKeys payload,@Nonnull final IntermediateResultEnqueuer intermediateResultEnqueuer,@Nonnull final FinalResultEnqueuer finalResultEnqueuer) throws Exception
 				{
 					asyncClient.modifyKeys1(payload,sign(payload),new FinalResultHandler(finalResultEnqueuer,method1));
 				}

@@ -26,13 +26,13 @@ class ClientDBAccessor
 	 */
 	private static final String[] queryFields={"clients"};
 	/**
+	 * The datastore is initialized in the constructor and is never null
+	 */
+	final private DataStore<Long,User> dataStore;
+	/**
 	 * Caches of intermediate structures used to get to the client.
 	 */
 	User user;
-	/**
-	 * The datastore is initialized in the constructor and is never null
-	 */
-	private DataStore<Long,User> dataStore;
 	private ClientId clientId;
 	private Map<CharSequence,Client> clients;
 

@@ -19,7 +19,9 @@ class IntermediateResultHandler<T extends TBase> extends ResultHandler<T>
 	final private Context context;
 
 	IntermediateResultHandler(final @Nonnull IntermediateResultEnqueuer intermediateResultEnqueuer,final @Nonnull com.kareebo.contacts.client.protocol
-		                                                                                                              .ServiceMethod jobMethod,final @Nonnull ErrorEnqueuer errorEnqueuer,final ServiceMethod callerMethod,final Context context)
+		                                                                                                              .ServiceMethod
+		                                                                                               jobMethod,final @Nonnull
+			                                                                                                         ErrorEnqueuer errorEnqueuer,final ServiceMethod callerMethod,@Nonnull final Context context)
 	{
 		super(errorEnqueuer,callerMethod);
 		this.intermediateResultEnqueuer=intermediateResultEnqueuer;

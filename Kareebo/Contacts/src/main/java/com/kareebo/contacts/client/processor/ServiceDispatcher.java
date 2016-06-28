@@ -31,6 +31,7 @@ public class ServiceDispatcher extends com.kareebo.contacts.client.jobs.ServiceD
 	protected Service constructService(@Nonnull final Class<?> service,final Context context) throws NoSuchMethodException, IllegalAccessException,
 		                                                                                                 InvocationTargetException, InstantiationException
 	{
-		return (Service)service.getDeclaredConstructor(PersistedObjectRetriever.class).newInstance(persistedObjectRetriever);
+		return (Service)service.getDeclaredConstructor(Context.class,PersistedObjectRetriever.class).newInstance(context,
+			persistedObjectRetriever);
 	}
 }

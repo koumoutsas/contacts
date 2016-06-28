@@ -1,13 +1,18 @@
 package com.kareebo.contacts.crypto;
 
 import com.kareebo.contacts.base.TypeConverter;
+import com.kareebo.contacts.server.gora.EncryptionAlgorithm;
+import com.kareebo.contacts.server.gora.EncryptionKey;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.VerificationKey;
 import com.kareebo.contacts.thrift.FailedOperation;
 
 import javax.annotation.Nonnull;
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import java.nio.ByteBuffer;
 import java.security.*;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Vector;
@@ -45,8 +50,7 @@ public class Utils
 	{
 		final Vector<String> characteristics=decompose(verificationKey.getAlgorithm());
 		final Signature verify=Signature.getInstance(characteristics.get(Private),provider);
-		final byte[] verificationBytes=com.kareebo.contacts.base.Utils.getBytes(verificationKey.getBuffer());
-		verify.initVerify(KeyFactory.getInstance(characteristics.get(Public)).generatePublic(new X509EncodedKeySpec(verificationBytes)));
+		verify.initVerify(KeyFactory.getInstance(characteristics.get(Public)).generatePublic(new X509EncodedKeySpec(com.kareebo.contacts.base.Utils.getBytes(verificationKey.getBuffer()))));
 		verify.update(plaintext);
 		final byte[] signatureBytes=new byte[signature.remaining()];
 		signature.get(signatureBytes);
@@ -133,5 +137,46 @@ public class Utils
 	String getSignatureAlgorithm(final @Nonnull com.kareebo.contacts.thrift.SignatureAlgorithm algorithm) throws NoSuchAlgorithmException
 	{
 		return decompose(TypeConverter.convert(algorithm)).elementAt(Private);
+	}
+
+	/**
+	 * {@link Exception} subclass thrown when the algorithm is not supported
+	 */
+	public static class UnsupportedAlgorithmException extends Exception
+	{
+	}
+
+	/**
+	 * Pair of a {@link Cipher} created with the "RSA/NONE/NoPadding" specification and the {@link RSAPublicKey} used for the cipher
+	 */
+	public static class RSANoPaddingCipher
+	{
+		public final Cipher cipher;
+		public final RSAPublicKey publicKey;
+
+		/**
+		 * Constructor from {@link EncryptionKey}
+		 *
+		 * @param encryptionKey The encryption key
+		 * @throws UnsupportedAlgorithmException When the algorithm of the key is not {@link EncryptionAlgorithm#RSA2048}
+		 * @throws NoSuchPaddingException
+		 * @throws NoSuchAlgorithmException
+		 * @throws NoSuchProviderException
+		 * @throws InvalidKeyException
+		 * @throws InvalidKeySpecException
+		 */
+		public RSANoPaddingCipher(final EncryptionKey encryptionKey) throws UnsupportedAlgorithmException, NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException
+		{
+			final EncryptionAlgorithm encryptionAlgorithm=encryptionKey.getAlgorithm();
+			if(encryptionAlgorithm!=EncryptionAlgorithm.RSA2048)
+			{
+				throw new UnsupportedAlgorithmException();
+			}
+			cipher=Cipher.getInstance("RSA/NONE/NoPadding",Utils.getProvider());
+			publicKey=(RSAPublicKey)KeyFactory.getInstance("RSA").generatePublic(new
+				                                                                     X509EncodedKeySpec(com.kareebo.contacts.base.Utils.getBytes
+					                                                                                                                        (encryptionKey.getBuffer())));
+			cipher.init(Cipher.ENCRYPT_MODE,publicKey);
+		}
 	}
 }

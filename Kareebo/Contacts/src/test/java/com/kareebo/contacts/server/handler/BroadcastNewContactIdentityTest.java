@@ -1,6 +1,9 @@
 package com.kareebo.contacts.server.handler;
 
+import com.kareebo.contacts.base.RandomHashPad;
 import com.kareebo.contacts.base.TypeConverter;
+import com.kareebo.contacts.crypto.TestEncryptionKeyPair;
+import com.kareebo.contacts.crypto.TestSignatureKeyPair;
 import com.kareebo.contacts.crypto.Utils;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.gora.EncryptedBuffer;
@@ -25,8 +28,14 @@ import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
 import javax.annotation.Nonnull;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -431,6 +440,7 @@ public class BroadcastNewContactIdentityTest
 			final User user=new User();
 			private final Set<ClientId> expected=new HashSet<>(2);
 			private final Set<EncryptedBufferPair> encryptedBufferPairs=new HashSet<>(4);
+			private final BigInteger R=new BigInteger(new RandomHashPad().getBytes());
 
 			private Base2() throws Exception
 			{
@@ -478,36 +488,26 @@ public class BroadcastNewContactIdentityTest
 			 *
 			 * @param id        The client id
 			 * @param clients   The client set
-			 * @param algorithm The algorithm used for the encryption key
 			 * @return The created client
 			 */
-			private Client setupClient(final ClientId id,final HashMap<CharSequence,Client> clients,final com.kareebo.contacts.server
-				                                                                                              .gora
-				                                                                                              .EncryptionAlgorithm algorithm)
+			private Client setupClient(final ClientId id,final HashMap<CharSequence,Client> clients) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 			{
 				final Client client=new Client();
 				final UserAgent userAgent=new UserAgent();
 				userAgent.setPlatform("A");
 				userAgent.setVersion("B");
 				client.setUserAgent(userAgent);
-				final com.kareebo.contacts.server.gora.EncryptionKey encryptionKey=new com.kareebo.contacts.server.gora
-					                                                                       .EncryptionKey();
-				encryptionKey.setAlgorithm(algorithm);
-				final byte[] bytes=new byte[3];
-				new SecureRandom().nextBytes(bytes);
-				final ByteBuffer b=ByteBuffer.wrap(bytes);
-				b.mark();
-				encryptionKey.setBuffer(b);
-				final VerificationKey verificationKey=new VerificationKey();
-				verificationKey.setAlgorithm(SignatureAlgorithm.SHA512withECDSAprime239v1);
-				verificationKey.setBuffer(b);
 				final PublicKeys publicKeys=new PublicKeys();
-				publicKeys.setEncryption(encryptionKey);
-				publicKeys.setVerification(verificationKey);
+				publicKeys.setEncryption(new TestEncryptionKeyPair().getEncryptionKey());
+				publicKeys.setVerification(new TestSignatureKeyPair().verificationKey());
 				client.setKeys(publicKeys);
 				final List<EncryptedBuffer> comparisonIdentities=new ArrayList<>();
 				final EncryptedBuffer comparisonIdentity1=new EncryptedBuffer();
 				comparisonIdentity1.setAlgorithm(com.kareebo.contacts.server.gora.EncryptionAlgorithm.RSA2048);
+				final byte[] bytes=new byte[3];
+				new SecureRandom().nextBytes(bytes);
+				final ByteBuffer b=ByteBuffer.wrap(bytes);
+				b.mark();
 				comparisonIdentity1.setBuffer(b);
 				comparisonIdentities.add(comparisonIdentity1);
 				final EncryptedBuffer comparisonIdentity2=new EncryptedBuffer();
@@ -521,60 +521,15 @@ public class BroadcastNewContactIdentityTest
 				return client;
 			}
 
-			private Client setupValidClient(final ClientId id,final HashMap<CharSequence,Client> clients)
+			private Client setupValidClient(final ClientId id,final HashMap<CharSequence,Client> clients) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 			{
-				return setupClient(id,clients,com.kareebo.contacts.server.gora.EncryptionAlgorithm.RSA2048);
-			}
-
-			private void setupMatchingClient(final ClientId id,final HashMap<CharSequence,Client> clients,final boolean reverse)
-			{
-				expected.add(id);
-				createEncryptedBufferPair(setupValidClient(id,clients),id,reverse);
-			}
-
-			private void createEncryptedBufferPair(final Client client,final ClientId id,final boolean reverse)
-			{
-				final List<EncryptedBuffer> comparisonIdentities=client.getComparisonIdentities();
-				final ByteBuffer comparisonIdentity=comparisonIdentities.iterator().next().getBuffer();
-				if(reverse)
-				{
-					Collections.reverse(comparisonIdentities);
-				}
-				final byte[] b=com.kareebo.contacts.base.Utils.getBytes(comparisonIdentity);
-				final byte[] i=new byte[b.length];
-				new SecureRandom().nextBytes(i);
-				final ByteBuffer iB=ByteBuffer.wrap(i);
-				iB.mark();
-				final com.kareebo.contacts.thrift.EncryptedBuffer I=new com.kareebo.contacts.thrift.EncryptedBuffer(iB,
-					                                                                                                   EncryptionAlgorithm.RSA2048,id);
-				final ByteBuffer iRB=ByteBuffer.wrap(Utils.xor(b,i));
-				iRB.mark();
-				final com.kareebo.contacts.thrift.EncryptedBuffer IR=new com.kareebo.contacts.thrift.EncryptedBuffer(iRB,
-					                                                                                                    EncryptionAlgorithm.RSA2048,id);
-				encryptedBufferPairs.add(new EncryptedBufferPair(I,IR));
-			}
-
-			private HashMap<CharSequence,Client> setupClients(final Long userId)
-			{
-				final HashMap<CharSequence,Client> ret=new HashMap<>(4);
-				setupMatchingClient(new ClientId(userId,(long)0),ret,true);
-				setupMatchingClient(new ClientId(userId,(long)1),ret,false);
-				setupValidClient(new ClientId(userId,(long)2),ret);
-				final ClientId id3=new ClientId(userId,(long)3);
-				createEncryptedBufferPair(setupClient(id3,ret,com.kareebo.contacts.server.gora
-					                                              .EncryptionAlgorithm.Fake),id3,false);
-				final ByteBuffer byteBuffer=ByteBuffer.wrap("4".getBytes());
-				byteBuffer.mark();
-				final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer5=new com.kareebo.contacts.thrift.EncryptedBuffer
-					                                                                   (byteBuffer,EncryptionAlgorithm.RSA2048,new ClientId(userId,4));
-				encryptedBufferPairs.add(new EncryptedBufferPair(encryptedBuffer5,encryptedBuffer5));
-				return ret;
+				return setupClient(id,clients);
 			}
 
 			/**
 			 * Set up the datastores and and the encrypted buffer pairs
 			 */
-			private void setupDatastores()
+			private void setupDatastores() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidKeyException, Utils.UnsupportedAlgorithmException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException
 			{
 				user.setId((long)10);
 				final ByteBuffer b=ByteBuffer.wrap("".getBytes());
@@ -583,6 +538,51 @@ public class BroadcastNewContactIdentityTest
 				user.setClients(setupClients(user.getId()));
 				user.setIdentities(new ArrayList<>());
 				user.setSentRequests(new ArrayList<>());
+			}
+
+			private HashMap<CharSequence,Client> setupClients(final Long userId) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, Utils.UnsupportedAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException
+			{
+				final HashMap<CharSequence,Client> ret=new HashMap<>(4);
+				setupMatchingClient(new ClientId(userId,(long)0),ret,true);
+				setupMatchingClient(new ClientId(userId,(long)1),ret,false);
+				setupValidClient(new ClientId(userId,(long)2),ret);
+				final ClientId id3=new ClientId(userId,(long)3);
+				createEncryptedBufferPair(setupClient(id3,ret),id3,false);
+				final ByteBuffer byteBuffer=ByteBuffer.wrap("4".getBytes());
+				byteBuffer.mark();
+				final com.kareebo.contacts.thrift.EncryptedBuffer encryptedBuffer5=new com.kareebo.contacts.thrift.EncryptedBuffer
+					                                                                   (byteBuffer,EncryptionAlgorithm.RSA2048,new ClientId(userId,4));
+				encryptedBufferPairs.add(new EncryptedBufferPair(encryptedBuffer5,encryptedBuffer5));
+				return ret;
+			}
+
+			private void setupMatchingClient(final ClientId id,final HashMap<CharSequence,Client> clients,final boolean reverse) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidKeyException, Utils.UnsupportedAlgorithmException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException
+			{
+				expected.add(id);
+				createEncryptedBufferPair(setupValidClient(id,clients),id,reverse);
+			}
+
+			private void createEncryptedBufferPair(final Client client,final ClientId id,final boolean reverse) throws NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, Utils.UnsupportedAlgorithmException, InvalidKeySpecException, BadPaddingException, IllegalBlockSizeException
+			{
+				final List<EncryptedBuffer> comparisonIdentities=client.getComparisonIdentities();
+				final ByteBuffer comparisonIdentity=comparisonIdentities.iterator().next().getBuffer();
+				if(reverse)
+				{
+					Collections.reverse(comparisonIdentities);
+				}
+				final Utils.RSANoPaddingCipher rsaNoPaddingCipher=new Utils.RSANoPaddingCipher(clientValid.getKeys().getEncryption());
+				final Cipher cipherA=rsaNoPaddingCipher.cipher;
+				final BigInteger modulusA=rsaNoPaddingCipher.publicKey.getModulus();
+				final BigInteger iTimesR=new BigInteger(com.kareebo.contacts.base.Utils.getBytes(comparisonIdentity)).modInverse
+					                                                                                                      (modulusA).multiply(R).mod(modulusA);
+				final Cipher cipherB=new Utils.RSANoPaddingCipher(client.getKeys().getEncryption()).cipher;
+				final ByteBuffer I=ByteBuffer.wrap(cipherA.doFinal(cipherB.doFinal(iTimesR.toByteArray())));
+				I.mark();
+				final ByteBuffer IR=ByteBuffer.wrap(cipherA.doFinal(cipherB.doFinal(R.toByteArray())));
+				IR.mark();
+				encryptedBufferPairs.add(new EncryptedBufferPair(new com.kareebo.contacts.thrift.EncryptedBuffer(I,
+					                                                                                                EncryptionAlgorithm.RSA2048,id),new com.kareebo.contacts.thrift.EncryptedBuffer(IR,
+						                                                                                                                                                                               EncryptionAlgorithm.RSA2048,id)));
 			}
 
 			@Override
@@ -803,13 +803,12 @@ public class BroadcastNewContactIdentityTest
 	 */
 	abstract private class Base extends SignatureVerifierTestBase
 	{
-		final DataStore<ByteBuffer,HashIdentity> identityDataStore;
-		@SuppressWarnings("ConstantConditions")
-		final ClientNotifier clientNotifier=new ClientNotifier(null,null);
+		final DataStore<ByteBuffer,HashIdentity> identityDataStore=DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration());
+		final ClientNotifier clientNotifier=new ClientNotifier((ClientNotifierBackend)(deviceToken,payload)->{
+		},DataStoreFactory.getDataStore(Long.class,PendingNotification.class,new Configuration()));
 
-		Base() throws GoraException
+		Base() throws GoraException, NoSuchProviderException, NoSuchAlgorithmException
 		{
-			identityDataStore=DataStoreFactory.getDataStore(ByteBuffer.class,HashIdentity.class,new Configuration());
 		}
 
 		@Override

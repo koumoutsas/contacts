@@ -1,7 +1,7 @@
 package com.kareebo.contacts.client.protocol;
 
 import com.kareebo.contacts.client.jobs.EnqueuerImplementation;
-import com.kareebo.contacts.crypto.TestKeyPair;
+import com.kareebo.contacts.crypto.TestSignatureKeyPair;
 import com.kareebo.contacts.thrift.*;
 import com.kareebo.contacts.thrift.client.jobs.ErrorCode;
 import com.kareebo.contacts.thrift.client.jobs.JobType;
@@ -38,13 +38,13 @@ class SimpleTestHarness
 	{
 		protected final SignatureAlgorithm algorithm=SignatureAlgorithm.SHA512withECDSAprime239v1;
 		protected final ClientId clientId=new ClientId(0,0);
-		final TestKeyPair testKeyPair;
+		final TestSignatureKeyPair testSignatureKeyPair;
 		final String fieldName;
 		final private EnqueuerImplementation enqueuer=new EnqueuerImplementation();
 
 		TestBase(final String fieldName) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 		{
-			testKeyPair=new TestKeyPair();
+			testSignatureKeyPair=new TestSignatureKeyPair();
 			this.fieldName=fieldName;
 		}
 
@@ -57,7 +57,7 @@ class SimpleTestHarness
 		private void test(final boolean success) throws com.kareebo.contacts.client.jobs.Service.ExecutionFailed, com.kareebo.contacts.client.jobs.ServiceDispatcher.NoSuchService, com.kareebo.contacts.client.jobs.Service.NoSuchMethod, ServiceDispatcher.DuplicateService, ClassNotFoundException, InvalidKeySpecException, NoSuchAlgorithmException
 		{
 			final ServiceMethod method=getServiceMethod();
-			final ServiceDispatcher serviceDispatcher=new ServiceDispatcher(new Enqueuers(enqueuer,enqueuer),testKeyPair.signingKey(),
+			final ServiceDispatcher serviceDispatcher=new ServiceDispatcher(new Enqueuers(enqueuer,enqueuer),testSignatureKeyPair.signingKey(),
 				                                                               clientId);
 			serviceDispatcher.add(method.getServiceName(),clientManager(success));
 			serviceDispatcher.run(method,constructPayload(),null);
@@ -174,7 +174,7 @@ class SimpleTestHarness
 						tPayloadField.setAccessible(true);
 						final TBase tPayload=(TBase)tPayloadField.get(t);
 						tPayloadField.setAccessible(false);
-						assertTrue(new Verifier(testKeyPair.getPublic(),algorithm).verify(tPayload,signature.getBuffer()));
+						assertTrue(new Verifier(testSignatureKeyPair.getPublic(),algorithm).verify(tPayload,signature.getBuffer()));
 					}
 				}
 			};
@@ -231,7 +231,7 @@ class SimpleTestHarness
 					signatureField.setAccessible(true);
 					final SignatureBuffer signature=(SignatureBuffer)signatureField.get(method);
 					signatureField.setAccessible(false);
-					assertTrue(new Verifier(testKeyPair.getPublic(),algorithm).verify(payload,signature.getBuffer()));
+					assertTrue(new Verifier(testSignatureKeyPair.getPublic(),algorithm).verify(payload,signature.getBuffer()));
 				}
 			};
 		}

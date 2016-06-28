@@ -2,8 +2,6 @@ namespace java com.kareebo.contacts.thrift.client
 
 include "DataStructures.thrift"
 
-const string Protocol="kareebo"
-
 enum ContactType
 {
 	MSISDN=1,
@@ -28,3 +26,28 @@ struct Identity
 	2:ContactType type,
 	3:DataStructures.HashBuffer blinded,
 }
+
+struct DecryptionKey
+{
+	1:DataStructures.ByteArray buffer,
+	2:DataStructures.EncryptionAlgorithm algorithm,
+}
+
+struct SigningKey
+{
+	1:DataStructures.ByteArray buffer,
+	2:DataStructures.SignatureAlgorithm algorithm,
+}
+
+struct PrivateKeys
+{
+	1:DecryptionKey decryption,
+	2:SigningKey signing,
+}
+
+struct BroadcastIdentities
+{
+	1:set<DataStructures.HashBuffer> identities,
+}
+
+const string Protocol="kareebo"

@@ -1,13 +1,11 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.base.TypeConverter;
+import com.kareebo.contacts.crypto.TestEncryptionKeyPair;
 import com.kareebo.contacts.server.gora.Client;
 import com.kareebo.contacts.server.gora.PublicKeys;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.server.gora.UserAgent;
 import com.kareebo.contacts.thrift.ClientId;
-import com.kareebo.contacts.thrift.EncryptionAlgorithm;
-import com.kareebo.contacts.thrift.EncryptionKey;
 import com.kareebo.contacts.thrift.SignatureBuffer;
 import org.apache.gora.store.DataStore;
 import org.apache.gora.store.DataStoreFactory;
@@ -22,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * Base class for all test suites for {@link SignatureVerifier} subclasses
@@ -29,14 +28,35 @@ import static org.junit.Assert.assertNotNull;
 abstract class SignatureVerifierTestBase extends Signer
 {
 	final ClientId clientIdValid=new ClientId();
-	private final PublicKeys publicKeys=new PublicKeys();
 	SignatureBuffer signature;
 	SignatureBuffer wrongSignature;
 	SignatureVerifier signatureVerifier;
-	Client clientValid;
-	UserAgent userAgent;
+	final Client clientValid;
+	final UserAgent userAgent;
 	long userId;
 	DataStore<Long,User> dataStore;
+
+	SignatureVerifierTestBase()
+	{
+		userAgent=new UserAgent();
+		userAgent.setPlatform("A");
+		userAgent.setVersion("B");
+		final PublicKeys publicKeys=new PublicKeys();
+		try
+		{
+			publicKeys.setEncryption(new TestEncryptionKeyPair().getEncryptionKey());
+		}
+		catch(NoSuchProviderException | NoSuchAlgorithmException e)
+		{
+			e.printStackTrace();
+			fail();
+		}
+		publicKeys.setVerification(verificationKey);
+		clientValid=new Client();
+		clientValid.setUserAgent(userAgent);
+		clientValid.setKeys(publicKeys);
+		clientValid.setComparisonIdentities(new ArrayList<>());
+	}
 
 	public void setUp() throws Exception
 	{
@@ -54,15 +74,6 @@ abstract class SignatureVerifierTestBase extends Signer
 		setUpCrypto();
 		clientIdValid.setClient(0);
 		clientIdValid.setUser(userValid.getId());
-		userAgent=new UserAgent();
-		userAgent.setPlatform("A");
-		userAgent.setVersion("B");
-		publicKeys.setEncryption(TypeConverter.convert(setUpEncryptionKey(buffer)));
-		publicKeys.setVerification(verificationKey);
-		clientValid=new Client();
-		clientValid.setUserAgent(userAgent);
-		clientValid.setKeys(publicKeys);
-		clientValid.setComparisonIdentities(new ArrayList<>());
 		signatureVerifier=construct(dataStore);
 		signatureVerifier.clientDBAccessor.put(clientIdValid,clientValid);
 		assertNotNull(signatureVerifier);
@@ -73,16 +84,6 @@ abstract class SignatureVerifierTestBase extends Signer
 	{
 		signature=sign(constructPlaintext(),clientIdValid);
 		wrongSignature=sign("feg".getBytes(),clientIdValid);
-	}
-
-	static EncryptionKey setUpEncryptionKey(final byte[] buffer)
-	{
-		final EncryptionKey encryptionKey=new EncryptionKey();
-		encryptionKey.setAlgorithm(EncryptionAlgorithm.RSA2048);
-		final ByteBuffer byteBuffer=ByteBuffer.wrap(buffer);
-		byteBuffer.mark();
-		encryptionKey.setBuffer(byteBuffer);
-		return encryptionKey;
 	}
 
 	abstract SignatureVerifier construct(final DataStore<Long,User> dataStore);

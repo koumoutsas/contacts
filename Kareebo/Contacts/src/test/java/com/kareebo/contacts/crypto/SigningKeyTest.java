@@ -17,7 +17,7 @@ public class SigningKeyTest
 	@Test
 	public void test() throws Exception
 	{
-		final PrivateKey expectedKey=new TestKeyPair().getPrivate();
+		final PrivateKey expectedKey=new TestSignatureKeyPair().getPrivate();
 		final SignatureAlgorithm expectedAlgorithm=SignatureAlgorithm.Fake;
 		final ByteBuffer buffer=ByteBuffer.wrap(new PKCS8EncodedKeySpec(expectedKey.getEncoded()).getEncoded());
 		buffer.mark();

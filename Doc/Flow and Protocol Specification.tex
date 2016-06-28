@@ -7,10 +7,10 @@
 \newcommand{\newPublicKeys}{\emph{newPublicKeys}}
 \newcommand{\newPrivateKeys}{\emph{newPrivateKeys}}
 \newcommand{\privateKeys}{\emph{privateKeys}}
-\newcommand{\publicKeys}{\emph{publicKeys}}
+\newcommand{\publicKeys}[1]{\parenthesize{publicKeys}{#1}}
 \newcommand{\signingKey}{\privateKeys{}.\emph{signing}}
 \newcommand{\verificationKey}{\publicKeys{}.\emph{verification}}
-\newcommand{\encryptionKey}{\publicKeys{}.\emph{encryption}}
+\newcommand{\encryptionKey}[1]{\publicKeys{#1}.\emph{encryption}}
 \newcommand{\decryptionKey}{\privateKeys{}.\emph{decryption}}
 \newcommand{\userId}[1]{\identity{#1}{\em.user}}
 \newcommand{\userIdSimple}[1]{\parenthesize{userId}{#1}}
@@ -308,7 +308,7 @@ If \Client{B} has \identity{C} in its contact book, it receives $U(C)$, and \Ser
 The following is executed for each member of \encryptionKeyMap{B} and each \Client{B} corresponding to this member. Each communication round between \Client{A} and \Server{} 
 aggregates the values for each run of the rest of the flow.
 \begin{enumerate}[resume]
- \item \Client{A} calculates $I=$\identity{C}$^{-1}$ for \encryptionKey{} and sets $I=E(A,E(B,i\odot R))$. The inverse is calculated according to the homomorphism of the crypto 
+ \item \Client{A} calculates $i=$\identity{C}$^{-1}$ for \encryptionKey{B} and sets $I=E(A,E(B,i\odot R))$. The inverse is calculated according to the homomorphism of the crypto 
 system, denoted with $\odot$. For RSA, for example, it is multiplication.
  \item \Client{A} calculates $I_R=E(A,E(B,R))$.
  \item \Client{A} populates \signedData{} from \signingKey{} and $I$ and $I_R$.
@@ -317,7 +317,7 @@ system, denoted with $\odot$. For RSA, for example, it is multiplication.
  \item \Server{} verifies \signedData{}.
  \item \Server{} retrieves ComparisonIdentities from UserSet for \userId{B} and \clientId{B} and for each member $i$
  \begin{enumerate}
-  \item It calculates $i\odot I$ and compares it to $I_R$. If they are equal the contacts match.
+  \item \Server{} calculates $E(A,i)\odot I$ and compares it to $I_R$. If they are equal the contacts match.
  \end{enumerate}
  \item If there is a match, \Server{} populates \publicKeys{} from \identity{B} and replies to \Client{A} with \identity{B}, \encryptionKey{}, otherwise the flow terminates.
 \end{enumerate}

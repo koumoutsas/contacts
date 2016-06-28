@@ -58,7 +58,7 @@ class RegisterIdentity extends SignatureVerifierWithIdentityStore implements com
 				id=identity.getId();
 				newUser=clientDBAccessor.get(id);
 			}
-			final ByteBuffer blind=new RandomHashPad().getBytes();
+			final ByteBuffer blind=new RandomHashPad().getByteBuffer();
 			newUser.setBlind(blind);
 			final List<Long> confirmers=identity.getConfirmers();
 			confirmers.add(user.getId());

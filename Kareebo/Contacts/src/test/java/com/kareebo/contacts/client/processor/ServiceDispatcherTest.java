@@ -74,9 +74,9 @@ public class ServiceDispatcherTest
 
 	private static class ServiceImplementation extends Service
 	{
-		ServiceImplementation(final PersistedObjectRetriever persistedObjectRetriever)
+		ServiceImplementation(final Context context,final PersistedObjectRetriever persistedObjectRetriever)
 		{
-			super(new Context(),persistedObjectRetriever);
+			super(context,persistedObjectRetriever);
 		}
 
 		@Nonnull

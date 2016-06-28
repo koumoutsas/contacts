@@ -3,7 +3,7 @@ package com.kareebo.contacts.client.protocol;
 import com.kareebo.contacts.client.jobs.Enqueuers;
 import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.crypto.SigningKey;
-import com.kareebo.contacts.crypto.TestKeyPair;
+import com.kareebo.contacts.crypto.TestSignatureKeyPair;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
@@ -36,27 +36,27 @@ public class ServiceTest
 	final private ClientId clientId=new ClientId(0,0);
 	final private SignatureAlgorithm algorithm=SignatureAlgorithm.SHA512withECDSAprime239v1;
 	final private LongId id=new LongId(5);
-	final private TestKeyPair testKeyPair;
+	final private TestSignatureKeyPair testSignatureKeyPair;
 
 	public ServiceTest() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 	{
-		testKeyPair=new TestKeyPair();
+		testSignatureKeyPair=new TestSignatureKeyPair();
 	}
 
 	@Test
 	public void testSign() throws Exception
 	{
-		final SignatureBuffer result=new ServiceImplementation(testKeyPair.signingKey(),clientId).getSignature(id);
+		final SignatureBuffer result=new ServiceImplementation(testSignatureKeyPair.signingKey(),clientId).getSignature(id);
 		assertEquals(algorithm,result.getAlgorithm());
 		assertEquals(clientId,result.getClient());
-		assertTrue(new Verifier(testKeyPair.getPublic(),algorithm).verify(id,result.getBuffer()));
+		assertTrue(new Verifier(testSignatureKeyPair.getPublic(),algorithm).verify(id,result.getBuffer()));
 	}
 
 	@Test
 	public void testIllegalJobType() throws Exception
 	{
 		thrown.expect(IllegalArgumentException.class);
-		new ServiceImplementation(testKeyPair.signingKey(),clientId).run(null,new Enqueuers(new HashMap<>(),new FinalResultEnqueuer()
+		new ServiceImplementation(testSignatureKeyPair.signingKey(),clientId).run(null,new Enqueuers(new HashMap<>(),new FinalResultEnqueuer()
 		{
 			@Override
 			public void error(@Nonnull final ErrorJob job)
@@ -74,7 +74,7 @@ public class ServiceTest
 	public void test() throws Exception
 	{
 		final LongId expected=new LongId(0);
-		final ServiceImplementation serviceImplementation=new ServiceImplementation(testKeyPair.signingKey(),
+		final ServiceImplementation serviceImplementation=new ServiceImplementation(testSignatureKeyPair.signingKey(),
 			                                                                           clientId);
 		serviceImplementation.run(expected,new Enqueuers(JobType
 			                                                 .Processor,(jobs)->{

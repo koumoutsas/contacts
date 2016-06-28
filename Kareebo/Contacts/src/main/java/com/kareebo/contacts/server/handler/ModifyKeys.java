@@ -28,7 +28,7 @@ public class ModifyKeys extends SignatureVerifier implements com.kareebo.contact
 	 * The client sends the new keys signed with the old keys
 	 */
 	public void modifyKeys1(final @Nonnull PublicKeys newPublicKeys,final @Nonnull SignatureBuffer signature,final @Nonnull Future<Void>
-		                                                                                       future)
+		                                                                                                         future)
 	{
 		verify(newPublicKeys,signature,new Reply<>(future),(user,client)->
 		{

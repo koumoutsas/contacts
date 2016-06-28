@@ -11,12 +11,7 @@ public class RandomHashPad
 {
 	private final byte[] bytes=new byte[16];
 
-	/**
-	 * Get the random bytes
-	 */
-	public
-	@Nonnull
-	RandomHashPad()
+	public RandomHashPad()
 	{
 		new SecureRandom().nextBytes(bytes);
 	}
@@ -28,10 +23,20 @@ public class RandomHashPad
 	 */
 	public
 	@Nonnull
-	ByteBuffer getBytes()
+	ByteBuffer getByteBuffer()
 	{
 		final ByteBuffer ret=ByteBuffer.wrap(bytes);
 		ret.mark();
 		return ret;
+	}
+
+	/**
+	 * Get the byte arrays for the pad
+	 * @return {@link #bytes}
+	 */
+	@Nonnull
+	public byte[] getBytes()
+	{
+		return bytes;
 	}
 }

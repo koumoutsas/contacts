@@ -14,8 +14,16 @@ import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
 import javax.annotation.Nonnull;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 /**
@@ -41,7 +49,7 @@ class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndN
 
 	@Override
 	public void broadcastNewContactIdentity1(final @Nonnull LongId userIdB,final @Nonnull SignatureBuffer signature,final @Nonnull Future<MapClientIdEncryptionKey>
-		                                                                                              future)
+		                                                                                                                future)
 	{
 		final MapClientIdEncryptionKey reply=new MapClientIdEncryptionKey();
 		final Map<ClientId,EncryptionKey> replyMap=new HashMap<>();
@@ -76,32 +84,47 @@ class BroadcastNewContactIdentity extends SignatureVerifierWithIdentityStoreAndN
 		final Map<ClientId,EncryptionKey> replyMap=new HashMap<>(encryptedBufferPairsSet.size());
 		verify(encryptedBufferPairs,signature,new Reply<>(future,reply),(user,client)->
 		{
-			for(final EncryptedBufferPair e : encryptedBufferPairsSet)
+			try
 			{
-				final byte[] I=e.getI().getBuffer();
-				final byte[] IR=e.getIR().getBuffer();
-				final ClientId clientIdB=e.getI().getClient();
-				try
+				final Utils.RSANoPaddingCipher rsaNoPaddingCipher=new Utils.RSANoPaddingCipher(client.getKeys().getEncryption());
+				final BigInteger modulus=rsaNoPaddingCipher.publicKey.getModulus();
+				final Cipher cipher=rsaNoPaddingCipher.cipher;
+				for(final EncryptedBufferPair e : encryptedBufferPairsSet)
 				{
-					final Client clientB=clientDBAccessor.get(clientIdB);
-					final List<com.kareebo.contacts.server.gora.EncryptedBuffer> comparisonIdentities=clientB.getComparisonIdentities();
-					for(final com.kareebo.contacts.server.gora.EncryptedBuffer c : comparisonIdentities)
+					final ClientId clientIdB=e.getI().getClient();
+					try
 					{
-						if(Arrays.equals(IR,Utils.xor(com.kareebo.contacts.base.Utils.getBytes(c.getBuffer()),I)))
+						final Client clientB=clientDBAccessor.get(clientIdB);
+						final List<com.kareebo.contacts.server.gora.EncryptedBuffer> comparisonIdentities=clientB.getComparisonIdentities();
+						for(final com.kareebo.contacts.server.gora.EncryptedBuffer c : comparisonIdentities)
 						{
-							replyMap.put(clientIdB,TypeConverter.convert(clientB.getKeys().getEncryption()));
-							break;
+							if(new BigInteger(cipher.doFinal(com.kareebo.contacts.base
+								                                 .Utils.getBytes(c.getBuffer()))).multiply(new BigInteger(e.getI().getBuffer())).mod(modulus)
+								   .equals(new BigInteger(e.getIR().getBuffer())))
+							{
+								replyMap.put(clientIdB,TypeConverter.convert(clientB.getKeys().getEncryption()));
+								break;
+							}
 						}
 					}
+					catch(final FailedOperation exception)
+					{
+						logger.error("Unable to find client "+clientIdB);
+						throw exception;
+					}
+					catch(final NoSuchAlgorithmException|BadPaddingException|IllegalBlockSizeException exception)
+					{
+						logger.error("Encryption failed for "+clientIdB,exception);
+						throw new FailedOperation();
+					}
 				}
-				catch(FailedOperation exception)
-				{
-					logger.error("Unable to find client "+clientIdB);
-				}
-				catch(NoSuchAlgorithmException exception)
-				{
-					logger.error("Invalid algorithm found for "+clientIdB,exception);
-				}
+			}
+			catch(final Utils.UnsupportedAlgorithmException|InvalidKeyException|NoSuchAlgorithmException
+				            |InvalidKeySpecException|NoSuchProviderException
+				            |NoSuchPaddingException e)
+			{
+				logger.error("Encryption failed with exception",e);
+				throw new FailedOperation();
 			}
 			reply.setKeyMap(replyMap);
 		});

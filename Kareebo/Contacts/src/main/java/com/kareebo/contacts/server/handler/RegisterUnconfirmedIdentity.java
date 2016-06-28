@@ -33,7 +33,7 @@ public class RegisterUnconfirmedIdentity extends SignatureVerifierWithIdentitySt
 	 * @param identityDatastore The datastore of hashed identities
 	 */
 	public RegisterUnconfirmedIdentity(final @Nonnull DataStore<Long,User> userDataStore,final @Nonnull DataStore<ByteBuffer,HashIdentity>
-		                                                                            identityDatastore)
+		                                                                                     identityDatastore)
 	{
 		super(userDataStore,identityDatastore);
 	}

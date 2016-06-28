@@ -11,18 +11,18 @@ import java.security.SecureRandom;
 /**
  * Specialization of {@link PersistedObjectRetriever} for {@link Context}
  */
-class ContextRetriever
+public class ContextRetriever
 {
 	private final PersistedObjectRetriever persistedObjectRetriever;
 
 	/**
-	 * Create a {@link PersistedObjectRetriever} from a {@link PersistentStorage}
+	 * Create a {@link ContextRetriever} from a {@link PersistedObjectRetriever}
 	 *
-	 * @param persistentStorage The {@link PersistentStorage}
+	 * @param persistedObjectRetriever The {@link PersistedObjectRetriever}
 	 */
-	ContextRetriever(final @Nonnull PersistentStorage persistentStorage)
+	public ContextRetriever(final @Nonnull PersistedObjectRetriever persistedObjectRetriever)
 	{
-		persistedObjectRetriever=new PersistedObjectRetriever(persistentStorage);
+		this.persistedObjectRetriever=persistedObjectRetriever;
 	}
 
 	/**

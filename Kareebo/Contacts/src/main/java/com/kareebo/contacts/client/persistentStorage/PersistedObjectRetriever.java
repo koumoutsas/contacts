@@ -59,7 +59,7 @@ public class PersistedObjectRetriever
 	}
 
 	/// Start a transaction
-	void start()
+	public void start()
 	{
 		persistentStorage.start();
 	}

@@ -1,5 +1,7 @@
 package com.kareebo.contacts.crypto;
 
+import com.kareebo.contacts.server.gora.EncryptionAlgorithm;
+import com.kareebo.contacts.server.gora.EncryptionKey;
 import com.kareebo.contacts.server.gora.SignatureAlgorithm;
 import com.kareebo.contacts.server.gora.VerificationKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
@@ -10,6 +12,8 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.security.*;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
 
 import static org.junit.Assert.*;
 
@@ -37,7 +41,7 @@ public class UtilsTest
 		final ECParameterSpec ecSpec=ECNamedCurveTable.getParameterSpec("prime192v1");
 		final KeyPairGenerator g=KeyPairGenerator.getInstance(ecdsa,Utils.getProvider());
 		g.initialize(ecSpec,new SecureRandom());
-		final TestKeyPair keyPair=new TestKeyPair();
+		final TestSignatureKeyPair keyPair=new TestSignatureKeyPair();
 		Signature ecdsaSign=Signature.getInstance("SHA512withECDSA",Utils.getProvider());
 		ecdsaSign.initSign(keyPair.getPrivate());
 		ecdsaSign.update(plaintext);
@@ -71,6 +75,28 @@ public class UtilsTest
 	{
 		assertArrayEquals(x,Utils.xor(a,b));
 		assertArrayEquals(x,Utils.xor(b,a));
+	}
+
+	@Test(expected=Utils.UnsupportedAlgorithmException.class)
+	public void testRSANoPaddingCipherInvalid() throws Exception
+	{
+		final EncryptionKey invalid=new EncryptionKey();
+		invalid.setAlgorithm(EncryptionAlgorithm.Fake);
+		new Utils.RSANoPaddingCipher(invalid);
+	}
+
+	@Test
+	public void testRSANoPaddingCipher() throws Exception
+	{
+		final EncryptionKey valid=new TestEncryptionKeyPair().getEncryptionKey();
+		final ByteBuffer byteBuffer=valid.getBuffer();
+		final Utils.RSANoPaddingCipher rsaNoPaddingCipher=new Utils.RSANoPaddingCipher(valid);
+		assertEquals("RSA/NONE/NoPadding",rsaNoPaddingCipher.cipher.getAlgorithm());
+		final RSAPublicKey key=rsaNoPaddingCipher.publicKey;
+		assertEquals("RSA",key.getAlgorithm());
+		final ByteBuffer keyBuffer=ByteBuffer.wrap(new X509EncodedKeySpec(key.getEncoded()).getEncoded());
+		keyBuffer.mark();
+		assertEquals(byteBuffer,keyBuffer);
 	}
 
 	@Test

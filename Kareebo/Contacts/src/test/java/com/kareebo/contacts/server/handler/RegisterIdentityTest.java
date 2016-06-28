@@ -1,6 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
+import com.kareebo.contacts.crypto.TestEncryptionKeyPair;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.gora.EncryptionAlgorithm;
 import com.kareebo.contacts.server.gora.EncryptionKey;
@@ -482,7 +483,7 @@ public class RegisterIdentityTest
 			{
 				clientId.setUser(user);
 				clientId.setClient(client);
-				publicKeys.setEncryption(SignatureVerifierTestBase.setUpEncryptionKey("ab".getBytes()));
+				publicKeys.setEncryption(TypeConverter.convert(new TestEncryptionKeyPair().getEncryptionKey()));
 				publicKeys.setVerification(TypeConverter.convert(verificationKey));
 				setupRegisterIdentityInput();
 				registerIdentityInput.setPublicKeys(publicKeys);

@@ -10,7 +10,7 @@ import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.client.persistentStorage.PersistedObjectRetriever;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorage;
 import com.kareebo.contacts.client.protocol.ServiceDispatcher;
-import com.kareebo.contacts.crypto.TestKeyPair;
+import com.kareebo.contacts.crypto.TestSignatureKeyPair;
 import com.kareebo.contacts.server.gora.*;
 import com.kareebo.contacts.server.handler.ClientNotifierBackend;
 import com.kareebo.contacts.server.handler.GraphAccessor;
@@ -284,7 +284,7 @@ abstract class IntegrationTestBase
 	private static class TestPersistentStorage implements PersistentStorage
 	{
 		private final Map<String,byte[]> cache=new HashMap<>(2);
-		private final TestKeyPair keyPair=new TestKeyPair();
+		private final TestSignatureKeyPair keyPair=new TestSignatureKeyPair();
 
 		private TestPersistentStorage() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 		{

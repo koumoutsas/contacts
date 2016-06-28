@@ -21,7 +21,7 @@ public class ContextRetrieverTest
 	public void test() throws Exception
 	{
 		final PersistentStorageImplementation persistentStorageImplementation=new PersistentStorageImplementation();
-		final ContextRetriever contextRetriever=new ContextRetriever(persistentStorageImplementation);
+		final ContextRetriever contextRetriever=new ContextRetriever(new PersistedObjectRetriever(persistentStorageImplementation));
 		final Context context1=ContextRetriever.create();
 		Context context2=ContextRetriever.create();
 		int numberOfRetries=0;

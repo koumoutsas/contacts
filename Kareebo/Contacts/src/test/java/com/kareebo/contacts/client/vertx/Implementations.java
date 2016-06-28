@@ -2,7 +2,7 @@ package com.kareebo.contacts.client.vertx;
 
 import com.kareebo.contacts.client.jobs.*;
 import com.kareebo.contacts.client.persistentStorage.PersistentStorage;
-import com.kareebo.contacts.crypto.TestKeyPair;
+import com.kareebo.contacts.crypto.TestSignatureKeyPair;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.SignatureAlgorithm;
 import com.kareebo.contacts.thrift.client.persistentStorage.PersistentStorageConstants;
@@ -77,7 +77,7 @@ class Implementations
 		@Nonnull
 		private byte[] getSigningKey() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, TException
 		{
-			final ByteBuffer buffer=ByteBuffer.wrap(new PKCS8EncodedKeySpec(new TestKeyPair().getPrivate().getEncoded()).getEncoded());
+			final ByteBuffer buffer=ByteBuffer.wrap(new PKCS8EncodedKeySpec(new TestSignatureKeyPair().getPrivate().getEncoded()).getEncoded());
 			buffer.mark();
 			return new TSerializer().serialize(new com.kareebo.contacts.thrift.client.SigningKey(buffer,SignatureAlgorithm.Fake));
 		}

@@ -5,7 +5,7 @@ import com.kareebo.contacts.client.jobs.FinalResultEnqueuer;
 import com.kareebo.contacts.client.jobs.IntermediateJob;
 import com.kareebo.contacts.client.jobs.IntermediateResultEnqueuer;
 import com.kareebo.contacts.crypto.SigningKey;
-import com.kareebo.contacts.crypto.TestKeyPair;
+import com.kareebo.contacts.crypto.TestSignatureKeyPair;
 import com.kareebo.contacts.thrift.ClientId;
 import com.kareebo.contacts.thrift.LongId;
 import com.kareebo.contacts.thrift.client.jobs.Context;
@@ -76,7 +76,7 @@ public class ServiceDispatcherTest
 	{
 		try
 		{
-			signingKeyExpected=new TestKeyPair().signingKey();
+			signingKeyExpected=new TestSignatureKeyPair().signingKey();
 		}
 		catch(InvalidKeySpecException|NoSuchAlgorithmException|InvalidAlgorithmParameterException|NoSuchProviderException e)
 		{

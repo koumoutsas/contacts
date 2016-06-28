@@ -1,6 +1,6 @@
 package com.kareebo.contacts.server.handler;
 
-import com.kareebo.contacts.crypto.TestKeyPair;
+import com.kareebo.contacts.crypto.TestSignatureKeyPair;
 import com.kareebo.contacts.crypto.Utils;
 import com.kareebo.contacts.server.gora.VerificationKey;
 import com.kareebo.contacts.thrift.ClientId;
@@ -20,13 +20,13 @@ import static org.junit.Assert.fail;
 class Signer
 {
 	protected VerificationKey verificationKey;
-	private TestKeyPair keyPair;
+	private TestSignatureKeyPair keyPair;
 
 	Signer()
 	{
 		try
 		{
-			keyPair=new TestKeyPair();
+			keyPair=new TestSignatureKeyPair();
 			verificationKey=keyPair.verificationKey();
 		}
 		catch(InvalidAlgorithmParameterException|NoSuchProviderException|NoSuchAlgorithmException e)

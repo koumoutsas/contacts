@@ -1,6 +1,7 @@
 package com.kareebo.contacts.server.handler;
 
 import com.kareebo.contacts.base.TypeConverter;
+import com.kareebo.contacts.crypto.TestEncryptionKeyPair;
 import com.kareebo.contacts.server.gora.User;
 import com.kareebo.contacts.thrift.EncryptionAlgorithm;
 import com.kareebo.contacts.thrift.EncryptionKey;
@@ -13,6 +14,7 @@ import org.vertx.java.core.Future;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,9 +30,9 @@ public class ModifyKeysTest
 		new Base()
 		{
 			@Override
-			PublicKeys createKeys() throws NoSuchAlgorithmException
+			PublicKeys createKeys() throws NoSuchAlgorithmException, NoSuchProviderException
 			{
-				return new PublicKeys(setUpEncryptionKey("abc".getBytes()),TypeConverter.convert(verificationKey));
+				return new PublicKeys(TypeConverter.convert(new TestEncryptionKeyPair().getEncryptionKey()),TypeConverter.convert(verificationKey));
 			}
 
 			void run() throws NoSuchAlgorithmException
@@ -58,9 +60,9 @@ public class ModifyKeysTest
 			}
 
 			@Override
-			PublicKeys createKeys() throws NoSuchAlgorithmException
+			PublicKeys createKeys() throws NoSuchAlgorithmException, NoSuchProviderException
 			{
-				final EncryptionKey encryptionKey=setUpEncryptionKey("abc".getBytes());
+				final EncryptionKey encryptionKey=TypeConverter.convert(new TestEncryptionKeyPair().getEncryptionKey());
 				encryptionKey.setAlgorithm(EncryptionAlgorithm.Fake);
 				return new PublicKeys(encryptionKey,TypeConverter.convert(verificationKey));
 			}
@@ -82,7 +84,7 @@ public class ModifyKeysTest
 			super.setUp();
 		}
 
-		abstract PublicKeys createKeys() throws NoSuchAlgorithmException;
+		abstract PublicKeys createKeys() throws NoSuchAlgorithmException, NoSuchProviderException;
 
 		@Override
 		SignatureVerifier construct(final DataStore<Long,User> dataStore)

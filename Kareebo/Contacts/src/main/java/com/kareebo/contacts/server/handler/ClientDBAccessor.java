@@ -82,6 +82,26 @@ class ClientDBAccessor
 	}
 
 	/**
+	 * Get a user by id
+	 *
+	 * @param id The user id
+	 * @return The user
+	 * @throws FailedOperation If there is no user for the id
+	 */
+	@Nonnull
+	User get(final @Nonnull Long id) throws FailedOperation
+	{
+		user=dataStore.get(id,queryFields);
+		if(user==null)
+		{
+			logger.error("No user for "+id);
+			resetState();
+			throw new FailedOperation();
+		}
+		return user;
+	}
+
+	/**
 	 * Set a client for a user, without calling get first. The client can exist already, in
 	 * which case it's an update, or not, in which case it's an insert.
 	 *
@@ -164,26 +184,6 @@ class ClientDBAccessor
 	void close()
 	{
 		dataStore.close();
-	}
-
-	/**
-	 * Get a user by id
-	 *
-	 * @param id The user id
-	 * @return The user
-	 * @throws FailedOperation If there is no user for the id
-	 */
-	@Nonnull
-	User get(final @Nonnull Long id) throws FailedOperation
-	{
-		user=dataStore.get(id,queryFields);
-		if(user==null)
-		{
-			logger.error("No user for "+id);
-			resetState();
-			throw new FailedOperation();
-		}
-		return user;
 	}
 
 	/**
